@@ -1,0 +1,54 @@
+# -*- mode: snippet -*-
+# name: babel-shell
+# key: babel-shell
+# --
+
+* Setup
+
+Bash should terminate in case a command or chain of command finishes with a non-zero exit status.
+Terminate the script in case an uninitialized variable is accessed.
+See: https://github.com/azet/community_bash_style_guide#style-conventions
+
+#+BEGIN_SRC sh
+set -e
+set -u
+#+END_SRC
+
+
+* Readonly Variables
+
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+* Global Variables
+
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+
+* Functions
+
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+* Main
+
+#+BEGIN_SRC sh
+main() {
+
+}
+main
+#+END_SRC
+
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ${1:~/bin/`(file-name-nondirectory (file-name-sans-extension (buffer-file-name)))`}
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env ${2:sh}
+#+DESCRIPTION: $0

@@ -1,0 +1,244 @@
+#==============================================
+#           Networking
+#==============================================
+
+#Show the TCP and UDP ports being listened on with the process associated, user, etc.
+alias lport="sudo netstat -lepunt"
+
+#--------------------------------------
+# Simple Python Servers
+#--------------------------------------
+
+#run simple python server from directory
+alias simpleServer="python -m SimpleHTTPServer"
+
+#use simple python server to view jekyll site from _all directory. Useful for when you use SVG's as much as I do.
+alias jserver="cd ..; jekyll --no-server; cd _site; simpleServer"
+
+
+#--------------------------------------
+# OpenWRT easy ssh and scp node Alias's
+#--------------------------------------
+alias oscp='scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
+alias ossh='ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
+
+#==============================================
+#           Listserv grabber
+#	Quickly pull down a whole listserv archive and time it too
+#	Because... openthreads.
+#
+#	Will pull down entire listserv and place a concatinated textfile
+#	in a file called archive.
+#
+#
+#	Usage: listserv <URL> <TYPE>
+#
+#	Options
+#		TYPE	[ txt | gz ] gz will download and unpack gzip bundled
+#				archives. Text will do the same for plain text archives.
+#
+#==============================================
+
+
+alias listserv='time get_listserv'
+
+get_listserv()
+{
+	wget --no-directories  --no-check-certificate --accept=.$2 -r -l1 $1
+	if [[ $2 ==  "gz" ]]; then
+		for file in *.gz ; do gzip -d $file; done
+		for file in *.txt; do cat $file >> archive; done
+	else
+		for file in *.txt; do cat $file >> archive; done
+	fi
+	echo "You spent ↓ ammount of time scraping that poor listservs site"
+}
+
+#==============================================
+#           Command Line Navigation
+#==============================================
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+#Quick easy cd history
+alias ..='cd ..'
+alias ...='cd ../..'
+
+#----------------------------------------------
+#           Extreem Change Directory
+#
+# Usage: cd <arg>
+# 
+# 
+# --	show stack of recent paths.
+# -#	cd to path number #
+#
+# Examples:
+#     1)	User@Computer:~$ cd --
+#            0  ~
+# 			 1  /usr/lib/git-core/mergetools
+# 			 2  /usr/bin
+# 			 3  ~/Documents
+# 			 4  ~/Downloads
+#  
+#     2)    User@Computer:~$ cd -1
+#	  		User@Computer:/usr/lib/git-core/mergetools$
+#
+#----------------------------------------------
+cd_func ()
+{
+  local x2 the_new_dir adir index
+  local -i cnt
+
+  if [[ $1 ==  "--" ]]; then
+    dirs -v
+    return 0
+  fi
+
+  the_new_dir=$1
+  [[ -z $1 ]] && the_new_dir=$HOME
+
+  if [[ ${the_new_dir:0:1} == '-' ]]; then
+    #
+    # Extract dir N from dirs
+    index=${the_new_dir:1}
+    [[ -z $index ]] && index=1
+    adir=$(dirs +$index)
+    [[ -z $adir ]] && return 1
+    the_new_dir=$adir
+  fi
+
+  # '~' has to be substituted by ${HOME}
+  [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
+
+  # Now change to the new dir and add to the top of the stack
+  pushd "${the_new_dir}" > /dev/null
+  [[ $? -ne 0 ]] && return 1
+  the_new_dir=$(pwd)
+
+  # Trim down everything beyond 11th entry
+  popd -n +11 2>/dev/null 1>/dev/null
+
+  # Remove any other occurence of this dir, skipping the top of the stack
+  for ((cnt=1; cnt <= 10; cnt++)); do
+    x2=$(dirs +${cnt} 2>/dev/null)
+    [[ $? -ne 0 ]] && return 0
+    [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
+    if [[ "${x2}" == "${the_new_dir}" ]]; then
+      popd -n +$cnt 2>/dev/null 1>/dev/null
+      cnt=cnt-1
+    fi
+  done
+
+  return 0
+}
+alias cd=cd_func
+
+
+#==============================================
+#           fun command line pranks
+#==============================================
+
+alias rainbow='for i in {1..665535};do printf "%x\n" $i;done|while read -r u;do printf "\033[38;5;$((16+$((16#$u))%230))m\u$u\033[0m";done'
+
+
+#==============================================
+#           Utilities
+#==============================================
+
+#Make valgrind track origins
+alias valgrind="valgrind --track-origins=yes"
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+#find installed files (good for grepping for dependencies. "installed |grep DEPEN")
+alias installed='dpkg --get-selections | grep -v deinstall'
+
+# Hide the previous command you just ran and forgot to use space.
+alias hideprev='history -d $((HISTCMD-2)) && history -d $((HISTCMD-1))'
+
+undel_func(){
+	echo "Searching for deleted file with string $1"
+	# *"Attempt"* to recover an accidentally removed file.
+	sudo fgrep --binary-files=text -C 2000 "$1" /dev/sda > recovereddata.out
+}
+alias undelete=undel_func
+
+#----------------------------------------------
+#		DD-Status
+# 	Get the status of a currently running dd process
+#
+#	Use in a terminal NOT running the current dd!
+#
+#	Usage: ddstat
+#
+#----------------------------------------------
+alias ddstat="sudo kill -USR1 `pgrep -l '^dd$' | cut -f 1 -d \" \"`"
+
+
+burnusb() {
+	sudo dd if=$1 of=$2 bs=4M conv=sync
+	sync
+	ding
+	notify-send -u critical 'burnusb' 'done'
+}
+
+
+extract() {
+	if [ -f $1 ] ; then
+		case $1 in
+			*.tar.bz2) tar xvjf $1 ;;
+			*.tar.gz) tar xvzf $1 ;;
+			*.bz2) bunzip2 $1 ;;
+			*.rar) unrar x $1 ;;
+			*.gz) gunzip $1 ;;
+			*.tar) tar xvf $1 ;;
+			*.tbz2) tar xvjf $1 ;;
+			*.tgz) tar xvzf $1 ;;
+			*.zip) unzip $1 ;;
+			*.Z) uncompress $1;;
+			*.7z) 7z x $1 ;;
+			*) echo "'$1' cannot be extracted via >extract<" ;;
+		esac
+	else
+		echo "'$1' is not a valid file"
+	fi
+}
+
+
+curltar() {
+	case $1 in
+		*.tar.bz2) \curl -kL $1 | tar xvjf - ;;
+		*.tar.gz) \curl -kL $1 | tar xvzf - ;;
+		*.bz2) \curl -kL $1 | bunzip2 - ;;
+		*.rar) \curl -kL $1 | unrar x - ;;
+		*.gz) \curl -kL $1 | gunzip - ;;
+		*.tar) \curl -kL $1 | tar xvf - ;;
+		*.tbz2) \curl -kL $1 | tar xvjf - ;;
+		*.tgz) \curl -kL $1 | tar xvzf - ;;
+		*.zip) \curl -kL $1 | unzip - ;;
+		*.Z) \curl -kL $1 | uncompress - ;;
+		*.7z) \curl -kL $1 | 7z x - ;;
+		*) \curl -kLO $1
+	esac
+}
+
+whitenoise() { aplay -c 2 -f S16_LE -r 44100 /dev/urandom ;}
+

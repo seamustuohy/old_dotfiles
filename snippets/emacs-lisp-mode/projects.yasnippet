@@ -1,0 +1,27 @@
+# -*- mode: snippet -*-
+# name: project
+# key: project
+# --
+;; ${1:`(replace-regexp-in-string "-" " " (capitalize (file-name-nondirectory (file-name-sans-extension (buffer-file-name)))))`}
+;; Copyright (C) `(format-time-string "%Y")` `(user-full-name)`
+;; Keywords: $2
+;; Author: `(user-full-name)` `user-mail-address`
+;; Maintainer: `(user-full-name)` `user-mail-address`
+;; Created: `(format-time-string "%Y %b %d")`
+
+;; NOTICE
+;;
+;; CONFIDENTIAL - Do not duplicate or distribute without written permission From seamus tuohy
+;;
+
+(append 'org-agenda-files (quote ("$3")))
+
+(append 'org-capture-templates
+	(quote (("${4:K}" "${5:project name here}")
+	("t" "todo" entry (id "${6:ID-NUMBER-OF-Entry-4fc5-b965-ec2b2ba3kd89b}")
+	 "* TODO %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t))))
+
+(provide   'init-project-${7:`(file-name-nondirectory (file-name-sans-extension (buffer-file-name)))`})
+(run-hooks $7-load-hook)
+
+;;; XXX.el ends here

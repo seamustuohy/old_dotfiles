@@ -1,0 +1,30 @@
+#+TITLE: inputrc
+#+AUTHOR: seamus tuohy
+#+EMAIL: s2e@seamustuohy.com
+#+DATE: <2015-04-28 Tue>
+#+TAGS: bash commandline
+
+
+* I want to search backwards from the command types.
+
+You can get [[http://codeinthehole.com/writing/the-most-important-command-line-tip-incremental-history-searching-with-inputrc/][an explanation here.]] Among a variety of other places.
+
+#+BEGIN_QUOTE
+These lines need to be placed in your ~/.inputrc file, the start-up script for the Readline utility used by Bash (as well as several other applications) and others). The important commands here are the first two, which bind your up and down cursor keys to incrementally search your history. (The second two ensure that left and right continue to work correctly).
+#+END_QUOTE
+
+#+BEGIN_SRC sh
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\e[C": forward-char
+"\e[D": backward-char
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.inputrc
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env bash
+#+DESCRIPTION: My inputrc file.

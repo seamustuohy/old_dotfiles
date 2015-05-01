@@ -1,0 +1,209 @@
+#+TITLE: Install
+#+AUTHOR: seamus tuohy
+#+EMAIL: s2e@seamustuohy.com
+#+DATE: 2015 Apr 18
+#+TAGS: org emacs install build bash
+
+* Setup
+
+Bash should terminate in case a command or chain of command finishes with a non-zero exit status.
+Terminate the script in case an uninitialized variable is accessed.
+See: https://github.com/azet/community_bash_style_guide#style-conventions
+
+#+BEGIN_SRC sh
+#set -e
+#set -u
+set -x
+#+END_SRC
+
+* Readonly Variables
+NONE
+
+* Global Variables
+#+BEGIN_SRC sh
+  readonly resource_dir=~/.emacs.d/resources
+  readonly elisp_dir=~/.emacs.d/elisp
+  readonly cache_dir=~/.emacs.d/cache
+  readonly emacs_package_dir=~/.emacs.d/packages
+  readonly prog_name=$(basename $0)
+  readonly prog_dir=$(readlink -m $(dirname $0))
+#+END_SRC
+
+* Functions
+
+** Environment Creation
+
+#+BEGIN_SRC sh
+create_emacs_paths(){
+    mkdir -p "$resource_dir"
+    mkdir -p "$cache_dir"
+    mkdir -p "$elisp_dir"
+}
+#+END_SRC
+
+** Dependencies
+
+#+BEGIN_SRC sh
+  install_package_deps() {
+      sudo apt-get -y install \
+          zip \
+          unzip \
+          tree \
+          vim \
+          wget \
+          time \
+          python-pip \
+          sqlite3 \
+          pylint \
+          gnutls-bin
+  }
+#+END_SRC
+
+#+BEGIN_SRC sh
+  install_emacs_deps() {
+      install_thesaurus
+      install_write_good
+      install_guru_mode
+      install_cask
+      install_code_checkers
+      install_calfw
+      install_orgcaldav
+  }
+#+END_SRC
+
+** Installation
+
+*** Thesarus
+Check for a thesaurus and if it does not exist install it.
+#+BEGIN_SRC sh
+install_thesaurus() {
+    #Check for & get thesaurus if missing
+    local thes_name=mthes10.txt
+    local zip_name=mthes10.zip
+    local url=ftp://ibiblio.org/pub/docs/books/gutenberg/etext02/mthes10.zip
+    if [[ ! -e $resource_dir/$thes_name ]]; then
+        local tmpdir=$(mktemp -dt "$(basename "$0").XXXXX")
+        wget --output-document="$tmpdir"/$zip_name "$url"
+        unzip "$tmpdir"/mthes10.zip -d $resource_dir/$thes_name
+    fi
+
+    #Check for & get synonym.el if missing
+    local syn_file="$emacs_package_dir"/synonyms/synonyms.el
+    local syn_el_url=http://www.emacswiki.org/emacs/download/synonyms.el
+    if [[ ! -e $syn_file ]]; then
+        mkdir --parents "$emacs_package_dir"/synonyms/
+        wget --output-document=$syn_file "$syn_el_url"
+    fi
+}
+#+END_SRC
+
+*** Write Good
+#+BEGIN_SRC sh
+  install_write_good() {
+      get_git_package "$emacs_package_dir"/writegood-mode https://github.com/bnbeckwith/writegood-mode.git
+  }
+#+END_SRC
+
+*** calfw
+#+BEGIN_SRC sh
+  install_calfw() {
+      get_git_package "$emacs_package_dir"/calfw https://github.com/kiwanami/emacs-calfw.git
+  }
+#+END_SRC
+
+*** org-caldav
+#+BEGIN_SRC sh
+  install_orgcaldav() {
+      get_git_package "$emacs_package_dir"/org-caldav https://github.com/dengste/org-caldav.git
+  }
+#+END_SRC
+
+*** Guru Mode
+#+BEGIN_SRC sh
+  install_guru_mode() {
+      get_git_package "$emacs_package_dir"/guru-mode https://github.com/bbatsov/guru-mode.git
+  }
+#+END_SRC
+
+*** Cask
+#+BEGIN_SRC sh
+  install_cask() {
+    local tmpdir=$(mktemp -dt "$(basename "$0").XXXXX")
+    local cask_dir=~/.cask
+    git clone  https://github.com/cask/cask.git "${tmpdir}"
+    cd "${tmpdir}"
+    python go
+    cd ~/.emacs.d
+    export PATH="/home/test/.cask/bin:$PATH"
+    cask
+    cd "${prog_dir}"
+  }
+#+END_SRC
+
+*** Git Package Grabber
+#+BEGIN_SRC sh
+  get_git_package() {
+      local package_dir="${1}"
+      local repo="${2}"
+      if [[ ! -e $package_dir ]]; then
+          git clone "$repo"  "$package_dir"
+      else # Update to the latest version for good measure.
+          git --git-dir="$package_dir"/.git --work-tree="$package_dir"  pull
+      fi
+  }
+#+END_SRC
+
+*** Code Checkers
+install_code_checkers() {
+sudo pip install flake8
+sudo apt-get -y install shellcheck
+}
+
+*** Code Tangler
+#+BEGIN_SRC sh
+tangle_code() {
+for DIR in ~/.dotfiles/configs/emacs ~/.dotfiles/bin ~/.dotfiles/configs/bash ~/.dotfiles/configs/git
+do
+        tangle $DIR
+done
+}
+#+END_SRC
+
+#+BEGIN_SRC sh
+  tangle() {
+      for file in "$1"/*.org; do
+          emacs $file --batch --eval="(org-babel-tangle)"
+      done
+  }
+#+END_SRC
+
+** Links
+#+BEGIN_SRC sh
+link_lisp() {
+        ln -s  ~/.dotfiles/configs/emacs/Cask ~/.emacs.d/Cask || true
+        ln -s ~/.dotfiles/templates/emacs/  ~/.emacs.d/templates || true
+}
+
+#+END_SRC
+
+* Main
+
+#+BEGIN_SRC sh
+main() {
+    create_emacs_paths
+    tangle_code
+    link_lisp
+    install_emacs_deps
+}
+main
+#+END_SRC
+
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.bin/install
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env bash
+#+DESCRIPTION: Installs the various packages that I need.

@@ -1,0 +1,282 @@
+#+TITLE: Emacs Email
+#+AUTHOR: s2e
+#+EMAIL: s2e@device
+#+DATE: 2015 Apr 19
+#+TAGS: email
+
+* Get Gnus Started
+
+#+BEGIN_SRC emacs-lisp
+(require 'message)
+(require 'gnus)
+(require 'starttls)
+(require 'epg)
+(require 'epa)
+(setq epa-popup-info-window nil)
+(require 'smtpmail)
+(require 'spam)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-gnus)
+#+END_SRC
+
+* Storage
+* Display
+
+inverted sorting: newest threads on top
+#+BEGIN_SRC emacs-lisp
+(setq gnus-thread-sort-functions '(gnus-thread-sort-by-number (not gnus-thread-sort-by-date)))
+#+END_SRC
+
+http://groups.google.com/group/gnu.emacs.gnus/browse_thread/thread/a673a74356e7141f
+#+BEGIN_SRC emacs-lisp
+(when window-system
+  (setq gnus-sum-thread-tree-indent "  ")
+  (setq gnus-sum-thread-tree-root "") ;; "● ")
+  (setq gnus-sum-thread-tree-false-root "") ;; "◯ ")
+  (setq gnus-sum-thread-tree-single-indent "") ;; "◎ ")
+  (setq gnus-sum-thread-tree-vertical        "│")
+  (setq gnus-sum-thread-tree-leaf-with-other "├─► ")
+  (setq gnus-sum-thread-tree-single-leaf     "╰─► "))
+(setq gnus-summary-line-format
+      (concat
+       "%0{%U%R%z%}"
+       "%3{│%}" "%1{%d%}" "%3{│%}" ;; date
+       "  "
+       "%4{%-20,20f%}"               ;; name
+       "  "
+       "%3{│%}"
+       " "
+       "%1{%B%}"
+       "%s\n"))
+(setq gnus-summary-display-arrow t)
+#+END_SRC
+
+ reconfigure buffer positions for a wider screen
+
+#+BEGIN_SRC emacs-lisp
+  (gnus-add-configuration ; summary view
+   '(summary
+     (horizontal 1.0
+                 (vertical 1.0 (group 0.25) (summary 1.0 point)))))
+  (gnus-add-configuration ; article view
+   '(article
+     (horizontal 1.0
+                 (vertical 0.45 (group 0.25) (summary 1.0 point) ("*BBDB*" 0.15))
+                 (vertical 1.0 (article 1.0)))))
+  (gnus-add-configuration ; post new stuff
+   '(edit-form
+     (horizontal 1.0
+                 (vertical 0.45 (group 0.25) (edit-form 1.0 point) ("*BBDB*" 0.15))
+                 (vertical 1.0 (article 1.0)))))
+  (gnus-add-configuration ; score editing
+   '(edit-score
+     (horizontal 1.0
+                 (vertical 0.45 (group 0.25) (edit-score 1.0 point) ("*BBDB*" 0.15))
+                 (vertical 1.0 (article 1.0)))))
+  (gnus-add-configuration ; score tracing
+   '(score-trace
+     (horizontal 1.0
+                 (vertical 0.45 (group 0.25) (score-trace 1.0 point) ("*BBDB*" 0.15))
+                 (vertical 1.0 (article 1.0)))))
+#+END_SRC
+
+I'd prefer text/plain messages (with inline attachments)
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "mm-decode"
+  '(progn
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext")))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq gnus-mime-view-all-parts t ; View all the MIME parts in current
+        gnus-always-read-dribble-file 1) ; always read auto-save file
+#+END_SRC
+
+I'd prefer to have sane default headers
+#+BEGIN_SRC emacs-lisp
+  (setq gnus-visible-headers '("^From:\\|^Subject:\\|To:\\|^Cc:\\|^Date:\\|^Newsgroups:\\|^User-Agent:\\|^X-Newsreader:\\|^X-Mailer:")
+  gnus-sorted-header-list gnus-visible-headers)
+#+END_SRC
+
+* Searching
+
+#+BEGIN_SRC emacs-lisp
+  (defun notmuch-file-to-group (file)
+    "Calculate the Gnus group name from the given file name."
+    (let ((group (file-name-directory (directory-file-name (file-name-directory file)))))
+      (setq group (replace-regexp-in-string ".*/Maildir/" "nnimap+USER:" group))
+      (setq group (replace-regexp-in-string "/$" "" group))
+      (if (string-match ":$" group)
+          (concat group "INBOX")
+        (replace-regexp-in-string ":\\." ":" group))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (defun notmuch-goto-message-in-gnus ()
+    "Open a summary buffer containing the current notmuch
+   article."
+    (interactive)
+    (unless (gnus-alive-p) (with-temp-buffer (gnus)))
+    (let ((group (notmuch-file-to-group (notmuch-show-get-filename)))
+          (message-id
+           (replace-regexp-in-string "\"" ""
+                                     (replace-regexp-in-string "^id:" ""
+                                                               (notmuch-show-get-message-id)))))
+      (if (and group message-id)
+          (progn
+            (gnus-summary-read-group group 1) ; have to show at least one old message
+            (gnus-summary-refer-article message-id)) ; simpler than org-gnus method?
+        (message "Couldn't get relevant infos for switching to Gnus."))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (define-key notmuch-show-mode-map (kbd "C-c C-c") 'notmuch-goto-message-in-gnus)
+#+END_SRC
+
+** Splitting
+I want message ids to be saved for as long as possible so I keep a large cache.  (A value of 5000 appears to create a file some 300 kBytes in size.)
+#+BEGIN_SRC emacs-lisp
+  ;; (setq nnmail-message-id-cache-length 20000)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+
+  ;;TODO MOVE THIS OUT OF EMAIL SO THAT IT IS USED BY OTHER FUNCTIONS and TOOLS
+  ;;(setq stte-project-dictionaries ())
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (defun stte-nnmail-split-projects ()
+  ;;   "A function that checks for project specific keywords assigned elsewhere and splits an email based upon those rule sets"
+  ;;   (let (pineapple)
+  ;;     (message "TODO search by keyword in body against project dictionaries")
+  ;;     (message "TODO")))
+#+END_SRC
+
+My splitting rules
+
+#+BEGIN_SRC emacs-lisp
+  ;; (setq nnmail-treat-duplicates 'warn     ; or delete
+  ;;       nnmail-cache-accepted-message-ids t
+  ;;       nnmail-split-fancy
+  ;;       '(| (: nnmail-split-fancy-with-parent) ; (1)
+  ;;           (: stte-nnmail-split-projects) ; (2)
+  ;;           ;; other splits go here
+  ;;         ))
+#+END_SRC
+
+(1) [[https://www.gnu.org/software/emacs/manual/html_node/gnus/Fancy-Mail-Splitting.html][nnmail-split-fancy-with-parent]] is a function which allows you to split followups into the same groups their parents are in. Sometimes you can’t make splitting rules for all your mail. For example, your boss might send you personal mail regarding different projects you are working on, and as you can’t tell your boss to put a distinguishing string into the subject line, you have to resort to manually moving the messages into the right group. With this function, you only have to do it once per thread.
+
+(2)
+
+* Basic configuration
+** Remove news server
+[[http://koldfront.dk/text/gnus-email-tutorial.html][
+So I add this to ~/.gnus (to avoid Gnus trying to connect to a non-existant local news server)]]
+#+BEGIN_SRC emacs-lisp
+(setq gnus-select-method '(nnnil ""))
+#+END_SRC
+
+** Email Splitting Core
+
+Core email splitting Rule
+#+BEGIN_SRC emacs-lisp
+   (setq nnimap-split-rule 'nnmail-split-fancy)
+   (setq nnmail-split-methods 'nnimap-split-fancy)
+   (gnus-registry-initialize)
+#+END_SRC
+
+** Email Cache
+
+#+BEGIN_SRC emacs-lisp
+  (setq gnus-directory "~/.emacs.d/News/"
+        message-directory "~/.emacs.d/Mail/"
+        gnus-agent-directory (concat gnus-directory "agent/")
+        gnus-cache-directory (concat gnus-directory "cache/")
+        gnus-cache-active-file (concat gnus-directory "cache/active") ; no slash! this is a file, not a directory!
+        gnus-article-save-directory (concat gnus-directory "save/")
+        gnus-kill-files-directory (concat gnus-directory "killfiles/")
+        nndraft-directory (concat message-directory "drafts/")
+        nnfolder-directory (concat message-directory "archive/"))
+#+END_SRC
+
+** Basic Configuration largely stolen from [[https://github.com/dertuxmalwieder/My-Emacs-config/blob/master/.gnus.el][dertuxmalwieder]]
+
+#+BEGIN_SRC emacs-lisp
+(setq gnus-summary-gather-subject-limit 'fuzzy
+      gnus-inhibit-startup-message t
+      gnus-play-startup-jingle nil
+      gnus-interactive-exit nil)
+#+END_SRC
+
+** Email Groups
+
+Set an empty gnus-parameters so that projects can add-to-list what they need for their projects.
+#+BEGIN_SRC emacs-lisp
+(setq gnus-parameters '())
+#+END_SRC
+
+** Topic Sorting
+
+;; Start the topic view
+#+BEGIN_SRC emacs-lisp
+(add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+#+END_SRC
+
+
+* SPAM
+#+BEGIN_SRC emacs-lisp
+(setq spam-use-spamassassin t)
+(setq spam-spamassassin-path "/usr/bin/vendor_perl/spamassassin")
+(setq spam-use-spamassassin-headers t)
+(setq smiley-style 'medium)
+#+END_SRC
+
+** TODO Explore these configs
+*** Hook to display dormant article in Gnus
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-follow-link-hook
+          (lambda ()
+            (if (eq major-mode 'gnus-summary-mode)
+                (gnus-summary-insert-dormant-articles))))
+#+END_SRC
+
+*** Working Mail and org
+#+BEGIN_SRC emacs-lisp
+(setq org-link-frame-setup '((gnus . gnus) (file . find-file-other-window)))
+#+END_SRC
+
+*** Mail to
+#+BEGIN_SRC emacs-lisp
+(setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
+#+END_SRC
+
+*** Web links
+#+BEGIN_SRC emacs-lisp
+(setq org-gnus-prefer-web-links nil)
+#+END_SRC
+
+
+* Technical Artifacts
+
+  Make sure that we can simply =require= this library.
+
+#+BEGIN_SRC elisp
+  (provide 'init-emacs-email)
+#+END_SRC
+
+  Before you can build this on a new system, make sure that you put
+  the cursor over any of these properties, and hit: =C-c C-c=
+
+#+DESCRIPTION: email
+#+PROPERTY:    results silent
+#+PROPERTY:    tangle ~/.emacs.d/elisp/emacs-email.el
+#+PROPERTY:    eval no-export
+#+PROPERTY:    comments org
+#+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil
+#+OPTIONS:     skip:nil author:nil email:nil creator:nil timestamp:nil
+#+INFOJS_OPT:  view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js

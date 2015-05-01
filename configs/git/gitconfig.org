@@ -1,0 +1,47 @@
+#+TITLE: gitconfig
+#+AUTHOR: seamus tuohy
+#+EMAIL: s2e@seamustuohy.com
+#+DATE: 2015 Apr 18
+#+TAGS: git  commandline
+
+#+BEGIN_SRC sh
+[core]
+	editor = emacs
+	
+[push]
+	default = current
+	
+[user]
+	name = seamus tuohy
+	email = stuohy@internews.org
+
+[grep]
+	extendedRegexp = true
+	lineNumber = true
+	
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	pdiff = diff --ignore-space-at-eol -b -w
+	churn = !sh -c '~/.dotfiles/git/alias/churn'
+	contrib = !sh -c '~/.dotfiles/git/alias/contributor $1 $2' -
+	overwritten = !sh -c '~/.dotfiles/git/alias/git-overwritten $1 $2 $3 ' -
+	merge = merge --no-ff
+
+[alias]
+	churn = !sh -c '~/.dotfiles/git/alias/churn'
+
+[color]
+	ui = always
+	status = true
+
+[commit]
+	template=~/.dotfiles/git/template
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.gitconfig
+#+PROPERTY: comments org
+#+DESCRIPTION: My BashRC file

@@ -1,0 +1,28 @@
+#!/bin/sh
+# -*- mode: shell-script -*-
+#
+# tangle files with org-mode
+#
+set -x
+set -e
+
+prep_dir() {
+    mkdir -p ~/.bin
+}
+
+tangle() {
+    emacs ~/.dotfiles/install.org --batch --eval="(org-babel-tangle)"
+}
+
+run() {
+    ~/.bin/install
+
+}
+
+main() {
+    prep_dir
+    tangle
+#    run
+}
+
+main

@@ -1,0 +1,165 @@
+#+TITLE: Bashrc
+#+AUTHOR: seamus tuohy
+#+EMAIL: s2e@seamustuohy.com
+#+DATE: 2015 Apr 18
+#+TAGS: bash commandline
+
+
+* Editor
+
+
+# ~/.bashrc: executed by bash(1) for non-login shells.
+  # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+
+#set default editor to emacs
+export EDITOR=emacs
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+* History
+
+#==================================
+#        HISTORY CONTROLS
+#==================================
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+#ALSO See: PROMPT_COMMAND below
+
+# remove duplicates while preserving input order
+function dedup {
+   awk '! x[$0]++' $@
+}
+
+# removes $HISTIGNORE commands from input
+function remove_histignore {
+   if [ -n "$HISTIGNORE" ]; then
+      # replace : with |, then * with .*
+      local IGNORE_PAT=`echo "$HISTIGNORE" | sed s/\:/\|/g | sed s/\*/\.\*/g`
+      # negated grep removes matches
+      grep -vx "$IGNORE_PAT" $@
+   else
+      cat $@
+   fi
+}
+
+# clean up the history file by remove duplicates and commands matching
+# $HISTIGNORE entries
+function history_cleanup {
+   local HISTFILE_SRC=~/.bash_history
+   local HISTFILE_DST=/tmp/.$USER.bash_history.clean
+   if [ -f $HISTFILE_SRC ]; then
+      \cp $HISTFILE_SRC $HISTFILE_SRC.backup
+      dedup $HISTFILE_SRC | remove_histignore >| $HISTFILE_DST
+      \mv $HISTFILE_DST $HISTFILE_SRC
+      chmod go-r $HISTFILE_SRC
+      history -c
+      history -r
+   fi
+}
+
+#run histroy cleanup on bash startup
+history_cleanup
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+#==============================
+
+* Colors
+
+#+BEGIN_SRC sh
+export TERM=xterm-color
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+export CLICOLOR=1
+color_prompt=yes
+#+END_SRC
+
+ls Colors
+#+BEGIN_SRC sh
+alias ls='ls --color'
+LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
+export LS_COLORS
+#+END_SRC
+
+* Prompt
+
+#+BEGIN_SRC sh
+PS1="\[\e[32m\]\$(parse_git_branch)\[\e[34m\]\h:\W \$ \[\e[m\]"
+#+END_SRC
+
+#+BEGIN_SRC sh
+PROMPT_COMMAND=prompt_commands
+#+END_SRC
+
+Add additional prompt commands to the function below
+  - update histfile after every command
+
+#+BEGIN_SRC sh
+prompt_commands() {
+	history -a
+}
+#+END_SRC
+
+* Display 
+
+Check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
+#+BEGIN_SRC sh
+shopt -s checkwinsize
+#+END_SRC
+
+* Completion
+
+If set, the pattern "**" used in a pathname expansion context will match all files and zero or more directories and subdirectories.
+#+BEGIN_SRC sh
+shopt -s globstar
+#+END_SRC
+
+
+Enable programmable completion features (you don't need to enable this, if it's already enabled in /etc/bash.bashrc and /etc/profile sources /etc/bash.bashrc).
+
+#+BEGIN_SRC sh
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+#+END_SRC
+
+* Load External
+
+** Alias
+#+BEGIN_SRC sh
+if [ -f ~/.bin/bash_alias ]; then
+    source ~/.bin/bash_alias
+fi
+#+END_SRC
+
+* PATH
+Add CASK to the path for emacs.
+#+BEGIN_SRC sh
+export PATH="$PATH:$HOME/.cask/bin"
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.bashrc
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env bash
+#+DESCRIPTION: My BashRC file
