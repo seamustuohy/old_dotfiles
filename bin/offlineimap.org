@@ -1,0 +1,103 @@
+[[https://wiki.archlinux.org/index.php/OfflineIMAP][See the password section tool from the arch wiki]]
+
+#+BEGIN_SRC python
+  # import re
+  # import sys
+  # import gtk
+  # import gnomekeyring as gkey
+
+  # class Keyring(object):
+  #     def __init__(self, name, server, protocol):
+  #         self._name = name
+  #         self._server = server
+  #         self._protocol = protocol
+  #         self._keyring = gkey.get_default_keyring_sync()
+
+  #     def has_credentials(self):
+  #         try:
+  #             attrs = {"server": self._server, "protocol": self._protocol}
+  #             items = gkey.find_items_sync(gkey.ITEM_NETWORK_PASSWORD, attrs)
+  #             return len(items) > 0
+  #         except gkey.DeniedError:
+  #             return False
+
+  #     def get_credentials(self):
+  #         attrs = {"server": self._server, "protocol": self._protocol}
+  #         items = gkey.find_items_sync(gkey.ITEM_NETWORK_PASSWORD, attrs)
+  #         return (items[0].attributes["user"], items[0].secret)
+
+  #     def set_credentials(self, (user, pw)):
+  #         attrs = {
+  #                 "user": user,
+  #                 "server": self._server,
+  #                 "protocol": self._protocol,
+  #             }
+  #         gkey.item_create_sync(gkey.get_default_keyring_sync(),
+  #                 gkey.ITEM_NETWORK_PASSWORD, self._name, attrs, pw, True)
+
+  # def get_username(server):
+  #     keyring = Keyring("offlineimap", server, "imap")
+  #     (username, password) = keyring.get_credentials()
+  #     return username
+
+  # def get_password(server):
+  #     keyring = Keyring("offlineimap", server, "imap")
+  #     (username, password) = keyring.get_credentials()
+  #     return password
+
+#+END_SRC
+
+See: Gnus, Dovecot, OfflineIMAP, search: a HOWTO
+http://roland.entierement.nu/blog/2010/09/08/gnus-dovecot-offlineimap-search-a-howto.html
+
+Adds a new flag that OfflineIMAP will propagate back and forth. By default, only the standard IMAP flags are propagated; we also want to synchronize the gnus-expire flag that Gnus uses to mark expirable articles. It's a hack, but it works for now (maybe someday OfflineIMAP will propagate all the flags it finds?).
+
+# Propagate gnus-expire flag
+
+#+BEGIN_SRC python
+  from offlineimap import imaputil
+
+  def lld_flagsimap2maildir(flagstring):
+      """Convert string into a flags set"""
+      flagmap = {'\\seen': 'S',
+                 '\\answered': 'R',
+                 '\\flagged': 'F',
+                 '\\deleted': 'T',
+                 '\\draft': 'D',
+                 'gnus-expire': 'E'}
+      retval = []
+      imapflaglist = [x.lower() for x in flagstring[1:-1].split()]
+      for imapflag in imapflaglist:
+          if flagmap.has_key(imapflag):
+              retval.append(flagmap[imapflag])
+      retval.sort()
+      return retval
+
+  def lld_flagsmaildir2imap(list):
+      """Convert set of flags into a string"""
+      flagmap = {'S': '\\Seen',
+                 'R': '\\Answered',
+                 'F': '\\Flagged',
+                 'T': '\\Deleted',
+                 'D': '\\Draft',
+                 'E': 'gnus-expire'}
+      retval = []
+      for mdflag in list:
+          if flagmap.has_key(mdflag):
+              retval.append(flagmap[mdflag])
+      retval.sort()
+      return '(' + ' '.join(retval) + ')'
+
+  imaputil.flagsmaildir2imap = lld_flagsmaildir2imap
+  imaputil.flagsimap2maildir = lld_flagsimap2maildir
+
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.bin/offlineimap
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env python
+#+DESCRIPTION: Offline Imap syncing script.

@@ -114,6 +114,91 @@ This has a better chance of being what I want when splitting strings. See: http:
   (global-set-key (kbd "C-x 3") 'bnb/hsplit-last-buffer)
 #+END_SRC
 
+* Perspective
+
+[[http://www.wickeddutch.com/2014/01/03/gaining-some-perspective-in-emacs/][Mostly taken from Wicked Dutch]]
+Setup perspectives, or workspaces, to switch between
+
+Enable perspective mode
+#+BEGIN_SRC emacs-lisp
+(persp-mode t)
+#+END_SRC
+
+loading code for our custom perspectives
+taken from Magnar Sveen
+#+BEGIN_SRC emacs-lisp
+  (defmacro custom-persp (name &rest body)
+    `(let ((initialize (not (gethash ,name perspectives-hash)))
+           (current-perspective persp-curr))
+       (persp-switch ,name)
+       (when initialize ,@body)
+       (setq persp-last current-perspective)))
+#+END_SRC
+
+Jump to last perspective
+taken from Magnar Sveen
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp-last ()
+    (interactive)
+    (persp-switch (persp-name persp-last)))
+#+END_SRC
+
+Easily switch to your last perspective
+#+BEGIN_SRC emacs-lisp
+(define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp/start-calendar ()
+    (interactive)
+    (custom-persp "calendar")
+    (setq cfw:render-line-breaker 'cfw:render-line-breaker-none)
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (org-caldav-sync) ;;sync with the online calendar (possibly do this at startup instead of here)
+    (cfw:open-org-calendar)
+    )
+
+  (defun custom-persp/calendar ()
+    (interactive)
+    (custom-persp "calendar")
+    (setq cfw:render-line-breaker 'cfw:render-line-breaker-none)
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (cfw:open-org-calendar)
+    )
+
+  (define-key persp-mode-map (kbd "C-x p C") 'custom-persp/start-calendar) ;;only on first time do we sync
+  (define-key persp-mode-map (kbd "C-x p c") 'custom-persp/calendar)
+#+END_SRC
+
+Email persp
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp/start-email ()
+    (interactive)
+    (custom-persp "email")
+    (gnus))
+;;TODO add start offline imap
+
+  (defun custom-persp/email ()
+    (interactive)
+    (custom-persp "email"))
+
+    (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
+    (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
+#+END_SRC
+
+org-agenda persp
+#+BEGIN_SRC emacs-lisp
+    (defun custom-persp/org-agenda ()
+      (interactive)
+      (custom-persp "org")
+      (org-agenda nil "ta"))
+
+      (define-key persp-mode-map (kbd "C-x p o") 'custom-persp/org-agenda)
+#+END_SRC
+
+
+
 * Pretty Things
 ** Themes
 I keep my themes in a separate themes directory in my .emacs.d folder.
@@ -130,7 +215,7 @@ Load my current theme.
 #+BEGIN_SRC emacs-lisp
 (require 'rainbow-mode)
 (add-to-list 'find-file-hook
-	     (lambda () (unless (derived-mode-p 'web-mode) (rainbow-mode))))
+             (lambda () (unless (derived-mode-p 'web-mode) (rainbow-mode))))
 #+END_SRC
 
 ** Fonts
@@ -151,17 +236,17 @@ Load my current theme.
 (defun totd()
   (random t)
   (let ((stars "*****************************")
-	(tip (with-temp-buffer 
-	       (insert-file-contents totd-file)
-	       (goto-line (1+ (random
-			       (count-lines (point-min)
-					    (point-max)))))
-	       (buffer-substring (point) (line-end-position)))))
+        (tip (with-temp-buffer
+               (insert-file-contents totd-file)
+               (goto-line (1+ (random
+                               (count-lines (point-min)
+                                            (point-max)))))
+               (buffer-substring (point) (line-end-position)))))
     (momentary-string-display
      (concat "\n\n" stars "\n"
-	     "Elation Foundation:\n"
-	     "\n" tip "\n\n"
-	     stars "\n\n")
+             "Elation Foundation:\n"
+             "\n" tip "\n\n"
+             stars "\n\n")
       (window-start) ?\r
       "Hit any key when done reading")))
 (totd)
@@ -185,4 +270,3 @@ Load my current theme.
 #+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil
 #+OPTIONS:     skip:nil author:nil email:nil creator:nil timestamp:nil
 #+INFOJS_OPT:  view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
-

@@ -3,6 +3,7 @@
 (source melpa)
 
 (depends-on "undo-tree")
+(depends-on "notmuch")
 (depends-on "perspective")
 (depends-on "guide-key")
 (depends-on "yasnippet")
@@ -30,3 +31,5 @@
 (depends-on "projectile")
 (depends-on "org-plus-contrib")
 (depends-on "diff-hl")
+(depends-on "bbdb")
+(depends-on "bbdb-ext")

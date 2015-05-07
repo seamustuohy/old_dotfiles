@@ -28,17 +28,7 @@ NONE
   readonly prog_dir=$(readlink -m $(dirname $0))
 #+END_SRC
 
-* Functions
-** Environment Creation
-
-#+BEGIN_SRC sh
-create_emacs_paths(){
-    mkdir -p "$resource_dir"
-    mkdir -p "$cache_dir"
-    mkdir -p "$elisp_dir"
-}
-#+END_SRC
-
+* Installation
 ** Dependencies
 
 #+BEGIN_SRC sh
@@ -53,26 +43,28 @@ create_emacs_paths(){
           python-pip \
           sqlite3 \
           pylint \
-          gnutls-bin
+          gnutls-bin \
+          offlineimap \
+          dovecot-imapd \
+          notmuch
   }
 #+END_SRC
-** Installation
-*** Install ALL
+** Install ALL
 
 #+BEGIN_SRC sh
-    install_emacs_deps() {
-        install_thesaurus
-        install_write_good
-        install_guru_mode
-        install_cask
-        install_code_checkers
-        install_calfw
-        install_orgcaldav
-        install_org-bullets
-    }
+  install_emacs_deps() {
+      install_thesaurus
+      install_write_good
+      install_guru_mode
+      install_cask
+      install_code_checkers
+      install_calfw
+      install_orgcaldav
+      install_org-bullets
+      prepare_imap
+  }
 #+END_SRC
-
-*** Thesarus
+** Thesarus
 Check for a thesaurus and if it does not exist install it.
 #+BEGIN_SRC sh
 install_thesaurus() {
@@ -96,41 +88,41 @@ install_thesaurus() {
 }
 #+END_SRC
 
-*** Write Good
+** Write Good
 #+BEGIN_SRC sh
   install_write_good() {
       get_git_package "$emacs_package_dir"/writegood-mode https://github.com/bnbeckwith/writegood-mode.git
   }
 #+END_SRC
 
-*** calfw
+** calfw
 #+BEGIN_SRC sh
   install_calfw() {
       get_git_package "$emacs_package_dir"/calfw https://github.com/kiwanami/emacs-calfw.git
   }
 #+END_SRC
 
-*** org-caldav
+** org-caldav
 #+BEGIN_SRC sh
   install_orgcaldav() {
       get_git_package "$emacs_package_dir"/org-caldav https://github.com/dengste/org-caldav.git
   }
 #+END_SRC
 
-*** Guru Mode
+** Guru Mode
 #+BEGIN_SRC sh
   install_guru_mode() {
       get_git_package "$emacs_package_dir"/guru-mode https://github.com/bbatsov/guru-mode.git
   }
 #+END_SRC
-*** Org Bullets
+** Org Bullets
 #+BEGIN_SRC sh
   install_org-bullets() {
       get_git_package "$emacs_package_dir"/org-bullets https://github.com/sabof/org-bullets.git
   }
 #+END_SRC
 
-*** Cask
+** Cask
 #+BEGIN_SRC sh
   install_cask() {
     local tmpdir=$(mktemp -dt "$(basename "$0").XXXXX")
@@ -145,7 +137,7 @@ install_thesaurus() {
   }
 #+END_SRC
 
-*** Git Package Grabber
+** Git Package Grabber
 #+BEGIN_SRC sh
   get_git_package() {
       local package_dir="${1}"
@@ -158,7 +150,7 @@ install_thesaurus() {
   }
 #+END_SRC
 
-*** Code Checkers
+** Code Checkers
 #+BEGIN_SRC sh
 install_code_checkers() {
 sudo pip install flake8
@@ -167,7 +159,7 @@ sudo apt-get -y install shellcheck
 
 #+END_SRC
 
-*** Code Tangler
+** Code Tangler
 #+BEGIN_SRC sh
 tangle_code() {
 for DIR in ~/.dotfiles/configs/emacs ~/.dotfiles/bin ~/.dotfiles/configs/bash ~/.dotfiles/configs/git
@@ -185,7 +177,22 @@ done
   }
 #+END_SRC
 
-*** Offline IMAP
+** Offline IMAP
+#+BEGIN_SRC sh
+  prepare_imap() {
+      sudo sed -i '/ENABLED=0/s/^#//' /etc/default/dovecot
+  }
+#+END_SRC
+* Functions
+** Environment Creation
+
+#+BEGIN_SRC sh
+create_emacs_paths(){
+    mkdir -p "$resource_dir"
+    mkdir -p "$cache_dir"
+    mkdir -p "$elisp_dir"
+}
+#+END_SRC
 
 ** Links
 #+BEGIN_SRC sh
@@ -205,6 +212,12 @@ done
       link_lisp
       install_package_deps
       install_emacs_deps
+      echo "===THINGS YOU STILL NEED TO DO==="
+      echo " * Create sym links "
+      echo "   - .s2e "
+      echo "   - .offlineimap.rc"
+      echo "   - .org "
+      echo "   - .notmuch-config "
   }
   main
 #+END_SRC

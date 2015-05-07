@@ -22,6 +22,38 @@
 #+END_SRC
 
 * Storage
+This is all done in project files
+* Contacts
+BBDB -- contact db
+[[https://github.com/vapniks/bbdb-ext][BBDB-ext]]
+#+BEGIN_SRC emacs-lisp
+  ;; (setq bbdb-file "~/MailDir/bbdb")
+  ;; (add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
+  ;; (setq bbdb-complete-name-full-completion t)
+  ;; (setq bbdb-completion-type 'primary-or-name)
+  ;; (setq bbdb-complete-name-allow-cycling t)
+  ;; (setq
+  ;;  bbdb-offer-save 1
+  ;;  bbdb-use-pop-up t
+  ;;  bbdb-electric-p t
+  ;;  bbdb-popup-target-lines  1)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-contacts-files '("~/.s2e/contacts.org"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-capture-templates
+               '("@" "Contacts" entry (file "~/.s2e/contacts.org")
+                 "* %(org-contacts-template-name)
+  :PROPERTIES:
+  :EMAIL: %(org-contacts-template-email)
+  :END:"))
+#+END_SRC
+* Identity Management
+
+
 * Display
 
 inverted sorting: newest threads on top
@@ -56,30 +88,23 @@ http://groups.google.com/group/gnu.emacs.gnus/browse_thread/thread/a673a74356e71
  reconfigure buffer positions for a wider screen
 
 #+BEGIN_SRC emacs-lisp
-  (gnus-add-configuration ; summary view
-   '(summary
-     (horizontal 1.0
-                 (vertical 1.0 (group 0.25) (summary 1.0 point)))))
+
+
+  ;; (gnus-add-configuration ; article view
+  ;;  '(article (horizontal 1.0
+  ;;                       (vertical 0.5
+  ;;                                 (group 1.0))
+  ;;                       (vertical 1.0
+  ;;                                 (summary 0.25 point)
+  ;;                                 (article 1.0)))))
+
   (gnus-add-configuration ; article view
    '(article
      (horizontal 1.0
-                 (vertical 0.45 (group 0.25) (summary 1.0 point) ("*BBDB*" 0.15))
-                 (vertical 1.0 (article 1.0)))))
-  (gnus-add-configuration ; post new stuff
-   '(edit-form
-     (horizontal 1.0
-                 (vertical 0.45 (group 0.25) (edit-form 1.0 point) ("*BBDB*" 0.15))
-                 (vertical 1.0 (article 1.0)))))
-  (gnus-add-configuration ; score editing
-   '(edit-score
-     (horizontal 1.0
-                 (vertical 0.45 (group 0.25) (edit-score 1.0 point) ("*BBDB*" 0.15))
-                 (vertical 1.0 (article 1.0)))))
-  (gnus-add-configuration ; score tracing
-   '(score-trace
-     (horizontal 1.0
-                 (vertical 0.45 (group 0.25) (score-trace 1.0 point) ("*BBDB*" 0.15))
-                 (vertical 1.0 (article 1.0)))))
+                 (vertical 0.5
+                           (summary 1.0 point)) ;Summary for one half
+                 (vertical 1.0
+                           (article 1.0))))) ;Article for the other
 #+END_SRC
 
 I'd prefer text/plain messages (with inline attachments)
@@ -104,36 +129,39 @@ I'd prefer to have sane default headers
 * Searching
 
 #+BEGIN_SRC emacs-lisp
-  (defun notmuch-file-to-group (file)
-    "Calculate the Gnus group name from the given file name."
+  (add-hook 'gnus-group-mode-hook 'lld-notmuch-shortcut)
+
+  (defun lld-notmuch-shortcut ()
+    (define-key gnus-group-mode-map "GG" 'notmuch-search)
+    )
+
+  (defun lld-notmuch-file-to-group (file)
+    "Calculate the Gnus group name from the given file name.
+  "
     (let ((group (file-name-directory (directory-file-name (file-name-directory file)))))
-      (setq group (replace-regexp-in-string ".*/Maildir/" "nnimap+USER:" group))
+      (setq group (replace-regexp-in-string ".*/Maildir/Internews/" "nnmaildir+Internews:" group))
       (setq group (replace-regexp-in-string "/$" "" group))
       (if (string-match ":$" group)
           (concat group "INBOX")
         (replace-regexp-in-string ":\\." ":" group))))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (defun notmuch-goto-message-in-gnus ()
+  (defun lld-notmuch-goto-message-in-gnus ()
     "Open a summary buffer containing the current notmuch
-   article."
+  article."
     (interactive)
-    (unless (gnus-alive-p) (with-temp-buffer (gnus)))
-    (let ((group (notmuch-file-to-group (notmuch-show-get-filename)))
-          (message-id
-           (replace-regexp-in-string "\"" ""
-                                     (replace-regexp-in-string "^id:" ""
-                                                               (notmuch-show-get-message-id)))))
+    (let ((group (lld-notmuch-file-to-group (notmuch-show-get-filename)))
+          (message-id (replace-regexp-in-string
+                       "^id:" "" (notmuch-show-get-message-id))))
+      (setq message-id (replace-regexp-in-string "\"" "" message-id))
       (if (and group message-id)
           (progn
-            (gnus-summary-read-group group 1) ; have to show at least one old message
-            (gnus-summary-refer-article message-id)) ; simpler than org-gnus method?
+      (switch-to-buffer "*Group*")
+      (message group)
+      (message message-id)
+      (org-gnus-follow-link group message-id))
         (message "Couldn't get relevant infos for switching to Gnus."))))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (define-key notmuch-show-mode-map (kbd "C-c C-c") 'notmuch-goto-message-in-gnus)
+  (define-key notmuch-show-mode-map (kbd "C-c C-c") 'lld-notmuch-goto-message-in-gnus)
 #+END_SRC
 
 ** Splitting
@@ -190,20 +218,6 @@ Core email splitting Rule
    (gnus-registry-initialize)
 #+END_SRC
 
-** Email Cache
-
-#+BEGIN_SRC emacs-lisp
-  (setq gnus-directory "~/.emacs.d/News/"
-        message-directory "~/.emacs.d/Mail/"
-        gnus-agent-directory (concat gnus-directory "agent/")
-        gnus-cache-directory (concat gnus-directory "cache/")
-        gnus-cache-active-file (concat gnus-directory "cache/active") ; no slash! this is a file, not a directory!
-        gnus-article-save-directory (concat gnus-directory "save/")
-        gnus-kill-files-directory (concat gnus-directory "killfiles/")
-        nndraft-directory (concat message-directory "drafts/")
-        nnfolder-directory (concat message-directory "archive/"))
-#+END_SRC
-
 ** Basic Configuration largely stolen from [[https://github.com/dertuxmalwieder/My-Emacs-config/blob/master/.gnus.el][dertuxmalwieder]]
 
 #+BEGIN_SRC emacs-lisp
@@ -226,7 +240,6 @@ Set an empty gnus-parameters so that projects can add-to-list what they need for
 #+BEGIN_SRC emacs-lisp
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 #+END_SRC
-
 
 * SPAM
 #+BEGIN_SRC emacs-lisp
@@ -259,7 +272,6 @@ Set an empty gnus-parameters so that projects can add-to-list what they need for
 #+BEGIN_SRC emacs-lisp
 (setq org-gnus-prefer-web-links nil)
 #+END_SRC
-
 
 * Technical Artifacts
 
