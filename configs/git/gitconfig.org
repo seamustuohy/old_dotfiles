@@ -6,36 +6,36 @@
 
 #+BEGIN_SRC sh
 [core]
-	editor = emacs
-	
+        editor = emacs
+
 [push]
-	default = current
-	
+        default = current
+
 [user]
-	name = seamus tuohy
-	email = stuohy@internews.org
+        name = seamus tuohy
+        email = s2e@seamustuohy.com
 
 [grep]
-	extendedRegexp = true
-	lineNumber = true
-	
-[alias]
-	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-	pdiff = diff --ignore-space-at-eol -b -w
-	churn = !sh -c '~/.dotfiles/git/alias/churn'
-	contrib = !sh -c '~/.dotfiles/git/alias/contributor $1 $2' -
-	overwritten = !sh -c '~/.dotfiles/git/alias/git-overwritten $1 $2 $3 ' -
-	merge = merge --no-ff
+        extendedRegexp = true
+        lineNumber = true
 
 [alias]
-	churn = !sh -c '~/.dotfiles/git/alias/churn'
+        lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+        pdiff = diff --ignore-space-at-eol -b -w
+        churn = !sh -c '~/.dotfiles/git/alias/churn'
+        contrib = !sh -c '~/.dotfiles/git/alias/contributor $1 $2' -
+        overwritten = !sh -c '~/.dotfiles/git/alias/git-overwritten $1 $2 $3 ' -
+        merge = merge --no-ff
+
+[alias]
+        churn = !sh -c '~/.dotfiles/git/alias/churn'
 
 [color]
-	ui = always
-	status = true
+        ui = always
+        status = true
 
 [commit]
-	template=~/.dotfiles/git/template
+        template=~/.dotfiles/git/template
 #+END_SRC
 
 * Technical Section

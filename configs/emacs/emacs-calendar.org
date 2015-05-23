@@ -14,7 +14,6 @@ All calendar configuration is done in projects
 #+END_SRC
 
 * Pretty-ness
-
 #+BEGIN_SRC emacs-lisp
 
   ;; ;; Unicode characters
@@ -36,7 +35,17 @@ All calendar configuration is done in projects
         cfw:fchar-top-junction ?╦
         cfw:fchar-top-left-corner ?╔
         cfw:fchar-top-right-corner ?╗)
+#+END_SRC
 
+
+* Gnus integration
+
+#+BEGIN_SRC emacs-lisp
+  (require 'gnus-icalendar)
+  (setq gnus-icalendar-org-capture-file "~/.org/calendar/email.org")
+  (setq gnus-icalendar-org-capture-headline '("Calendar"))
+  (gnus-icalendar-setup)
+  (gnus-icalendar-org-setup)
 #+END_SRC
 
 * Technical Artifacts

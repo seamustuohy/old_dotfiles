@@ -2,7 +2,7 @@
 #+AUTHOR: seamus tuohy
 #+EMAIL: s2e@seamustuohy.com
 #+DATE: <2015-04-28 Tue>
-n#+TAGS: emacs org babel
+#+TAGS: emacs org babel
 
 * General
 ** Org-Modules
@@ -52,8 +52,8 @@ Ends with ".org"
 #+BEGIN_SRC emacs-lisp
 ;; keyword bindings
 (setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "TASK(T)" "|" "DONE(d!)")
-                                (sequence "WAIT(w@!/@!)"  "SOMEDAY(s)" "CANCELED(C)" "MEETING(M)")
-                                (sequence "REPLY(r@/!)" "CONTACT(c@/!)"))))
+                                (sequence "WAIT(w@!/@!)"  "SOMEDAY(s)" "CANCELED(C)")
+                                (sequence "REPLY(r@/!)" "CONTACT(c@/!)" "MEETING(M)"))))
 #+END_SRC
 
 Set the colors and properties for org mode tags
@@ -91,14 +91,14 @@ Capture Mode
 
 Capture templates for TODO tasks, Notes, appointments, phone calls, meetings,
 #+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates (quote (
+  (setq org-capture-templates '(
                                       ("f" "TO FILE")
                                       ("ft" "todo" entry (file "~/.org/todo/to_file.org")
                                        "* TODO %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
                                       ("fT" "task" entry (file "~/.org/todo/to_file.org")
                                        "* TASK %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:WITH:%^{Do With?}\n:END:\n" :clock-in t :clock-resume t)
                                       ("fr" "respond" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t)
+                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t)
                                       ("fn" "note" entry (file "~/.org/todo/to_file.org")
                                        "* %? :NOTE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
                                       ("fm" "Meeting" entry (file "~/.org/todo/to_file.org")
@@ -114,12 +114,34 @@ Capture templates for TODO tasks, Notes, appointments, phone calls, meetings,
                                       ("fc" "Contact" entry (file "~/.org/todo/to_file.org")
                                        "* CONTACT %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
                                       ("fe" "Event" entry (file "~/.org/todo/to_file.org")
-                                       "* EVENT %?:EVENT:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t))))
+                                       "* EVENT %?:EVENT:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)))
+
+#+END_SRC
+
+https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
+;; Searches for the current kill-ring head and adds the text under it.
+;; If kill ring head is not found it creates it at the bottom of the file.
+;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
+#+BEGIN_SRC emacs-lisp
+(defun dont-dup-headline ()
+  (let* ((org-refile-targets '((nil :maxlevel . 9)))
+         (hd (eval (current-kill 0))))
+    (goto-char (point-min))
+    (outline-next-heading)
+    (if (re-search-forward
+         (format org-complex-heading-regexp-format (regexp-quote hd))
+         nil t)
+        (goto-char (point-at-bol))
+      (goto-char (point-max))
+      (or (bolp) (insert "\n"))
+      (insert "* " hd "\n")))
+    (end-of-line))
 
 #+END_SRC
 
 I add my org-protocol captures here.
 #+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
   (append org-capture-templates '(
                                    ("p" "Org-Protocol")
                                    ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
@@ -139,7 +161,21 @@ I add my org-protocol captures here.
                                    ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
                                    ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)))
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+    (append org-capture-templates '(
+                                    ("@" "Contacts" entry (file "~/.s2e/contacts.org")
+                                     "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:"))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+    (append org-capture-templates '(
+                                      ("Q" "TEST-respond" entry (file "~/.org/todo/to_file.org")
+                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t))))
 #+END_SRC
 
 ** References
@@ -183,6 +219,35 @@ This is great for showing TODO items immediately as I type them out.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+END_SRC
+
+** Inline images
+
+When you see an image link, make it the image.
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'iimage-mode-image-regex-alist
+  ;;              (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex
+  ;;                            "\\)\\]") 1))
+#+END_SRC
+
+
+Enable iimage-mode every time an org-mode file is opened
+#+BEGIN_SRC emacs-lisp
+  ;; (add-hook 'org-mode-hook
+  ;;           (lambda ()
+  ;;             (iimage-mode)))
+#+END_SRC
+
+Enable toggle in case it does not work.
+#+BEGIN_SRC emacs-lisp
+  ;; (defun org-toggle-iimage-in-org ()
+  ;;   "display images in your org file"
+  ;;   (interactive)
+  ;;   (if (face-underline-p 'org-link)
+  ;;       (set-face-underline-p 'org-link nil)
+  ;;     (set-face-underline-p 'org-link t))
+  ;;   (iimage-mode))
+#+END_SRC
+
 * Searching & Viewing
 ** Agenda
 *** Keybindings for Agenda Mode

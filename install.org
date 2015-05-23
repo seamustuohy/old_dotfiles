@@ -29,7 +29,7 @@ NONE
 #+END_SRC
 
 * Installation
-** Dependencies
+** Debian Dependencies
 
 #+BEGIN_SRC sh
   install_package_deps() {
@@ -46,24 +46,29 @@ NONE
           gnutls-bin \
           offlineimap \
           dovecot-imapd \
-          notmuch
+          notmuch \
+          python-bs4
   }
 #+END_SRC
-** Install ALL
+
+** Master Instaler
 
 #+BEGIN_SRC sh
-  install_emacs_deps() {
-      install_thesaurus
-      install_write_good
-      install_guru_mode
-      install_cask
-      install_code_checkers
-      install_calfw
-      install_orgcaldav
-      install_org-bullets
-      prepare_imap
-  }
+    install_emacs_deps() {
+        install_thesaurus
+        install_write_good
+        install_guru_mode
+        install_cask
+        install_code_checkers
+        install_calfw
+        install_orgcaldav
+        install_org-bullets
+        install_sumy
+        install_offlineimap
+        install_twittering
+    }
 #+END_SRC
+
 ** Thesarus
 Check for a thesaurus and if it does not exist install it.
 #+BEGIN_SRC sh
@@ -109,6 +114,20 @@ install_thesaurus() {
   }
 #+END_SRC
 
+** Offline Imap
+#+BEGIN_SRC sh
+  install_offlineimap() {
+      get_git_package "$emacs_package_dir"/offlineimap https://github.com/jd/offlineimap.el.git
+  }
+#+END_SRC
+
+** Twittering
+#+BEGIN_SRC sh
+  install_twittering() {
+      get_git_package "$emacs_package_dir"/twittering-mode git://github.com/hayamiz/twittering-mode.git
+  }
+
+#+END_SRC
 ** Guru Mode
 #+BEGIN_SRC sh
   install_guru_mode() {
@@ -137,25 +156,12 @@ install_thesaurus() {
   }
 #+END_SRC
 
-** Git Package Grabber
-#+BEGIN_SRC sh
-  get_git_package() {
-      local package_dir="${1}"
-      local repo="${2}"
-      if [[ ! -e $package_dir ]]; then
-          git clone "$repo"  "$package_dir"
-      else # Update to the latest version for good measure.
-          git --git-dir="$package_dir"/.git --work-tree="$package_dir"  pull
-      fi
-  }
-#+END_SRC
-
 ** Code Checkers
 #+BEGIN_SRC sh
-install_code_checkers() {
-sudo pip install flake8
-sudo apt-get -y install shellcheck
-}
+  install_code_checkers() {
+      sudo pip install flake8
+      sudo apt-get -y install shellcheck
+  }
 
 #+END_SRC
 
@@ -177,13 +183,27 @@ done
   }
 #+END_SRC
 
-** Offline IMAP
+** Sumy
+Module for automatic summarization of text documents and HTML pages.
 #+BEGIN_SRC sh
-  prepare_imap() {
-      sudo sed -i '/ENABLED=0/s/^#//' /etc/default/dovecot
+  install_sumy() {
+      sudo pip install git+git://github.com/miso-belica/sumy.git
   }
 #+END_SRC
-* Functions
+* Utilities
+** Git Package Grabber
+#+BEGIN_SRC sh
+  get_git_package() {
+      local package_dir="${1}"
+      local repo="${2}"
+      if [[ ! -e $package_dir ]]; then
+          git clone "$repo"  "$package_dir"
+      else # Update to the latest version for good measure.
+          git --git-dir="$package_dir"/.git --work-tree="$package_dir"  pull
+      fi
+  }
+#+END_SRC
+
 ** Environment Creation
 
 #+BEGIN_SRC sh
@@ -199,10 +219,34 @@ create_emacs_paths(){
   link_lisp() {
           ln -s  ~/.dotfiles/configs/emacs/Cask ~/.emacs.d/Cask || true
           ln -s ~/.dotfiles/templates/emacs/  ~/.emacs.d/templates || true
+          ln -s ~/.dotfiles/snippets ~/.emacs.d/snippets
+  }
+#+END_SRC
+
+
+* Configuration
+
+** Master Preparer
+#+BEGIN_SRC sh
+  prepare_packages() {
+      prepare_imap
+      prepare_sumy
+  }
+#+END_SRC
+** Offline IMAP
+#+BEGIN_SRC sh
+  prepare_imap() {
+      sudo sed -i '/ENABLED=0/s/^#//' /etc/default/dovecot
+  }
+#+END_SRC
+
+** Sumy
+#+BEGIN_SRC sh
+  prepare_sumy() {
+      python -m nltk.downloader punkt
   }
 
 #+END_SRC
-
 * Main
 
 #+BEGIN_SRC sh
@@ -212,12 +256,14 @@ create_emacs_paths(){
       link_lisp
       install_package_deps
       install_emacs_deps
+      prepare_packages
       echo "===THINGS YOU STILL NEED TO DO==="
       echo " * Create sym links "
       echo "   - .s2e "
       echo "   - .offlineimap.rc"
       echo "   - .org "
       echo "   - .notmuch-config "
+
   }
   main
 #+END_SRC

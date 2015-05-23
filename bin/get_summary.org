@@ -19,36 +19,14 @@ from sumy.nlp.stemmers import Stemmer
 from sumy.utils import get_stop_words
 #+END_SRC
 
-Scraping
-#+BEGIN_SRC python
-from bs4 import BeautifulSoup
-from urllib import urlopen
-#+END_SRC
-
-Needed for the google api
-#+BEGIN_SRC python
-from apiclient.discovery import build
-#+END_SRC
 
 Needed for command line functionality
 #+BEGIN_SRC python
 import sys
 import argparse
-from getpass import getpass
 #+END_SRC
 
-* Scraping
-
-#+BEGIN_SRC python
-  def get_url(url):
-      url_obj = urlopen(url).read()
-      print(url)
-      html = BeautifulSoup(url_obj)
-      print(html)
-      raw = html.get_text()
-      return raw
-#+END_SRC
-
+* Read text from file
 #+BEGIN_SRC python
   def get_plain_text(text_file):
       with open(text_file, 'r') as f:
@@ -59,7 +37,7 @@ from getpass import getpass
 * Summation
 
 #+BEGIN_SRC python
-  def summarize(text, language, count):
+  def summarize(text, language="english", count=5):
       """
       text (str):
       language (str):
@@ -68,7 +46,7 @@ from getpass import getpass
       summary = []
       text_file = text
       parser = PlaintextParser.from_string(text, Tokenizer(language))
-      stemmer = Stemmer(langauge)
+      stemmer = Stemmer(language)
       # or for plain text files
       summarizer = Summarizer(stemmer)
       summarizer.stop_words = get_stop_words(language)
@@ -78,47 +56,13 @@ from getpass import getpass
       return summary
 #+END_SRC
 
-* Translation
-#+BEGIN_SRC python
-  def get_source_lang(summary):
-      """
-      TODO
-      Returns a tuple with the two letter name of the language used and the full name of the tokenizer to use.
-      """
-      #TODO THIS
-      return ('fr', "french")
-#+END_SRC
-
-#+BEGIN_SRC python
-  def translate(summary, developer_key, source_lang):
-  # Build a service object for interacting with the API. Visit
-  # the Google APIs Console <http://code.google.com/apis/console>
-  # to get an API key for your own application.
-      service = build('translate', 'v2', developerKey=developer_key)
-      #get current language
-      source_lang = get_source_lang(summary)
-      translated = service.translations().list(
-          source=source_lang,
-          target='en',
-          q=summary
-      ).execute()
-      return translated
-
-#+END_SRC
-
 * Command Line
-
-#+BEGIN_SRC python
-  def get_api_key():
-        api_key = getpass("Enter your API key for Google Translate:")
-        return api_key
-#+END_SRC
 
 #+BEGIN_SRC python
   def parse_arguments():
       arg_p = argparse.ArgumentParser("Get a summary of some text")
       arg_p.add_argument("-u", "--url", type=str, help="A url to parse.")
-      arg_p.add_argument("-i", "--input-file", type=file, help="A file containing plain text to parse")
+      arg_p.add_argument("-i", "--input-file", type=str, help="A file containing plain text to parse")
       args = arg_p.parse_args()
       return args
 #+END_SRC
@@ -131,7 +75,6 @@ from getpass import getpass
 * Main
 #+BEGIN_SRC python
   def main():
-      #api_key = get_api_key()
       args = parse_arguments()
       if args.url:
           text = get_url(args.url)
@@ -141,26 +84,19 @@ from getpass import getpass
           usage()
           sys.exit(64)
       #lang = get_lang(text)
-      # TODO implement google translate API
-      lang = 'en'
-      count = '10'
-      summary = summarize(text, lang, count)
+      summary = summarize(text)
       #translated = translate(summary, dev_key, lang)
       #keywords = check_keywords(translated)
-      print(summary)
+      for i in summary:
+          sys.stdout.write(str(i).encode("UTF-8"))
+          sys.stdout.write("\n")
+      sys.exit(0)
 
   if __name__ == "__main__":
       main()
 #+END_SRC
 
 * References
-
-** Translation
-- https://developers.google.com/api-client-library/python/apis/translate/v2
-- https://developers.google.com/resources/api-libraries/documentation/translate/v2/python/latest/index.html
-- https://developers.google.com/resources/api-libraries/documentation/translate/v2/python/latest/translate_v2.translations.html
-- https://developers.google.com/api-client-library/python/
-- https://code.google.com/p/google-api-python-client/source/browse/samples/translate/main.py
 
 ** Text Summation
 - https://pypi.python.org/pypi/sumy

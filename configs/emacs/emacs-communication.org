@@ -1,10 +1,65 @@
-#+TITLE: Emacs Email
-#+AUTHOR: s2e
-#+EMAIL: s2e@device
-#+DATE: 2015 Apr 19
-#+TAGS: email
+#+TITLE: Emacs Communication
+#+AUTHOR: seamus tuohy
+#+EMAIL: stuohy@internews.org
+#+DATE: 2015 May 14
+#+TAGS: org emacs communications
 
-* Get Gnus Started
+* IRC
+#+BEGIN_SRC emacs-lisp
+  (use-package erc
+    :ensure t :defer t
+    :config
+    (setq erc-nick "elation")
+    (require 'erc-list)
+    (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+    (add-to-list 'erc-modules 'list)
+    (erc-update-modules))
+#+END_SRC
+
+** Channels list commented out because it is contained in a project file with other channels.
+#+BEGIN_SRC emacs-lisp
+    ;; (setq erc-autojoin-channels-alist '(("freenode.net"
+    ;;                                      "#emacs"
+    ;;                                      "#emacs"
+    ;;                                      "#org-mode"
+    ;;                                      "#recon-ng"
+    ;;                                      "#commotion")))
+#+END_SRC
+
+* Email
+
+** Notmuch
+#+BEGIN_SRC emacs-lisp
+  (use-package notmuch
+    :commands notmuch notmuch-search
+    :init
+    (setq
+     ;; === SHOW EMAIL ===
+     ; Allows GPG to work cleanly by not indenting messages in threads
+     notmuch-show-indent-messages-width 0
+     ;; === SEARCH EMAIL ===
+     notmuch-search-oldest-first nil
+     ;; === Crypto ===
+     ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
+     notmuch-crypto-process-mime t
+    ;; == SENDING MAIL
+     message-kill-buffer-on-exit t))
+
+  (use-package org-notmuch)
+
+  (defun notmuch-search-filter-by-date (days)
+    (interactive "NNumber of days to display: ")
+    (let* ((now (current-time))
+           (beg (time-subtract now (days-to-time days)))
+           (filter
+            (concat
+             (format-time-string "%s.." beg)
+             (format-time-string "%s" now))))
+      (notmuch-search-filter filter)))
+#+END_SRC
+
+** GNUS
+*** Get Gnus Started
 
 #+BEGIN_SRC emacs-lisp
 (require 'message)
@@ -21,9 +76,9 @@
 (require 'org-gnus)
 #+END_SRC
 
-* Storage
+*** Storage
 This is all done in project files
-* Contacts
+*** Contacts
 BBDB -- contact db
 [[https://github.com/vapniks/bbdb-ext][BBDB-ext]]
 #+BEGIN_SRC emacs-lisp
@@ -43,18 +98,17 @@ BBDB -- contact db
 (setq org-contacts-files '("~/.s2e/contacts.org"))
 #+END_SRC
 
+Look at my emacs-org.org setup for org contacts capture.
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-capture-templates
-               '("@" "Contacts" entry (file "~/.s2e/contacts.org")
-                 "* %(org-contacts-template-name)
-  :PROPERTIES:
-  :EMAIL: %(org-contacts-template-email)
-  :END:"))
+  ;; (add-to-list 'org-capture-templates
+  ;;              '("@" "Contacts" entry (file "~/.s2e/contacts.org")
+  ;;                "* %(org-contacts-template-name)
+  ;; :PROPERTIES:
+  ;; :EMAIL: %(org-contacts-template-email)
+  ;; :END:"))
 #+END_SRC
-* Identity Management
-
-
-* Display
+*** Identity Management
+*** Display
 
 inverted sorting: newest threads on top
 #+BEGIN_SRC emacs-lisp
@@ -126,7 +180,7 @@ I'd prefer to have sane default headers
   gnus-sorted-header-list gnus-visible-headers)
 #+END_SRC
 
-* Searching
+*** Searching
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'gnus-group-mode-hook 'lld-notmuch-shortcut)
@@ -164,7 +218,7 @@ I'd prefer to have sane default headers
   (define-key notmuch-show-mode-map (kbd "C-c C-c") 'lld-notmuch-goto-message-in-gnus)
 #+END_SRC
 
-** Splitting
+**** Splitting
 I want message ids to be saved for as long as possible so I keep a large cache.  (A value of 5000 appears to create a file some 300 kBytes in size.)
 #+BEGIN_SRC emacs-lisp
   ;; (setq nnmail-message-id-cache-length 20000)
@@ -201,15 +255,15 @@ My splitting rules
 
 (2)
 
-* Basic configuration
-** Remove news server
+*** Basic configuration
+**** Remove news server
 [[http://koldfront.dk/text/gnus-email-tutorial.html][
 So I add this to ~/.gnus (to avoid Gnus trying to connect to a non-existant local news server)]]
 #+BEGIN_SRC emacs-lisp
 (setq gnus-select-method '(nnnil ""))
 #+END_SRC
 
-** Email Splitting Core
+**** Email Splitting Core
 
 Core email splitting Rule
 #+BEGIN_SRC emacs-lisp
@@ -218,7 +272,7 @@ Core email splitting Rule
    (gnus-registry-initialize)
 #+END_SRC
 
-** Basic Configuration largely stolen from [[https://github.com/dertuxmalwieder/My-Emacs-config/blob/master/.gnus.el][dertuxmalwieder]]
+**** Basic Configuration largely stolen from [[https://github.com/dertuxmalwieder/My-Emacs-config/blob/master/.gnus.el][dertuxmalwieder]]
 
 #+BEGIN_SRC emacs-lisp
 (setq gnus-summary-gather-subject-limit 'fuzzy
@@ -227,21 +281,21 @@ Core email splitting Rule
       gnus-interactive-exit nil)
 #+END_SRC
 
-** Email Groups
+**** Email Groups
 
 Set an empty gnus-parameters so that projects can add-to-list what they need for their projects.
 #+BEGIN_SRC emacs-lisp
 (setq gnus-parameters '())
 #+END_SRC
 
-** Topic Sorting
+**** Topic Sorting
 
 ;; Start the topic view
 #+BEGIN_SRC emacs-lisp
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 #+END_SRC
 
-* SPAM
+*** SPAM
 #+BEGIN_SRC emacs-lisp
 (setq spam-use-spamassassin t)
 (setq spam-spamassassin-path "/usr/bin/vendor_perl/spamassassin")
@@ -249,8 +303,8 @@ Set an empty gnus-parameters so that projects can add-to-list what they need for
 (setq smiley-style 'medium)
 #+END_SRC
 
-** TODO Explore these configs
-*** Hook to display dormant article in Gnus
+**** TODO Explore these configs
+***** Hook to display dormant article in Gnus
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-follow-link-hook
           (lambda ()
@@ -258,35 +312,52 @@ Set an empty gnus-parameters so that projects can add-to-list what they need for
                 (gnus-summary-insert-dormant-articles))))
 #+END_SRC
 
-*** Working Mail and org
+***** Working Mail and org
 #+BEGIN_SRC emacs-lisp
 (setq org-link-frame-setup '((gnus . gnus) (file . find-file-other-window)))
 #+END_SRC
 
-*** Mail to
+***** Mail to
 #+BEGIN_SRC emacs-lisp
 (setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
 #+END_SRC
 
-*** Web links
+***** Web links
 #+BEGIN_SRC emacs-lisp
 (setq org-gnus-prefer-web-links nil)
 #+END_SRC
 
+*** OfflineImap
+#+BEGIN_SRC emacs-lisp
+; (use-package offlineimap
+;   :load-path "packages/offlineimap/"
+;   :commands offlineimap
+;   :init
+;   (add-hook 'gnus-before-startup-hook 'offlineimap))
+#+END_SRC
+
+* Twitter
+#+BEGIN_SRC emacs-lisp
+  (use-package twittering-mode
+  :load-path "packages/twittering-mode"
+  :commands twit
+  :config
+  (setq twittering-use-master-password t))
+#+END_SRC
 * Technical Artifacts
 
   Make sure that we can simply =require= this library.
 
 #+BEGIN_SRC elisp
-  (provide 'init-emacs-email)
+  (provide 'init-emacs-communication)
 #+END_SRC
 
   Before you can build this on a new system, make sure that you put
   the cursor over any of these properties, and hit: =C-c C-c=
 
-#+DESCRIPTION: email
+#+DESCRIPTION:
 #+PROPERTY:    results silent
-#+PROPERTY:    tangle ~/.emacs.d/elisp/emacs-email.el
+#+PROPERTY:    tangle ~/.emacs.d/elisp/emacs-communication.el
 #+PROPERTY:    eval no-export
 #+PROPERTY:    comments org
 #+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil

@@ -115,7 +115,7 @@ This has a better chance of being what I want when splitting strings. See: http:
 #+END_SRC
 
 * Perspective
-
+** Config
 [[http://www.wickeddutch.com/2014/01/03/gaining-some-perspective-in-emacs/][Mostly taken from Wicked Dutch]]
 Setup perspectives, or workspaces, to switch between
 
@@ -148,6 +148,7 @@ Easily switch to your last perspective
 (define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
 #+END_SRC
 
+** Calendar
 
 #+BEGIN_SRC emacs-lisp
   (defun custom-persp/start-calendar ()
@@ -171,22 +172,25 @@ Easily switch to your last perspective
   (define-key persp-mode-map (kbd "C-x p c") 'custom-persp/calendar)
 #+END_SRC
 
-Email persp
+** Email
 #+BEGIN_SRC emacs-lisp
   (defun custom-persp/start-email ()
     (interactive)
     (custom-persp "email")
+    (gnus-icalendar-setup) ; Needed to make capture templates work. e.g. they should be loaded last, but my projects are and they muck with the templates.
+    (gnus-icalendar-org-setup)
     (gnus))
-;;TODO add start offline imap
+  ;;TODO add start offline imap
 
-  (defun custom-persp/email ()
-    (interactive)
-    (custom-persp "email"))
+    (defun custom-persp/email ()
+      (interactive)
+      (custom-persp "email"))
 
-    (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
-    (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
+      (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
+      (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
 #+END_SRC
 
+** Org Agenda
 org-agenda persp
 #+BEGIN_SRC emacs-lisp
     (defun custom-persp/org-agenda ()
@@ -197,6 +201,19 @@ org-agenda persp
       (define-key persp-mode-map (kbd "C-x p o") 'custom-persp/org-agenda)
 #+END_SRC
 
+** IRC
+#+BEGIN_SRC emacs-lisp
+      (defun custom-persp/start-irc ()
+        (interactive)
+        (custom-persp "irc")
+        (erc :server "irc.freenode.net" :port "6667" :password nil))
+      (defun custom-persp/irc ()
+        (interactive)
+        (custom-persp "irc"))
+
+        (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
+        (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
+#+END_SRC
 
 
 * Pretty Things

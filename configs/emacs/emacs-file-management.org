@@ -40,7 +40,7 @@ Add the hook.
 
 * Syncing
 
-** When files change on disk I want the buffers to change to match them. 
+** When files change on disk I want the buffers to change to match them.
 I will modify text files in bash while they are open in emacs when I need to do more automated modification.
 #+BEGIN_SRC emacs-lisp
 (global-auto-revert-mode 1)
@@ -60,7 +60,7 @@ Add the hook
 #+END_SRC
 
 * Identification
-uniquify shows a files location when it shares the same name as another file. 
+uniquify shows a files location when it shares the same name as another file.
 #+BEGIN_SRC emacs-lisp
 (require 'uniquify)
 (setq
@@ -109,10 +109,10 @@ Automatically purge backup files not accessed in a week:
 * Auto-Save
 
 #+BEGIN_SRC emacs-lisp
- (require 'real-auto-save)
-(add-hook 'prog-mode-hook 'real-auto-save-mode)
-(setq real-auto-save-interval 30)
-#+END_SRC 
+;;(require 'real-auto-save)
+;;(add-hook 'prog-mode-hook 'real-auto-save-mode)
+;;(setq real-auto-save-interval 30)
+#+END_SRC
 * Technical Artifacts
 
   Make sure that we can simply =require= this library.

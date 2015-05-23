@@ -34,7 +34,7 @@ Either the Key ID or set to nil to use symmetric encryption.
 ;;(add-to-list 'auth-sources (in-private-dir ".authinfo.gpg"))
 #+END_SRC
 
-* Personal key spaces
+* Personal key space
 
 #+BEGIN_SRC emacs-lisp
 (define-prefix-command 'personal-global-map)
@@ -65,14 +65,25 @@ No tabs for me.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
+* Security
+I use epa file to open encrypted files automatically
+#+BEGIN_SRC emacs-lisp
+  (use-package epa-file
+    :config
+    (progn
+      (setq epa-file-name-regexp "\\.\\(gpg\\|asc\\)$"
+            epa-armor t)
+      (epa-file-name-regexp-update)
+      (epa-file-enable)))
+#+END_SRC
 * Packages
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
 (setq emacs-dir "~/.emacs.d/")
 (defun in-emacs-d (path)
   (concat emacs-dir path))
-;(add-to-list 'load-path emacs-dir)
 #+END_SRC
+
 ** Cask
 #+BEGIN_SRC emacs-lisp
   (require 'cask "~/.cask/cask.el")
@@ -98,6 +109,13 @@ Load each package individually. Too busy with the re-write today to script up a 
 (add-to-list 'load-path (in-package-d "org-bullets"))
 #+END_SRC
 
+** Use Package
+
+I am switching to use package. It seems to offer a much cleaner package declaration.
+#+BEGIN_SRC emacs-lisp
+(require 'use-package)
+#+END_SRC
+
 ** Require
 
 [[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
@@ -120,8 +138,11 @@ Load each package individually. Too busy with the re-write today to script up a 
 I hate having to track down where I first require a package or have issues with my init ordering.
 #+BEGIN_SRC emacs-lisp
   (require 'calfw)
+  (require 'erc)
   (require 'calfw-org)
   (require 'org-caldav)
+  (require 'org-notmuch)
+  (require 'helm-swoop)
   (require 'wrap-region)
   (require 'perspective)
   (require 'flycheck)
@@ -143,7 +164,7 @@ I hate having to track down where I first require a package or have issues with 
   (require 'spam)
   (require 'org-gnus)
   (require 'uniquify)
-  (require 'real-auto-save)
+;;  (require 'real-auto-save)
   (require 'guide-key)
   (require 'undo-tree)
   (require 'company)

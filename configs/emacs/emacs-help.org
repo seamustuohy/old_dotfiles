@@ -6,10 +6,12 @@
 
 * Writing Help
 ** Spell Checking
-I use flyspell mode for spell checking everywhere.
+I use flyspell mode for spell checking for any text files.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+(add-hook 'message-mode-hook 'turn-on-flyspell 'append)
+
 #+END_SRC
 
 ** Synonyms
@@ -161,6 +163,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
              (define-key yas-minor-mode-map (kbd "TAB") nil)
              (define-key yas-minor-mode-map  (kbd "<C-tab>") 'yas-expand-from-trigger-key)))
 #+END_SRC
+
 
 ** Helm Dash
 
