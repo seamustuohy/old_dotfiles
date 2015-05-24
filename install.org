@@ -47,6 +47,7 @@ NONE
           offlineimap \
           dovecot-imapd \
           notmuch \
+          python-notmuch \
           python-bs4
   }
 #+END_SRC

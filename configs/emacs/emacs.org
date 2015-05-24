@@ -65,17 +65,6 @@ No tabs for me.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
-* Security
-I use epa file to open encrypted files automatically
-#+BEGIN_SRC emacs-lisp
-  (use-package epa-file
-    :config
-    (progn
-      (setq epa-file-name-regexp "\\.\\(gpg\\|asc\\)$"
-            epa-armor t)
-      (epa-file-name-regexp-update)
-      (epa-file-enable)))
-#+END_SRC
 * Packages
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
@@ -240,6 +229,18 @@ Huge time saver.
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C--") 'er/contract-region)
+#+END_SRC
+
+* Security
+I use epa file to open encrypted files automatically
+#+BEGIN_SRC emacs-lisp
+  (use-package epa-file
+    :config
+    (progn
+      (setq epa-file-name-regexp "\\.\\(gpg\\|asc\\)$"
+            epa-armor t)
+      (epa-file-name-regexp-update)
+      (epa-file-enable)))
 #+END_SRC
 
 * Load all other init files (elisp files)
