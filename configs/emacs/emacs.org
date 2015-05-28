@@ -4,8 +4,12 @@
 #+DATE: 2015 Apr 18
 #+TAGS: emacs core
 
+
 #+BEGIN_SRC emacs-lisp
 ;;(setq debug-on-error t)
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+;;(debug)
 #+END_SRC
 
 * Information
@@ -66,6 +70,7 @@ No tabs for me.
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
 * Packages
+
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
 (setq emacs-dir "~/.emacs.d/")
@@ -73,12 +78,15 @@ Set up my emacs main directory path.
   (concat emacs-dir path))
 #+END_SRC
 
+
 ** Cask
+
 #+BEGIN_SRC emacs-lisp
   (require 'cask "~/.cask/cask.el")
   (setq cask-filename "~/.emacs.d/Cask")
   (cask-initialize)
 #+END_SRC
+
 
 ** Local
 Create shortcut to packages directory
@@ -180,6 +188,8 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-bullets)
 #+END_SRC
 
+
+
 * Emacs Environment
 ** Server
 
@@ -234,13 +244,22 @@ Huge time saver.
 * Security
 I use epa file to open encrypted files automatically
 #+BEGIN_SRC emacs-lisp
-  (use-package epa-file
-    :config
-    (progn
-      (setq epa-file-name-regexp "\\.\\(gpg\\|asc\\)$"
-            epa-armor t)
-      (epa-file-name-regexp-update)
-      (epa-file-enable)))
+  ;; (use-package epa-file
+  ;;   :config
+  ;;   (progn
+  ;;     (setq epa-file-name-regexp "\\.\\(gpg\\|asc\\)$"
+  ;;           epa-armor t)
+  ;;     (epa-file-name-regexp-update)
+  ;;     (epa-file-enable)))
+#+END_SRC
+
+
+* Hacks
+This little hack saves me from when pasting becomes VERY slow. It occurs at seeming random intervals.
+- [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2015-04/msg00222.html][Problem]]
+- [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=16737][Solution]]
+#+BEGIN_SRC emacs-lisp
+(setq x-selection-timeout 10)
 #+END_SRC
 
 * Load all other init files (elisp files)
@@ -272,7 +291,7 @@ Hook to actually iterate through all elisp
   Make sure that we can simply =require= this library.
 
 #+BEGIN_SRC elisp
-  (provide 'init-emacs)
+;;  (provide 'init-emacs)
 #+END_SRC
 
   Before you can build this on a new system, make sure that you put
