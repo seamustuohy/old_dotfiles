@@ -15,6 +15,7 @@
                       org-gnus
                       org-annotate-file
                       org-toc
+                      org-notmuch
                       org-notify
                       org-habit
                       org-irc))
@@ -168,7 +169,20 @@ I add my org-protocol captures here.
 (setq org-capture-templates
     (append org-capture-templates '(
                                     ("@" "Contacts" entry (file "~/.s2e/contacts.org")
-                                     "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:"))))
+                                     "* %(org-contacts-template-name)
+:PROPERTIES:
+:EMAIL: %(org-contacts-template-email)
+:PHONE:
+:ALIAS:
+:NICKNAME:
+:IGNORE:
+:ICON:
+:NOTE:
+:ADDRESS:
+:BIRTHDAY:
+:FROM_TAGS:
+:TO_TAGS:
+:END:"))))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp

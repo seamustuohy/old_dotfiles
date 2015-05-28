@@ -27,9 +27,7 @@
 #+END_SRC
 
 * Email
-
 ** Notmuch
-
 *** Setup
 #+BEGIN_SRC emacs-lisp
   (use-package notmuch
@@ -41,6 +39,7 @@
      notmuch-show-indent-messages-width 0
      ;; === SEARCH EMAIL ===
      notmuch-search-oldest-first nil
+     notmuch-fcc-dirs "Sent/"
      ;; === Crypto ===
      ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
      notmuch-crypto-process-mime t
@@ -58,6 +57,10 @@
              (format-time-string "%s.." beg)
              (format-time-string "%s" now))))
       (notmuch-search-filter filter)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq notmuch-fcc-dirs "Sent/")
 #+END_SRC
 
 *** Contacts

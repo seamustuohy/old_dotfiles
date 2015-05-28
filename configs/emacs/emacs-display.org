@@ -179,7 +179,7 @@ Easily switch to your last perspective
     (custom-persp "email")
     (gnus-icalendar-setup) ; Needed to make capture templates work. e.g. they should be loaded last, but my projects are and they muck with the templates.
     (gnus-icalendar-org-setup)
-    (gnus))
+    (notmuch))
   ;;TODO add start offline imap
 
     (defun custom-persp/email ()

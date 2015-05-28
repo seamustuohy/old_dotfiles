@@ -37,7 +37,6 @@ All calendar configuration is done in projects
         cfw:fchar-top-right-corner ?╗)
 #+END_SRC
 
-
 * Gnus integration
 
 #+BEGIN_SRC emacs-lisp
