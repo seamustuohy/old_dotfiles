@@ -29,7 +29,7 @@ Either the Key ID or set to nil to use symmetric encryption.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (setq private-dir "~/.s2e/")
+  (setq private-dir (file-truename "~/.s2e/"))
   (defun in-private-dir (path)
     (concat private-dir path))
 #+END_SRC
@@ -71,9 +71,13 @@ No tabs for me.
 #+END_SRC
 * Packages
 
+#+BEGIN_SRC emacs-lisp
+(setq use-package-verbose t)
+#+END_SRC
+
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
-(setq emacs-dir "~/.emacs.d/")
+(setq emacs-dir (file-truename "~/.emacs.d/"))
 (defun in-emacs-d (path)
   (concat emacs-dir path))
 #+END_SRC
@@ -82,8 +86,8 @@ Set up my emacs main directory path.
 ** Cask
 
 #+BEGIN_SRC emacs-lisp
-  (require 'cask "~/.cask/cask.el")
-  (setq cask-filename "~/.emacs.d/Cask")
+  (require 'cask (file-truename "~/.cask/cask.el"))
+  (setq cask-filename (file-truename "~/.emacs.d/Cask"))
   (cask-initialize)
 #+END_SRC
 
@@ -173,7 +177,7 @@ I hate having to track down where I first require a package or have issues with 
   (require 'projectile)
   (require 'helm)
   (require 'helm-config)
-  (require 'cask "~/.cask/cask.el")
+  (require 'cask (file-truename "~/.cask/cask.el"))
   (require 'server)
   (require 'drag-stuff)
   (require 'diff-hl)
@@ -187,7 +191,6 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-id)
   (require 'org-bullets)
 #+END_SRC
-
 
 
 * Emacs Environment
@@ -253,7 +256,6 @@ I use epa file to open encrypted files automatically
   ;;     (epa-file-enable)))
 #+END_SRC
 
-
 * Hacks
 This little hack saves me from when pasting becomes VERY slow. It occurs at seeming random intervals.
 - [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2015-04/msg00222.html][Problem]]
@@ -262,28 +264,1757 @@ This little hack saves me from when pasting becomes VERY slow. It occurs at seem
 (setq x-selection-timeout 10)
 #+END_SRC
 
-* Load all other init files (elisp files)
+* Calendar
+** Setup Calendar
+All calendar configuration is done in projects
 
-Define where init files are ( ~/.emacs.d/elisp)
 #+BEGIN_SRC emacs-lisp
-(setq personal-elisp-dir (in-emacs-d "elisp/"))
-(defun in-personal-elisp-d (path)
-  (concat personal-elisp-dir path))
+(require 'calfw)
+(require 'calfw-org)
+(require 'org-caldav)
+#+END_SRC
+
+** Pretty-ness
+#+BEGIN_SRC emacs-lisp
+
+  ;; ;; Unicode characters
+  ;; (setq cfw:fchar-junction ?╋
+  ;;       cfw:fchar-vertical-line ?┃
+  ;;       cfw:fchar-horizontal-line ?━
+  ;;       cfw:fchar-left-junction ?┣
+  ;;       cfw:fchar-right-junction ?┫
+  ;;       cfw:fchar-top-junction ?┯
+  ;;       cfw:fchar-top-left-corner ?┏
+  ;;       cfw:fchar-top-right-corner ?┓)
+
+  ;; Another unicode chars
+  (setq cfw:fchar-junction ?╬
+        cfw:fchar-vertical-line ?║
+        cfw:fchar-horizontal-line ?═
+        cfw:fchar-left-junction ?╠
+        cfw:fchar-right-junction ?╣
+        cfw:fchar-top-junction ?╦
+        cfw:fchar-top-left-corner ?╔
+        cfw:fchar-top-right-corner ?╗)
+#+END_SRC
+
+** Gnus integration
+#+BEGIN_SRC emacs-lisp
+  ;; (require 'gnus-icalendar)
+  ;; (setq gnus-icalendar-org-capture-file "~/.org/calendar/email.org")
+  ;; (setq gnus-icalendar-org-capture-headline '("Calendar"))
+  ;; (gnus-icalendar-setup)
+  ;; (gnus-icalendar-org-setup)
+#+END_SRC
+
+* Communication
+** IRC
+#+BEGIN_SRC emacs-lisp
+  (use-package erc
+    :ensure t :defer t
+    :config
+    (setq erc-nick "elation")
+    (require 'erc-list)
+    (setq erc-hide-list '("JOIN" "PART" "QUIT"))
+    (add-to-list 'erc-modules 'list)
+    (erc-update-modules))
+#+END_SRC
+
+*** Channels list commented out because it is contained in a project file with other channels.
+#+BEGIN_SRC emacs-lisp
+    ;; (setq erc-autojoin-channels-alist '(("freenode.net"
+    ;;                                      "#emacs"
+    ;;                                      "#emacs"
+    ;;                                      "#org-mode"
+    ;;                                      "#recon-ng"
+    ;;                                      "#commotion")))
+#+END_SRC
+
+** Email
+*** Notmuch
+**** Setup
+#+BEGIN_SRC emacs-lisp
+  (use-package notmuch
+    :commands notmuch
+    :init
+    (setq
+     ;; === SHOW EMAIL ===
+     ; Allows GPG to work cleanly by not indenting messages in threads
+     notmuch-show-indent-messages-width 0
+     ;; === SEARCH EMAIL ===
+     notmuch-search-oldest-first nil
+     notmuch-fcc-dirs "Sent/"
+     ;; === Crypto ===
+     ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
+     notmuch-crypto-process-mime t
+    ;; == SENDING MAIL
+     message-kill-buffer-on-exit t))
+
+  (use-package org-notmuch)
+
+  (defun notmuch-search-filter-by-date (days)
+    (interactive "NNumber of days to display: ")
+    (let* ((now (current-time))
+           (beg (time-subtract now (days-to-time days)))
+           (filter
+            (concat
+             (format-time-string "%s.." beg)
+             (format-time-string "%s" now))))
+      (notmuch-search-filter filter)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq notmuch-fcc-dirs "Sent/")
+#+END_SRC
+
+**** Contacts
+
+#+BEGIN_SRC emacs-lisp
+(setq org-contacts-files '("~/.s2e/contacts.org"))
+#+END_SRC
+
+Look at my emacs-org.org setup for org contacts capture.
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'org-capture-templates
+  ;;              '("@" "Contacts" entry (file "~/.s2e/contacts.org")
+  ;;                "* %(org-contacts-template-name)
+  ;; :PROPERTIES:
+  ;; :EMAIL: %(org-contacts-template-email)
+  ;; :END:"))
+#+END_SRC
+
+**** Org
+#+BEGIN_SRC emacs-lisp
+(setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
+#+END_SRC
+**** OfflineImap
+Commented out becuase it never seems to work.
+#+BEGIN_SRC emacs-lisp
+; (use-package offlineimap
+;   :load-path "packages/offlineimap/"
+;   :commands offlineimap
+;   :init
+;   (add-hook 'gnus-before-startup-hook 'offlineimap))
+#+END_SRC
+
+**** Clocking
+#+BEGIN_SRC emacs-lisp
+  (use-package org-notmuch-clocking
+    :load-path "packages/org-notmuch-clocking/"
+    :init
+    (defadvice notmuch-search-show-thread (after notmuch-search-show-thread-after activate) (org-notmuch-clocking-email-clock-in))
+
+    (defadvice notmuch-bury-or-kill-this-buffer (before notmuch-bury-or-kill-this-buffer-before activate)
+      (if (eq 'notmuch-show-mode major-mode)
+          (org-notmuch-clocking-email-clock-out)))
+    :config
+    (setq org-notmuch-clocking-file (file-truename "~/.org/email-tracking.org")))
+#+END_SRC
+
+** Twitter
+#+BEGIN_SRC emacs-lisp
+  (use-package twittering-mode
+  :load-path "packages/twittering-mode"
+  :commands twit
+  :config
+  (setq twittering-use-master-password t))
+#+END_SRC
+
+
+
+* Time Clocking
+** Display
+
+When clocked in for a task, display the current task and accumulated time in the frame title.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-clock-clocked-in-display "frame-title")
+#+END_SRC
+
+** TODO Multi-level Time Tracking
+I want to be able to clock to major projects as well as to the websites I visit, emails I am reading and responding to, codebase I am in, emails I am responding to, etc. So, I need to have sub-projects automatically apply closked time to major "project codes" based upon tags (email org), or file location (code).
+
+** TODO Cross Mode Clocking
+
+* Code Support
+** Text Manipulation
+*** Return and indent on prog-mode variants
+#+BEGIN_SRC emacs-lisp
+(defun code/set-newline-and-indent ()
+  (local-set-key [(return)] 'newline-and-indent))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook 'code/set-newline-and-indent)
+#+END_SRC
+
+*** Wrap Regions
+#+BEGIN_SRC emacs-lisp
+; wrap-region
+(require 'wrap-region)
+(add-hook 'prog-mode-hook (lambda () (wrap-region-mode t)))
+(add-hook 'markdown-mode-hook (lambda () (wrap-region-mode t)))
+
+(wrap-region-add-wrapper "*" "*")
+#+END_SRC
+
+** FlyCheck
+
+#+BEGIN_SRC emacs-lisp
+(require 'flycheck)
+#+END_SRC
+
+*** Keybindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c m f") 'flycheck-mode)
+(global-set-key (kbd "C-c f r")
+                '(lambda ()
+                   (interactive)
+                   (flycheck-mode t)))
+
+(global-set-key [(f5)] 'flycheck-previous-error)
+(global-set-key [(f6)] 'flycheck-next-error)
+#+END_SRC
+
+*** Mode Hooks
+#+BEGIN_SRC emacs-lisp
+; turn on flycheck-mode in python-mode
+(add-hook 'python-mode-hook '(lambda () (flycheck-mode)))
+(add-hook 'sh-mode-hook '(lambda () (flycheck-mode)))
+#+END_SRC
+
+** Language Specific
+*** HTML
+#+BEGIN_SRC emacs-lisp
+; web-mode
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
+#+END_SRC
+
+*** XML
+Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules.
+#+BEGIN_SRC emacs-lisp
+(defun bf-pretty-print-xml-region (begin end)
+  "Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules."
+  (interactive "r")
+  (save-excursion
+      (nxml-mode)
+      (goto-char begin)
+      (while (search-forward-regexp "\>[ \\t]*\<" nil t)
+        (backward-char) (insert "\n"))
+      (indent-region begin end))
+    (message "Ah, much better!"))
+#+END_SRC
+
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+(autoload 'markdown-mode "markdown-mode.el" nil t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+;; flyspell mode for spell checking in markdown
+(add-hook 'markdown-mode-hook 'turn-on-flyspell 'append)
+#+END_SRC
+
+*** YAML
+#+BEGIN_SRC emacs-lisp
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+#+END_SRC
+
+*** LogFiles
+#+BEGIN_SRC emacs-lisp
+ (require 'syslog-mode)
+ (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode))
+#+END_SRC
+
+*** python
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+#+END_SRC
+*** Lisp
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-mode))
+#+END_SRC
+
+** Code Folding
+#+BEGIN_SRC emacs-lisp
+(setq hs-hide-comments-when-hiding-all +1)
+(setq hs-isearch-open t)
+(require 'hideshow-org)
+; Displaying overlay content in echo area or tooltip
+(defun display-code-line-counts (ov)
+      (when (eq 'code (overlay-get ov 'hs))
+        (overlay-put ov 'help-echo
+                     (buffer-substring (overlay-start ov)
+                                      (overlay-end ov)))))
+
+    (setq hs-set-up-overlay 'display-code-line-counts)
+; How do I get it to expand upon a goto-line?
+(defadvice goto-line (after expand-after-goto-line
+                                activate compile)
+        "hideshow-expand affected block when using goto-line in a collapsed buffer"
+        (save-excursion
+           (hs-show-block)))
+
+#+END_SRC
+
+* Display
+** Mark and Cursor
+
+I like to have the mark always active when I am selecting text.  This highlights the mark area.
+NOTE: I am currently exploring how to correctly use the mark, so this may become an annoyance.
+
+#+BEGIN_SRC emacs-lisp
+  (setq transient-mark-mode t)
+#+END_SRC
+
+I like to know exactly what character my cursor is on. This sets the cursor to be a box on top of that character.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default cursor-type 'box)
+#+END_SRC
+
+I want to see parens highlighted and I want them immediately.
+
+#+BEGIN_SRC emacs-lisp
+  (setq show-paren-delay 0)
+  (show-paren-mode)
+#+END_SRC
+
+** Indicators
+*** Line number mode
+I want to know what line number I am on. Line-number-mode keeps track of this for me globally.
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode 1)
+#+END_SRC
+
+*** Frame shows buffer name
+When not clocked into a task I want to see the full path of the current buffer I am in in the title frame.
+#+BEGIN_SRC emacs-lisp
+  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
+#+END_SRC
+
+*** Git Changes in the fringe
+In any programming major mode I use [diff-hl](https://github.com/dgutov/diff-hl) for highlighting uncommitted changes to my files  in the fringe.
+- Red shows deleted lines (sometimes)
+- Green shows added lines
+- Blue Shows changed lines.
+#+BEGIN_SRC emacs-lisp
+
+(add-hook 'prog-mode-hook '(lambda () (diff-hl-mode)))
+#+END_SRC
+
+*** Display trailing whitespace in code
+I want trailing whitespaces displayed when I am in programming mode.
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook (lambda ()
+                              (setq show-trailing-whitespace t)))
+#+END_SRC
+
+*** Line Numbers for coding
+When coding I  want to have my line number displayed on every line.
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook '(lambda () (linum-mode)))
+#+END_SRC
+
+*** visual bells
+
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+(setq visible-bell t)
+#+END_SRC
+
+** Clean up
+
+Get rid of the annoying menubars, toolbars, scrollbars, bells, and splash screens.
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (if (boundp 'tool-bar-mode)
+      (tool-bar-mode 0))
+  (if (fboundp 'scroll-bar-mode)
+      (scroll-bar-mode 0))
+  (setq ring-bell-function 'ignore)
+  (setq inhibit-splash-screen t)
+#+END_SRC
+
+This makes the frame title format the currently active buffer so I can just look up to see the full path of whatever file I am modifying. [[file:emacs-clocking.org][See emacs-clocking for modifications for showing clocked tasks in the title frame.]]
+#+BEGIN_SRC emacs-lisp
+  (setq frame-title-format '(buffer-file-name "%f" ("%b")))
+#+END_SRC
+
+I use popwin mode to make sure that temporary buffers act as pop-up windows and can be closed with <C-g>.
+#+BEGIN_SRC emacs-lisp
+  (require 'popwin)
+  (popwin-mode 1)
+#+END_SRC
+
+** Splitting Windows
+
+These settings split the window and load a previous buffer (instead of the same buffer in both).
+This has a better chance of being what I want when splitting strings. See: http://www.reddit.com/r/emacs/comments/25v0eo/you_emacs_tips_and_tricks/chldury
+#+BEGIN_SRC emacs-lisp
+  (defun bnb/vplit-last-buffer ()
+    (interactive)
+    (split-window-vertically)
+    (other-window 1 nil)
+    (switch-to-next-buffer))
+
+  (defun bnb/hsplit-last-buffer ()
+    (interactive)
+    (split-window-horizontally)
+    (other-window 1 nil)
+    (switch-to-next-buffer))
+
+  (global-set-key (kbd "C-x 2") 'bnb/vplit-last-buffer)
+  (global-set-key (kbd "C-x 3") 'bnb/hsplit-last-buffer)
+#+END_SRC
+
+** Perspective
+*** Config
+[[http://www.wickeddutch.com/2014/01/03/gaining-some-perspective-in-emacs/][Mostly taken from Wicked Dutch]]
+Setup perspectives, or workspaces, to switch between
+
+Enable perspective mode
+#+BEGIN_SRC emacs-lisp
+(persp-mode t)
+#+END_SRC
+
+loading code for our custom perspectives
+taken from Magnar Sveen
+#+BEGIN_SRC emacs-lisp
+  (defmacro custom-persp (name &rest body)
+    `(let ((initialize (not (gethash ,name perspectives-hash)))
+           (current-perspective persp-curr))
+       (persp-switch ,name)
+       (when initialize ,@body)
+       (setq persp-last current-perspective)))
+#+END_SRC
+
+Jump to last perspective
+taken from Magnar Sveen
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp-last ()
+    (interactive)
+    (persp-switch (persp-name persp-last)))
+#+END_SRC
+
+Easily switch to your last perspective
+#+BEGIN_SRC emacs-lisp
+(define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
+#+END_SRC
+
+*** Calendar
+
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp/start-calendar ()
+    (interactive)
+    (custom-persp "calendar")
+    (setq cfw:render-line-breaker 'cfw:render-line-breaker-none)
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (org-caldav-sync) ;;sync with the online calendar (possibly do this at startup instead of here)
+    (cfw:open-org-calendar)
+    )
+
+  (defun custom-persp/calendar ()
+    (interactive)
+    (custom-persp "calendar")
+    (setq cfw:render-line-breaker 'cfw:render-line-breaker-none)
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (cfw:open-org-calendar)
+    )
+
+  (define-key persp-mode-map (kbd "C-x p C") 'custom-persp/start-calendar) ;;only on first time do we sync
+  (define-key persp-mode-map (kbd "C-x p c") 'custom-persp/calendar)
+#+END_SRC
+
+*** Email
+#+BEGIN_SRC emacs-lisp
+  (defun custom-persp/start-email ()
+    (interactive)
+    (custom-persp "email")
+    (gnus-icalendar-setup) ; Needed to make capture templates work. e.g. they should be loaded last, but my projects are and they muck with the templates.
+    (gnus-icalendar-org-setup)
+    (notmuch))
+  ;;TODO add start offline imap
+
+    (defun custom-persp/email ()
+      (interactive)
+      (custom-persp "email"))
+
+      (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
+      (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
+#+END_SRC
+
+*** Org Agenda
+org-agenda persp
+#+BEGIN_SRC emacs-lisp
+    (defun custom-persp/org-agenda ()
+      (interactive)
+      (custom-persp "org"))
+
+      (define-key persp-mode-map (kbd "C-x p o") 'custom-persp/org-agenda)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+    (defun custom-persp/org-agenda-start ()
+      (interactive)
+      (custom-persp "org")
+      (org-agenda nil "ta"))
+
+      (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
+#+END_SRC
+
+*** IRC
+#+BEGIN_SRC emacs-lisp
+      (defun custom-persp/start-irc ()
+        (interactive)
+        (custom-persp "irc")
+        (erc :server "irc.freenode.net" :port "6667" :password nil))
+      (defun custom-persp/irc ()
+        (interactive)
+        (custom-persp "irc"))
+
+        (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
+        (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
+#+END_SRC
+
+** Pretty Things
+*** Themes
+I keep my themes in a separate themes directory in my .emacs.d folder.
+#+BEGIN_SRC  emacs-lisp
+(add-to-list 'custom-theme-load-path (in-emacs-d "themes"))
+#+END_SRC
+
+Load my current theme.
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'tango-dark t)
+#+END_SRC
+
+*** Colors
+#+BEGIN_SRC emacs-lisp
+(require 'rainbow-mode)
+(add-to-list 'find-file-hook
+             (lambda () (unless (derived-mode-p 'web-mode) (rainbow-mode))))
+#+END_SRC
+
+*** Fonts
+#+BEGIN_SRC emacs-lisp
+;; (setq my/font-family "M+ 1mn")
+;;(setq my/font-family "Source Code Pro")
+;;(setq my/font-family "hermit")
+;; (setq my/font-family "Anonymous Pro")
+;;(set-frame-font my/font-family)
+;;(set-face-attribute 'default nil :font my/font-family :height 120)
+;;(set-face-font 'default my/font-family)
+#+END_SRC
+*** Quotes
+#+BEGIN_SRC emacs-lisp
+;; Quote of the Day
+(setq totd-file "~/.dotfiles/.quotes")
+
+(defun totd()
+  (random t)
+  (let ((stars "*****************************")
+        (tip (with-temp-buffer
+               (insert-file-contents totd-file)
+               (goto-line (1+ (random
+                               (count-lines (point-min)
+                                            (point-max)))))
+               (buffer-substring (point) (line-end-position)))))
+    (momentary-string-display
+     (concat "\n\n" stars "\n"
+             "Elation Foundation:\n"
+             "\n" tip "\n\n"
+             stars "\n\n")
+      (window-start) ?\r
+      "Hit any key when done reading")))
+(totd)
+#+END_SRC
+
+* File Management
+** Cleanup
+
+I use these files for cleaning buffers when I save, or get annoyed by red highlighted spaces everywhere.
+
+#+BEGIN_SRC emacs-lisp
+(defun file-management/cleanup-buffer-safe ()
+  "Perform a bunch of safe operations on the whitespace content of a buffer.
+Does not indent buffer, because it is used for a before-save-hook, and that
+might be bad."
+  (interactive)
+  (if (not (or (string= major-mode 'makefile-gmake-mode)
+               (string= major-mode 'makefile-mode)))
+      (untabify (point-min) (point-max)))
+  (delete-trailing-whitespace)
+  (set-buffer-file-coding-system 'utf-8))
+
+(defun file-management/cleanup-buffer ()
+  "Perform a bunch of operations on the whitespace content of a buffer.
+Including indent-buffer, which should not be called automatically on save."
+  (interactive)
+  (file-management/cleanup-buffer-safe)
+  (indent-region (point-min) (point-max)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-c n") 'file-management/cleanup-buffer)
+#+END_SRC
+
+Add the hook.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'file-management/cleanup-buffer-safe)
+#+END_SRC
+
+** Syncing
+
+*** When files change on disk I want the buffers to change to match them.
+I will modify text files in bash while they are open in emacs when I need to do more automated modification.
+#+BEGIN_SRC emacs-lisp
+(global-auto-revert-mode 1)
+#+END_SRC
+
+*** I force emacs to assume new files are always modified. This is useful for  creating empty files.
+#+BEGIN_SRC emacs-lisp
+(defun file-management/assume-new-is-modified ()
+  (when (not (file-exists-p (buffer-file-name)))
+    (set-buffer-modified-p t)))
+#+END_SRC
+
+Add the hook
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'find-file-hooks 'file-management/assume-new-is-modified)
+#+END_SRC
+
+** Identification
+uniquify shows a files location when it shares the same name as another file.
+#+BEGIN_SRC emacs-lisp
+(require 'uniquify)
+(setq
+  uniquify-buffer-name-style 'post-forward
+  uniquify-separator ":")
+#+END_SRC
+
+I like my desktop to be saved across sessions.
+#+BEGIN_SRC emacs-lisp
+(desktop-save-mode 1)
+(setq desktop-restore-eager 10)
+#+END_SRC
+** Backups
+
+I use close to the basic backup setup described in the [[http://emacswiki.org/emacs/BackupDirectory][emacswiki.]]
+
+#+BEGIN_SRC emacs-lisp
+;;(setq temporary-file-directory "/tmp/")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq
+   backup-by-copying t      ; don't clobber symlinks
+   backup-directory-alist
+   `((".*" . ,temporary-file-directory))
+   auto-save-file-name-transforms
+   `((".*" ,temporary-file-directory t))
+   kept-new-versions 6
+   kept-old-versions 2
+   version-control t)       ; use versioned backups
+#+END_SRC
+
+Automatically purge backup files not accessed in a week:
+#+BEGIN_SRC emacs-lisp
+  (message "Deleting old backup files...")
+  (let ((week (* 60 60 24 7))
+        (current (float-time (current-time))))
+    (dolist (file (directory-files temporary-file-directory t))
+      (when (and (backup-file-name-p file)
+                 (> (- current (float-time (fifth (file-attributes file))))
+                    week))
+        (message "%s" file)
+        (delete-file file))))
+#+END_SRC
+
+** Auto-Save
+
+#+BEGIN_SRC emacs-lisp
+;;(require 'real-auto-save)
+;;(add-hook 'prog-mode-hook 'real-auto-save-mode)
+;;(setq real-auto-save-interval 30)
+#+END_SRC
+
+* Help
+** Writing Help
+*** Spell Checking
+I use flyspell mode for spell checking for any text files.
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+(add-hook 'message-mode-hook 'turn-on-flyspell 'append)
+
+#+END_SRC
+
+*** Synonyms
+**** KeyBindings
+#+BEGIN_QUOTE
+`C-u'     - Search for additional synonyms, in two senses:
+
+    1) Return also synonyms that are matched partially by the input.
+
+    2) Search the entire thesaurus for input matches, even if the input matches a thesaurus entry.
+
+`M--'     - Append the search results to any previous search results, in buffer *Synonyms*.  (Normally, the new results replace any previous results.)
+
+`C-u C-u' - `C-u' plus `M--': Search more and append results.
+#+END_QUOTE
+
+**** Define path for synonyms code and thesaurus
+#+BEGIN_SRC emacs-lisp
+(setq synonyms-file        "~/.emacs.d/resources/thesaurus/mthesaur.txt")
+(setq synonyms-cache-file  "~/.emacs.d/cache/thesaurus.txt")
+(require 'synonyms)
+#+END_SRC
+
+*** Writegood mode
+
+helps me write-good.
+
+#+BEGIN_SRC emacs-lisp
+(require 'writegood-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(define-key personal-global-map (kbd "ww") 'writegood-mode)
+(define-key personal-global-map (kbd "wl") 'writegood-grade-level)
+(define-key personal-global-map (kbd "we") 'writegood-reading-ease)
+#+END_SRC
+
+** Emacs Help
+*** Guide Key
+[[https://github.com/kai2nenobu/guide-key][guide-key.el]] displays the available key bindings automatically and dynamically. guide-key aims to be an alternative of one-key.el.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'guide-key)
+  (setq guide-key/guide-key-sequence t)
+  (guide-key-mode 1)
+  (setq guide-key/idle-delay .5)
+  (setq guide-key/popup-window-position 'bottom)
+#+END_SRC
+
+*** Emacs Guru Mode
+[[https://github.com/bbatsov/guru-mode][Guru mode]] disables some common keybindings and suggests the use of the established Emacs alternatives instead.
+
+#+BEGIN_SRC emacs-lisp
+(require 'guru-mode)
+#+END_SRC
+
+Currently running this globally. I may want to change this if I get too annoyed.
+#+BEGIN_SRC emacs-lisp
+  (guru-global-mode +1)
+  ;;(add-hook 'prog-mode-hook 'guru-mode)
+#+END_SRC
+
+I only want to get warnings when I use the arrow keys.
+#+BEGIN_SRC emacs-lisp
+(setq guru-warn-only t)
+#+END_SRC
+
+*** Undo Help
+Undo tree makes complex undo actions easy
+#+BEGIN_SRC emacs-lisp
+(require 'undo-tree)
+(global-undo-tree-mode t)
+#+END_SRC
+(define-key personal-global-map (kbd "u") 'undo-tree-visualize)
+
+**** Keep region when undoing in region
+Make it so the region does not keep jumping about when I use it.
+Via" [[http://whattheemacsd.com/my-misc.el-02.html][what the emacs.d]]
+
+#+BEGIN_SRC emacs-lisp
+(defadvice undo-tree-undo (around keep-region activate)
+  (if (use-region-p)
+      (let ((m (set-marker (make-marker) (mark)))
+            (p (set-marker (make-marker) (point))))
+        ad-do-it
+        (goto-char p)
+        (set-mark m)
+        (set-marker p nil)
+        (set-marker m nil))
+    ad-do-it))
+#+END_SRC
+
+** Text Help
+*** Company Mode
+#+BEGIN_SRC emacs-lisp
+(require 'company)
+(setq company-idle-delay 0.5)
+(setq company-tooltip-limit 10)
+(setq company-minimum-prefix-length 2)
+
+;; invert the navigation direction if the the completion popup-isearch-match
+;; is displayed on top (happens near the bottom of windows)
+(setq company-tooltip-flip-when-above t)
+
+(add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
+
+*** Auto-Complete Mode
+I am currently giving company mode a try out as an alternative to auto-complete mode.
+
+#+BEGIN_SRC emacs-lisp
+; (require 'auto-complete)
+; (require 'auto-complete-config)
+; (global-auto-complete-mode t)
+; (ac-config-default)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+;(defun ac-python-mode-setup ()
+;  (setq ac-sources (append '(ac-source-yasnippet ac-source-semantic) ac-sources)))
+;
+;(add-hook 'python-mode-hook 'ac-python-mode-setup)
+#+END_SRC
+
+*** Yasnippet
+#+BEGIN_SRC emacs-lisp
+(require 'yasnippet)
+(yas/global-mode 1)
+(setq yas/indent-line 'fixed) ; for indented snippets
+#+END_SRC
+
+YASnippet - should appear before custom-set-variables
+
+#+BEGIN_SRC emacs-lisp
+(defcustom python-snippet-debugger "pdb"
+  "Which python debugger should be used in the pdb template"
+  :type 'string
+  :group 'yasnippet)
+#+END_SRC
+
+Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet has a wrong fallback to the default <tab>, breaking Python's indentation cycling feature, and possibly other things too.
+    - See:
+       - https://github.com/fgallina/python.el/issues/123
+       - https://github.com/capitaomorte/yasnippet/issues/332
+#+BEGIN_SRC emacs-lisp
+(add-hook 'yas-minor-mode-hook
+          '(lambda ()
+             (define-key yas-minor-mode-map [(tab)] nil)
+             (define-key yas-minor-mode-map (kbd "TAB") nil)
+             (define-key yas-minor-mode-map  (kbd "<C-tab>") 'yas-expand-from-trigger-key)))
+#+END_SRC
+
+*** Helm Dash
+
+#+BEGIN_SRC emacs-lisp
+(require 'helm-dash)
+#+END_SRC
+
+**** Install doc-sets via: [[https://github.com/glynnforrest/emacs.d/blob/75589b87af99167517682f1bbbacad1f55de2438/site-lisp/setup-helm.el][glynn forrest]]
+#+BEGIN_SRC emacs-lisp
+
+  (defvar helm-dash-required-docsets '()
+    "A list of required helm-dash-docsets")
+
+  (setq helm-dash-required-docsets
+        )
+
+  ;; By default, no docsets are enabled.
+  (setq helm-dash-common-docsets '(
+          "Ansible"
+          "Bash"
+          "CSS"
+          "HTML"
+          "JavaScript"
+          "LaTeX"
+          "Markdown"
+          "Python 2"
+          "Python 3"
+          "D3JS"
+          "Lua_5.2"
+          "Emacs_Lisp"
+          "Flask"
+          ))
+#+END_SRC
+
+**** Set our custom hooks for various modes
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'emacs-lisp-mode-hook '(lambda () (setq-local helm-dash-docsets '("Emacs Lisp"))))
+(add-hook 'c-mode-hook '(lambda () (setq-local helm-dash-docsets '("C"))))
+(add-hook 'sh-mode-hook '(lambda () (setq-local helm-dash-docsets '("Bash"))))
+(add-hook 'lua-mode-hook '(lambda () (setq-local helm-dash-docsets '("Lua"))))
+(add-hook 'markdown-mode-hook '(lambda () (setq-local helm-dash-docsets '("Markdown" "LaTeX"))))
+(add-hook 'org-mode-hook '(lambda () (setq-local helm-dash-docsets '("LaTeX" "Emacs Lisp" "Bash" "Python" "HTML"))))
+
+;; Web based docs
+(add-hook 'web-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3.js" "HTML" "CSS" "JavaScript"))))
+(add-hook 'javascript-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3.js" "JavaScript"))))
+
+;;python docs
+(add-hook 'python-mode-hook '(lambda () (setq-local helm-dash-docsets '("Ansible" "Flask" "Python"))))
+#+END_SRC
+
+**** Use the eww browser to view docsets
+#+BEGIN_SRC emacs-lisp
+(setq helm-dash-browser-func 'eww-browse-url)
+#+END_SRC
+
+**** Create keybindings
+#+BEGIN_SRC emacs-lisp
+(define-key personal-global-map (kbd "h d") 'helm-dash)
+(define-key personal-global-map (kbd "h p") 'helm-dash-at-point)
+#+END_SRC
+
+* Navigation
+** In-File
+
+  Movement and line based commands should operate on the lines that I see (even if they are using word wrap) by default.
+
+#+BEGIN_SRC emacs-lisp
+(global-visual-line-mode t)
+#+END_SRC
+
+# Sublimity provides smooth-scrolling and minimap, like the sublime editor.
+#+BEGIN_SRC emacs-lisp
+;  (require 'sublimity-scroll)
+;  (sublimity-mode 1)
+;  (setq sublimity-scroll-weight 10
+;        sublimity-scroll-drift-length 5)
+#+END_SRC
+
+#Scroll one line at a time without recentering the screen
+#+BEGIN_SRC emacs-lisp
+;(setq scroll-step 1
+;      scroll-conservatively 10000)
+#+END_SRC
+
+*** Smart beginning of the line
+Move point to the first non-whitespace character on this line. If point was already at that position, move point to beginning of line.
+
+#+BEGIN_SRC emacs-lisp
+;; Move to the beginning of the text
+(defun smart-beginning-of-line ()
+  "Move point to first non-whitespace character or beginning-of-line.
+
+Move point to the first non-whitespace character on this line.
+If point was already at that position, move point to beginning of line."
+  (interactive) ; Use (interactive "^") in Emacs 23 to make shift-select work
+  (let ((oldpos (point)))
+    (back-to-indentation)
+    (and (= oldpos (point))
+         (beginning-of-line))))
+
+(global-set-key (kbd "C-a") 'smart-beginning-of-line)
+#+END_SRC
+
+** Projectile
+#+BEGIN_SRC emacs-lisp
+  (require 'projectile)
+  (projectile-global-mode)
+#+END_SRC
+
+** Helm
+
+Use helm and turn the delay to nothing.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :init
+    (progn
+      (require 'helm-config)
+      (setq helm-candidate-number-limit 100)
+      ;; From https://gist.github.com/antifuchs/9238468
+      (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+            helm-input-idle-delay 0.01  ; this actually updates things
+                                          ; reeeelatively quickly.
+            helm-quick-update t
+            helm-M-x-requires-pattern nil
+            helm-ff-skip-boring-files t)
+      (helm-mode))
+    :bind (("C-c h" . helm-mini)
+           ("C-x y" . helm-show-kill-ring)
+           ("M-x" . helm-M-x)
+           ("C-x b" . helm-buffers-list)
+           ("C-x C-f" . helm-find-files)
+           ("M-i" . helm-semantic-or-imenu)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-swoop
+ :bind (("C-S-s" . helm-swoop)))
+#+END_SRC
+
+* Org-Mode
+** General
+*** Org-Modules
+
+[[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-modules '(org-bbdb
+                      org-contacts
+                      org-gnus
+                      org-annotate-file
+                      org-toc
+                      org-notmuch
+                      org-notify
+                      org-habit
+                      org-irc))
+
+  (eval-after-load 'org
+    '(org-load-modules-maybe t))
+#+END_SRC
+*** Requirements
+#+BEGIN_SRC emacs-lisp
+(require 'org)
+#+END_SRC
+
+*** Files to activate org for
+Open org-mode for .org files and for .org.gpg files.
+Read [[http://ergoemacs.org/emacs/emacs_auto-activate_a_major-mode.html][this]] for how to format these strings. Then go and buy his book. It is the same content, but it is really good content and should be supported.
+
+Ends with ".org"
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist
+               '("\\.org\\'" . org-mode))
+#+END_SRC
+
+".org.gpg" occurs at least once in the file name. I use this when I open my archive files.
+#+BEGIN_SRC emacs-lisp
+;;   (add-to-list 'auto-mode-alist '("\\(\\.org\\.gpg\\)?$" . org-mode))
+#+END_SRC
+
+*** Auto Save
+ Set auto-save for org mode files every hour, on the hour.
+#+BEGIN_SRC emacs-lisp
+(run-at-time "00:59" 3600 'org-save-all-org-buffers)
+#+END_SRC
+** Filing
+*** Keywords
+#+BEGIN_SRC emacs-lisp
+;; keyword bindings
+(setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "TASK(T)" "|" "DONE(d!)")
+                                (sequence "WAIT(w@!/@!)"  "SOMEDAY(s)" "CANCELED(C)")
+                                (sequence "REPLY(r@/!)" "CONTACT(c@/!)" "MEETING(M)"))))
+#+END_SRC
+
+Set the colors and properties for org mode tags
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keyword-faces
+        (quote (
+                ("TODO" :foreground "red" :weight bold)
+                ("TASK" :foreground "red" :weight bold)
+                ("NEXT" :foreground "red" :weight bold)
+                ("CONTACT" :foreground "orange" :weight bold)
+                ("REPLY" :foreground "orange" :weight bold)
+                ("WAIT" :foreground "orange" :weight bold)
+                ("MEETING" :foreground "DarkGoldenrod2" :weight bold)
+                ("EVENT" :foreground "DarkGoldenrod2" :weight bold)
+                ("DONE" :foreground "cornflower blue" :weight bold)
+                ("SOMEDAY" :foreground "cornflower blue" :weight bold)
+                ("IDEA" :foreground "blue" :weight bold))))
+
+  (setq org-todo-state-tags-triggers
+        (quote (("SOMEDAY" ("SOMEDAY" . t))
+                ("WAIT" ("WAIT" . t))
+                ("TODO" ("WAIT") ("SOMEDAY"))
+                ("TASK" ("WAIT") ("SOMEDAY"))
+                ("CONTACT" ("WAIT" .t))
+                ("DONE" ("WAIT") ("SOMEDAY"))
+                ("NEXT" ("WAIT")))))
+#+END_SRC
+*** Capture
+
+Capture Mode
+#+BEGIN_SRC emacs-lisp
+(setq org-default-notes-file "~/.org/todo/to_file.org")
+(global-set-key (kbd "C-c c") 'org-capture)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+Capture templates for TODO tasks, Notes, appointments, phone calls, meetings,
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates '(
+                                      ("f" "TO FILE")
+                                      ("ft" "todo" entry (file "~/.org/todo/to_file.org")
+                                       "* TODO %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fT" "task" entry (file "~/.org/todo/to_file.org")
+                                       "* TASK %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:WITH:%^{Do With?}\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fr" "respond" entry (file "~/.org/todo/to_file.org")
+                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t)
+                                      ("fn" "note" entry (file "~/.org/todo/to_file.org")
+                                       "* %? :NOTE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fm" "Meeting" entry (file "~/.org/todo/to_file.org")
+                                       "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+                                      ("fp" "Phone call" entry (file "~/.org/todo/to_file.org")
+                                       "* PHONE %? :PHONE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:" :clock-in t :clock-resume t)
+                                      ("fh" "Habit" entry (file "~/.org/todo/to_file.org")
+                                       "* NEXT %?\nSCHEDULED: %(format-time-string \"<%Y-%m-%d %a .+1d/3d>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n)")
+                                      ("fi" "idea" entry (file "~/.org/todo/to_file.org")
+                                       "* IDEA %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fw" "wait" entry (file "~/.org/todo/to_file.org")
+                                       "* WAIT for %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fc" "Contact" entry (file "~/.org/todo/to_file.org")
+                                       "* CONTACT %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
+                                      ("fe" "Event" entry (file "~/.org/todo/to_file.org")
+                                       "* EVENT %?:EVENT:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)))
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+    (append org-capture-templates '(
+                                     ("C" "Org-Protocol")
+                                     ("Ce" "org-protocol" entry (file "~/.org/calendar/work.org")
+                                      "* %(notmuch-show-get-subject)\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n%T\n%i"))))
+
+#+END_SRC
+
+
+
+
+https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
+;; Searches for the current kill-ring head and adds the text under it.
+;; If kill ring head is not found it creates it at the bottom of the file.
+;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
+#+BEGIN_SRC emacs-lisp
+(defun dont-dup-headline ()
+  (let* ((org-refile-targets '((nil :maxlevel . 9)))
+         (hd (eval (current-kill 0))))
+    (goto-char (point-min))
+    (outline-next-heading)
+    (if (re-search-forward
+         (format org-complex-heading-regexp-format (regexp-quote hd))
+         nil t)
+        (goto-char (point-at-bol))
+      (goto-char (point-max))
+      (or (bolp) (insert "\n"))
+      (insert "* " hd "\n")))
+    (end-of-line))
+
+#+END_SRC
+
+I add my org-protocol captures here.
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+  (append org-capture-templates '(
+                                   ("p" "Org-Protocol")
+                                   ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
+                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+                                   ("pc" "org-protocol-to-clocked" entry (clock)
+                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+                                   ("pG" "Guides and Manuals (AUTO)" plain (file+function "~/.org/work/library/guides.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pB" "Best Practices (AUTO)" plain (file+function "~/.org/work/library/b_practices.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pT" "Tools (AUTO)" plain (file+function "~/.org/work/library/tools.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pL" "Lessons Learned (AUTO)" plain (file+function "~/.org/work/library/lessons.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pO" "Organizations (AUTO)" plain (file+function "~/.org/work/library/orgs.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+    (append org-capture-templates '(
+                                    ("@" "Contacts" entry (file "~/.s2e/contacts.org")
+                                     "* %(org-contacts-template-name)
+:PROPERTIES:
+:EMAIL: %(org-contacts-template-email)
+:PHONE:
+:ALIAS:
+:NICKNAME:
+:IGNORE:
+:ICON:
+:NOTE:
+:ADDRESS:
+:BIRTHDAY:
+:FROM_TAGS:
+:TO_TAGS:
+:END:"))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+    (append org-capture-templates '(
+                                      ("Q" "TEST-respond" entry (file "~/.org/todo/to_file.org")
+                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t))))
+#+END_SRC
+
+*** References
+- http://juanreyero.com/article/emacs/org-teams.html
+** Refile
+
+Targets include this file and any file contributing to the agenda - up to 3 levels deep
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-targets (quote ((nil :maxlevel . 4)
+                                 (org-agenda-files :maxlevel . 4))))
+#+END_SRC
+
+Allow refile to create parent tasks with confirmation
+#+BEGIN_SRC emacs-lisp
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
+#+END_SRC
+
+Targets complete in steps so we start with filename, TAB shows the next level of targets etc
+#+BEGIN_SRC emacs-lisp
+(setq org-outline-path-complete-in-steps t)
+#+END_SRC
+
+Dont give me DONE tasks as targets for refiling
+
+#+BEGIN_SRC emacs-lisp
+(defun org-init/verify-refile-target ()
+  "Exclude todo keywords with a done state from refile targets"
+  (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+
+(setq org-refile-target-verify-function 'org-init/verify-refile-target)
+#+END_SRC
+
+** Display
+Font-lock-mode will colorize/fontify text as I type it.
+This is great for showing TODO items immediately as I type them out.
+#+BEGIN_SRC emacs-lisp
+(global-font-lock-mode 1)
+#+END_SRC
+
+*** Bullets Mode
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+
+*** Inline images
+
+When you see an image link, make it the image.
+#+BEGIN_SRC emacs-lisp
+  ;; (add-to-list 'iimage-mode-image-regex-alist
+  ;;              (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex
+  ;;                            "\\)\\]") 1))
+#+END_SRC
+
+
+Enable iimage-mode every time an org-mode file is opened
+#+BEGIN_SRC emacs-lisp
+  ;; (add-hook 'org-mode-hook
+  ;;           (lambda ()
+  ;;             (iimage-mode)))
+#+END_SRC
+
+Enable toggle in case it does not work.
+#+BEGIN_SRC emacs-lisp
+  ;; (defun org-toggle-iimage-in-org ()
+  ;;   "display images in your org file"
+  ;;   (interactive)
+  ;;   (if (face-underline-p 'org-link)
+  ;;       (set-face-underline-p 'org-link nil)
+  ;;     (set-face-underline-p 'org-link t))
+  ;;   (iimage-mode))
+#+END_SRC
+
+** Searching & Viewing
+*** Agenda
+**** Keybindings for Agenda Mode
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+#+END_SRC
+
+**** Agenda Files
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files (quote ("~/.org/todo"
+                                 "~/.org/personal/"
+                                 "~/.org/work/library")))
+#+END_SRC
+**** Basic Settings
+#+BEGIN_SRC emacs-lisp
+;;Start with the agenda log ON
+(setq org-agenda-show-log t)
+
+;; Set the agenda to skip scheduled items if they are done
+(setq org-agenda-skip-scheduled-if-done t)
+
+;; Set the agenda to skip deadlines if they are done
+(setq org-agenda-skip-deadline-if-done t)
+#+END_SRC
+**** Agenda todo item configuration
+#+BEGIN_SRC emacs-lisp
+;; Keep tasks with dates on the global todo lists
+(setq org-agenda-todo-ignore-with-date nil)
+
+;; Keep tasks with deadlines on the global todo lists
+(setq org-agenda-todo-ignore-deadlines nil)
+
+;; Keep tasks with scheduled dates on the global todo lists
+(setq org-agenda-todo-ignore-scheduled nil)
+
+;; Keep tasks with timestamps on the global todo lists
+(setq org-agenda-todo-ignore-timestamp nil)
+
+;; Remove completed deadline tasks from the agenda view
+(setq org-agenda-skip-deadline-if-done t)
+
+;; Remove completed scheduled tasks from the agenda view
+(setq org-agenda-skip-scheduled-if-done t)
+
+;; Remove completed items from search results
+(setq org-agenda-skip-timestamp-if-done t)
+#+END_SRC
+
+**** Display
+
+***** Always hilight the current agenda line
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-agenda-mode-hook
+          '(lambda () (hl-line-mode 1))
+          'append)
+#+END_SRC
+
+***** Time Grid
+#+BEGIN_SRC emacs-lisp
+;;Set time grid ON for day
+(setq org-agenda-use-time-grid t)
+
+;; Set time grid times (show always on day even if no tasks set.)
+(setq org-agenda-time-grid
+      '((daily today)
+       "----------------"
+       (600 800 1000 1200 1400 1600 1800 2000)))
+#+END_SRC
+
+***** Custom clock faces
+#+BEGIN_SRC emacs-lisp
+;; The following custom-set-faces create the highlights
+(custom-set-faces
+ '(org-mode-line-clock ((t (:background "grey75" :foreground "red" :box (:line-width -1 :style released-button)))) t))
+#+END_SRC
+
+**** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
+#+BEGIN_SRC emacs-lisp
+;; Inhibit agenda files startup options (Org > 8.0)
+;; http://orgmode.org/worg/agenda-optimization.html#sec-4
+(setq org-agenda-inhibit-startup t)
+
+;; Do not dim blocked tasks
+(setq org-agenda-dim-blocked-tasks nil)
+#+END_SRC
+
+**** Custom agenda commands
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-custom-commands
+      (quote (("ts"
+               "TODAY's SHORT"
+               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                (agenda ""
+                ((org-agenda-ndays 1)
+                 (org-agenda-log-mode-items '(clock closed))
+                 (org-agenda-entry-types '())))
+                nil))
+              ("tl"
+               "TODAY's LOG"
+               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                (agenda ""
+                ((org-agenda-ndays 1)
+                 (org-agenda-show-log t)
+                 (org-agenda-log-mode-items '(clock closed))
+                 (org-agenda-entry-types '())))
+                nil))
+              ("ta"
+               "TODAY's Question"
+               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                (agenda ""
+                        ((org-agenda-ndays 1)
+                         (org-agenda-show-log t)
+                         (org-agenda-log-mode-items '(clock closed))
+                         (org-agenda-skip-function
+                          '(org-agenda-skip-entry-if 'todo '("CANCELED" "SOMEDAY")))))
+                nil))
+              ("wa"
+               "This Weeks's ALL TASKS"
+               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                (tags "+SCHEDULED>=\"<+1w>\"TODO=\"TODO\"|+DEADLINE>=\"<+1w>\"+TODO=\"TODO\""
+                      ((org-agenda-overriding-header "Upcoming tasks")))
+                (agenda ""
+                ((org-agenda-ndays 7)
+                 (org-agenda-log-mode-items '(clock closed))))
+                nil))
+              ("wl"
+               "This Weeks's LOGS"
+               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                (agenda ""
+                ((org-agenda-ndays 7)
+                 (org-agenda-show-log t)
+                 (org-agenda-log-mode-items '(clock closed))
+                 (org-agenda-entry-types '())))
+                nil)))))
+
+
+#+END_SRC
+
+*** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
+This currently breaks when it tries to load the directors defined by org-mode as files.
+#+BEGIN_SRC emacs-lisp
+;(require 'org-registry)
+;(org-registry-initialize)
+#+END_SRC
+
+** Notification
+
+I have disabled this snippet until I am ready to implement it. But, one day in the future.
+#+BEGIN_SRC emacs-lisp
+;;  (require 'org-notify)
+;;  (org-notify-start)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  ;; (org-notify-add 'appt
+  ;;                 '(:time "-1s"
+  ;;                         :period "5s"
+  ;;                         :duration 10
+  ;;                         :actions (-message -ding))
+  ;;                 '(:time "15m"
+  ;;                         :period "2m"
+  ;;                         :duration 100
+  ;;                         :actions -notify -ding)
+  ;;                 '(:time "2h"
+  ;;                         :period "5m"
+  ;;                         :actions -message)
+  ;;                 '(:time "3d"
+  ;;                         :actions -email))
+
+  ;; (org-notify-add 'flight
+  ;;                 '(:time "5h"
+  ;;                         :actions -email)
+  ;;                 '(:time "1d"
+  ;;                         :actions -email)
+  ;;                 '(:time "3d"
+  ;;                         :actions -email))
+#+END_SRC
+
+** Text Manipulation
+
+*** Don't allow me to edit invisible text
+#+BEGIN_SRC emacs-lisp
+(setq org-catch-invisible-edits 'error)
+#+END_SRC
+
+*** Allow sub-tasks to block tasks above it.
+I actually really hate this. But it forces me to address tasks below an item to identify old TODO's I will never do.
+#+BEGIN_SRC emacs-lisp
+(setq org-enforce-todo-dependencies t)
+#+END_SRC
+** Security
+
+I use gpg encryption to secure my org-notes
+
+#+BEGIN_SRC emacs-lisp
+(require 'epa-file)
+(epa-file-enable)
+
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
+#+END_SRC
+
+** Linking and Bookmarking
+
+*** Linking
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+#+END_SRC
+
+**** Link to custom ID, not to file location
+#+BEGIN_SRC emacs-lisp
+(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+#+END_SRC
+
+*** Bookmarks with firefox
+http://orgmode.org/worg/org-contrib/org-protocol.html
+
+#+BEGIN_SRC emacs-lisp
+(require 'org-protocol)
+
+#+END_SRC
+
+** Time CLocking
+
+*** Clock settings
+#+BEGIN_SRC emacs-lisp
+;; Resume clocking task when emacs is restarted
+(org-clock-persistence-insinuate)
+;; Show lot of clocking history so it's easy to pick items off the C-F11 list
+(setq org-clock-history-length 23)
+;; Resume clocking task on clock-in if the clock is open
+(setq org-clock-in-resume t)
+;; Change tasks to NEXT when clocking in
+(setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+;; Separate drawers for clocking and logs
+(setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
+;; Save clock data and state changes and notes in the LOGBOOK drawer
+(setq org-clock-into-drawer t)
+;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+(setq org-clock-out-remove-zero-time-clocks t)
+;; Clock out when moving task to a done state
+(setq org-clock-out-when-done t)
+;; Save the running clock and all clock history when exiting Emacs, load it on startup
+(setq org-clock-persist t)
+;; Do not prompt to resume an active clock
+(setq org-clock-persist-query-resume nil)
+;; Enable auto clock resolution for finding open clocks
+(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+;; Include current clocking task in clock reports
+(setq org-clock-report-include-clocking-task t)
+#+END_SRC
+
+*** Clocking Functions
+#+BEGIN_SRC emacs-lisp
+  (setq bh/keep-clock-running nil)
+
+  (defvar bh/organization-task-id "NONE")
+
+  (defun bh/is-task-p ()
+    "Any task with a todo keyword and no subtask"
+    (save-restriction
+      (widen)
+      (let ((has-subtask)
+            (subtree-end (save-excursion (org-end-of-subtree t)))
+            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+        (save-excursion
+          (forward-line 1)
+          (while (and (not has-subtask)
+                      (< (point) subtree-end)
+                      (re-search-forward "^\*+ " subtree-end t))
+            (when (member (org-get-todo-state) org-todo-keywords-1)
+              (setq has-subtask t))))
+        (and is-a-task (not has-subtask)))))
+
+  (defun bh/is-project-p ()
+    "Any task with a todo keyword subtask"
+    (save-restriction
+      (widen)
+      (let ((has-subtask)
+            (subtree-end (save-excursion (org-end-of-subtree t)))
+            (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+        (save-excursion
+          (forward-line 1)
+          (while (and (not has-subtask)
+                      (< (point) subtree-end)
+                      (re-search-forward "^\*+ " subtree-end t))
+            (when (member (org-get-todo-state) org-todo-keywords-1)
+              (setq has-subtask t))))
+        (and is-a-task has-subtask))))
+
+  (defun bh/clock-in-to-next (kw)
+    "Switch a task from TODO to NEXT when clocking in.
+  Skips capture tasks, projects, and subprojects.
+  Switch projects and subprojects from NEXT back to TODO"
+    (when (not (and (boundp 'org-capture-mode) org-capture-mode))
+      (cond
+       ((and (member (org-get-todo-state) (list "TODO"))
+             (bh/is-task-p))
+        "NEXT")
+       ((and (member (org-get-todo-state) (list "NEXT"))
+             (bh/is-project-p))
+        "TODO"))))
+
+  (defun bh/find-project-task ()
+    "Move point to the parent (project) task if any"
+    (save-restriction
+      (widen)
+      (let ((parent-task (save-excursion (org-back-to-heading 'invisible-ok) (point))))
+        (while (org-up-heading-safe)
+          (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+            (setq parent-task (point))))
+        (goto-char parent-task)
+        parent-task)))
+
+  (defun bh/punch-in (arg)
+    "Start continuous clocking and set the default task to the
+  selected task.  If no task is selected set the Organization task
+  as the default task."
+    (interactive "p")
+    (setq bh/keep-clock-running t)
+    (if (equal major-mode 'org-agenda-mode)
+        ;;
+        ;; We're in the agenda
+        ;;
+        (let* ((marker (org-get-at-bol 'org-hd-marker))
+               (tags (org-with-point-at marker (org-get-tags-at))))
+          (if (and (eq arg 4) tags)
+              (org-agenda-clock-in '(16))
+            (bh/clock-in-organization-task-as-default)))
+      ;;
+      ;; We are not in the agenda
+      ;;
+      (save-restriction
+        (widen)
+        ; Find the tags on the current task
+        (if (and (equal major-mode 'org-mode) (not (org-before-first-heading-p)) (eq arg 4))
+            (org-clock-in '(16))
+          (bh/clock-in-organization-task-as-default)))))
+
+  (defun bh/punch-out ()
+    (interactive)
+    (setq bh/keep-clock-running nil)
+    (when (org-clock-is-active)
+      (org-clock-out))
+    (org-agenda-remove-restriction-lock))
+
+  (defun bh/clock-in-default-task ()
+    (save-excursion
+      (org-with-point-at org-clock-default-task
+        (org-clock-in))))
+
+  (defun bh/clock-in-parent-task ()
+    "Move point to the parent (project) task if any and clock in"
+    (let ((parent-task))
+      (save-excursion
+        (save-restriction
+          (widen)
+          (while (and (not parent-task) (org-up-heading-safe))
+            (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+              (setq parent-task (point))))
+          (if parent-task
+              (org-with-point-at parent-task
+                (org-clock-in))
+            (when bh/keep-clock-running
+              (bh/clock-in-default-task)))))))
+
+  (defun bh/clock-in-organization-task-as-default ()
+    (interactive)
+    (org-with-point-at (org-id-find bh/organization-task-id 'marker)
+      (org-clock-in '(16))))
+
+  (defun bh/clock-out-maybe ()
+    (when (and bh/keep-clock-running
+               (not org-clock-clocking-in)
+               (marker-buffer org-clock-default-task)
+               (not org-clock-resolving-clocks-due-to-idleness))
+      (bh/clock-in-parent-task)))
+
+  (add-hook 'org-clock-out-hook 'bh/clock-out-maybe 'append)
+
+  (require 'org-id)
+  (defun bh/clock-in-task-by-id (id)
+    "Clock in a task by id"
+    (org-with-point-at (org-id-find id 'marker)
+      (org-clock-in nil)))
+
+  (defun bh/clock-in-last-task (arg)
+    "Clock in the interrupted task if there is one
+  Skip the default task and get the next one.
+  A prefix arg forces clock in of the default task."
+    (interactive "p")
+    (let ((clock-in-to-task
+           (cond
+            ((eq arg 4) org-clock-default-task)
+            ((and (org-clock-is-active)
+                  (equal org-clock-default-task (cadr org-clock-history)))
+             (caddr org-clock-history))
+            ((org-clock-is-active) (cadr org-clock-history))
+            ((equal org-clock-default-task (car org-clock-history)) (cadr org-clock-history))
+            (t (car org-clock-history)))))
+      (widen)
+      (org-with-point-at clock-in-to-task
+        (org-clock-in nil))))
+
+#+END_SRC
+
+*** Clock Keys
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f9> I") 'bh/punch-in)
+(global-set-key (kbd "<f9> O") 'bh/punch-out)
+#+END_SRC
+** Exporting
+
+#+BEGIN_SRC emacs-lisp
+(setq org-odt-content-template-file "~/.dotfiles/templates/emacs/OrgOdtContentTemplate.xml")
+#+END_SRC
+
+Sadly most people use Microsoft Word. So, I just export my .odt files as .doc files.
+#+BEGIN_SRC emacs-lisp
+(setq org-odt-preferred-output-format "doc")
+#+END_SRC
+
+** Babel
+
+*** Set acceptable languages (whatever I want Babel, whatever I want.)
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+  '((sh               . t)
+    (js                . t)
+    (emacs-lisp . t)
+    (ditaa           . t)
+    (gnuplot    . t)
+    (C          . t)
+    (latex     . t)
+    (makefile   . t)
+    (sql        . t)
+    (sqlite     . t)
+    (scala      . t)
+    (org        . t)
+    (python     . t)
+    (dot        . t)
+    (css        . t)))
+#+END_SRC
+
+*** Make code-blocks pretty
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-fontify-natively t)
+#+END_SRC
+
+*** [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
+**** TODO Org-Doco does not currently allow headlines. So, I will have to modify it to do that before I can use it.
+http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
+
+* Projects
+** Identify all projects from project directory
+
+Define where project files are ( ~/.s2e/projects)
+#+BEGIN_SRC emacs-lisp
+(setq personal-projects-dir (in-private-dir "projects/"))
 #+END_SRC
 
 Function to load any file not starting with . in the elisp dir
 #+BEGIN_SRC emacs-lisp
-(defun load-visible-elisp (part-name)
+(defun load-visible-project (part-name)
   (if (not (string-prefix-p "." part-name))
-      (load-file (concat personal-elisp-dir "/" part-name))))
+      (load-file (concat personal-projects-dir "/" part-name))))
 #+END_SRC
 
-Hook to actually iterate through all elisp
+Hook to actually iterate through all projects
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook (lambda ()
-                               (mapcar 'load-visible-elisp (sort (directory-files personal-elisp-dir) 'string<))))
-  (add-hook 'after-init-hook (lambda ()
-                               (mapcar 'message (sort (directory-files personal-elisp-dir) 'string<))))
+(defun load-private-projects()
+(mapcar 'load-visible-project (sort (directory-files personal-projects-dir) 'string<)))
+(load-private-projects)
 #+END_SRC
 
 * Technical Artifacts
