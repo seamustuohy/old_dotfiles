@@ -35,6 +35,8 @@
   :type 'file
   :group 'org-notmuch-clocking)
 
+(setq org-notmuch-clocking-clocked-email nil)
+
 (defun org-notmuch-clocking-email-clock ()
   (interactive)
   (let ((message_id (notmuch-show-get-message-id))
@@ -45,16 +47,25 @@
           (org-notmuch-clocking-email-clock-in)))))
 
 (defun org-notmuch-clocking-email-clock-out ()
-  "Clock out of a the current email. Only clocks out if the current e-mail is the active clocking task."
+  "Clock out of a the currently clocked email. Only clocks out if the current e-mail is the active clocking task."
   (interactive)
-  (if (org-clocking-p)
-      (let* ((message_id (notmuch-show-get-message-id))
-             (email_loc (org-id-find-id-in-file message_id org-notmuch-clocking-file))
-             (email_mrkr (make-marker)))
-        (set-marker email_mrkr (cdr email_loc) (get-file-buffer (car email_loc)))
-        (if (string-equal message_id (org-entry-get org-clock-marker "ID"))
-            (org-with-point-at email_mrkr
-              (org-clock-out))))))
+  (if (and (org-clocking-p)
+           (if org-notmuch-clocking-clocked-email
+               'true
+             'false))
+      ;; If there is an interupted task clock into that
+      (if (marker-buffer org-clock-interrupted-task)
+          (org-with-point-at org-clock-interrupted-task
+            (org-clock-in))
+        ;; If no interupted task then find our email and clock out of it.
+        (let* ((message_id org-notmuch-clocking-clocked-email)
+               (email_loc (org-id-find-id-in-file message_id org-notmuch-clocking-file))
+               (email_mrkr (make-marker)))
+          (set-marker email_mrkr (cdr email_loc) (get-file-buffer (car email_loc)))
+          (if (string-equal message_id (org-entry-get org-clock-marker "ID"))
+              (org-with-point-at email_mrkr
+                (org-clock-out)))))
+        (setq org-notmuch-clocking-clocked-email nil)))
 
 (defun org-notmuch-clocking-email-clock-in ()
   "Clock in to the header for the current email. If the header does not exist, this function will create it first."
@@ -63,6 +74,7 @@
   (if (org-id-find-id-in-file (notmuch-show-get-message-id) org-notmuch-clocking-file)
       (let* ((email_loc (org-id-find-id-in-file (notmuch-show-get-message-id) org-notmuch-clocking-file))
              (email_mrkr (make-marker)))
+        (setq org-notmuch-clocking-clocked-email (notmuch-show-get-message-id))
         (set-marker email_mrkr (cdr email_loc) (get-file-buffer (car email_loc)))
         (org-with-point-at email_mrkr
           (org-clock-in)))
@@ -82,6 +94,7 @@
     (org-insert-property-drawer)
     (org-entry-put nil "FROM" from)
     (org-entry-put nil "ID" message_id)
-    (org-capture-finalize)))
+    (org-capture-finalize)
+    (setq org-notmuch-clocking-clocked-email message_id)))
 
 (provide 'org-notmuch-clocking)

@@ -192,7 +192,6 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-bullets)
 #+END_SRC
 
-
 * Emacs Environment
 ** Server
 
@@ -421,8 +420,6 @@ Commented out becuase it never seems to work.
   :config
   (setq twittering-use-master-password t))
 #+END_SRC
-
-
 
 * Time Clocking
 ** Display
@@ -1258,7 +1255,7 @@ Use helm and turn the delay to nothing.
 #+END_SRC
 
 * Org-Mode
-** General
+** Requirements
 *** Org-Modules
 
 [[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
@@ -1282,7 +1279,7 @@ Use helm and turn the delay to nothing.
 (require 'org)
 #+END_SRC
 
-*** Files to activate org for
+** Files to activate org for
 Open org-mode for .org files and for .org.gpg files.
 Read [[http://ergoemacs.org/emacs/emacs_auto-activate_a_major-mode.html][this]] for how to format these strings. Then go and buy his book. It is the same content, but it is really good content and should be supported.
 
@@ -1297,46 +1294,12 @@ Ends with ".org"
 ;;   (add-to-list 'auto-mode-alist '("\\(\\.org\\.gpg\\)?$" . org-mode))
 #+END_SRC
 
-*** Auto Save
+** Auto Save
  Set auto-save for org mode files every hour, on the hour.
 #+BEGIN_SRC emacs-lisp
 (run-at-time "00:59" 3600 'org-save-all-org-buffers)
 #+END_SRC
-** Filing
-*** Keywords
-#+BEGIN_SRC emacs-lisp
-;; keyword bindings
-(setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "TASK(T)" "|" "DONE(d!)")
-                                (sequence "WAIT(w@!/@!)"  "SOMEDAY(s)" "CANCELED(C)")
-                                (sequence "REPLY(r@/!)" "CONTACT(c@/!)" "MEETING(M)"))))
-#+END_SRC
-
-Set the colors and properties for org mode tags
-#+BEGIN_SRC emacs-lisp
-  (setq org-todo-keyword-faces
-        (quote (
-                ("TODO" :foreground "red" :weight bold)
-                ("TASK" :foreground "red" :weight bold)
-                ("NEXT" :foreground "red" :weight bold)
-                ("CONTACT" :foreground "orange" :weight bold)
-                ("REPLY" :foreground "orange" :weight bold)
-                ("WAIT" :foreground "orange" :weight bold)
-                ("MEETING" :foreground "DarkGoldenrod2" :weight bold)
-                ("EVENT" :foreground "DarkGoldenrod2" :weight bold)
-                ("DONE" :foreground "cornflower blue" :weight bold)
-                ("SOMEDAY" :foreground "cornflower blue" :weight bold)
-                ("IDEA" :foreground "blue" :weight bold))))
-
-  (setq org-todo-state-tags-triggers
-        (quote (("SOMEDAY" ("SOMEDAY" . t))
-                ("WAIT" ("WAIT" . t))
-                ("TODO" ("WAIT") ("SOMEDAY"))
-                ("TASK" ("WAIT") ("SOMEDAY"))
-                ("CONTACT" ("WAIT" .t))
-                ("DONE" ("WAIT") ("SOMEDAY"))
-                ("NEXT" ("WAIT")))))
-#+END_SRC
-*** Capture
+** Capture
 
 Capture Mode
 #+BEGIN_SRC emacs-lisp
@@ -1344,127 +1307,6 @@ Capture Mode
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
 
-
-#+BEGIN_SRC emacs-lisp
-
-#+END_SRC
-
-Capture templates for TODO tasks, Notes, appointments, phone calls, meetings,
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates '(
-                                      ("f" "TO FILE")
-                                      ("ft" "todo" entry (file "~/.org/todo/to_file.org")
-                                       "* TODO %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fT" "task" entry (file "~/.org/todo/to_file.org")
-                                       "* TASK %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:WITH:%^{Do With?}\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fr" "respond" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t)
-                                      ("fn" "note" entry (file "~/.org/todo/to_file.org")
-                                       "* %? :NOTE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fm" "Meeting" entry (file "~/.org/todo/to_file.org")
-                                       "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
-                                      ("fp" "Phone call" entry (file "~/.org/todo/to_file.org")
-                                       "* PHONE %? :PHONE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:" :clock-in t :clock-resume t)
-                                      ("fh" "Habit" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT %?\nSCHEDULED: %(format-time-string \"<%Y-%m-%d %a .+1d/3d>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n)")
-                                      ("fi" "idea" entry (file "~/.org/todo/to_file.org")
-                                       "* IDEA %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fw" "wait" entry (file "~/.org/todo/to_file.org")
-                                       "* WAIT for %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fc" "Contact" entry (file "~/.org/todo/to_file.org")
-                                       "* CONTACT %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fe" "Event" entry (file "~/.org/todo/to_file.org")
-                                       "* EVENT %?:EVENT:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)))
-
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-    (setq org-capture-templates
-      (append org-capture-templates '(
-                                      ("e" "Calendar Event" entry (file "~/.org/calendar/work.org")
-                                        "* %(notmuch-show-get-subject)\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n%T\n%i"))))
-
-#+END_SRC
-
-
-
-
-https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
-;; Searches for the current kill-ring head and adds the text under it.
-;; If kill ring head is not found it creates it at the bottom of the file.
-;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
-#+BEGIN_SRC emacs-lisp
-(defun dont-dup-headline ()
-  (let* ((org-refile-targets '((nil :maxlevel . 9)))
-         (hd (eval (current-kill 0))))
-    (goto-char (point-min))
-    (outline-next-heading)
-    (if (re-search-forward
-         (format org-complex-heading-regexp-format (regexp-quote hd))
-         nil t)
-        (goto-char (point-at-bol))
-      (goto-char (point-max))
-      (or (bolp) (insert "\n"))
-      (insert "* " hd "\n")))
-    (end-of-line))
-
-#+END_SRC
-
-I add my org-protocol captures here.
-#+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-  (append org-capture-templates '(
-                                   ("p" "Org-Protocol")
-                                   ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
-                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
-                                   ("pc" "org-protocol-to-clocked" entry (clock)
-                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
-                                   ("pG" "Guides and Manuals (AUTO)" plain (file+function "~/.org/work/library/guides.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pB" "Best Practices (AUTO)" plain (file+function "~/.org/work/library/b_practices.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pT" "Tools (AUTO)" plain (file+function "~/.org/work/library/tools.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pL" "Lessons Learned (AUTO)" plain (file+function "~/.org/work/library/lessons.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pO" "Organizations (AUTO)" plain (file+function "~/.org/work/library/orgs.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates
-      (append org-capture-templates '(
-                                      ("@" "Contacts" entry (file "~/.s2e/contacts.org")
-                                       "* %(org-contacts-template-name)
-  :PROPERTIES:
-  :EMAIL: %(org-contacts-template-email)
-  :PHONE:
-  :ALIAS:
-  :NICKNAME:
-  :IGNORE:
-  :ICON:
-  :NOTE:
-  :ADDRESS:
-  :BIRTHDAY:
-  :FROM_TAGS:
-  :TO_TAGS:
-  :END:"))))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-    (append org-capture-templates '(
-                                      ("Q" "TEST-respond" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t))))
-#+END_SRC
-
-*** References
-- http://juanreyero.com/article/emacs/org-teams.html
 ** Refile
 
 Targets include this file and any file contributing to the agenda - up to 3 levels deep
@@ -1499,7 +1341,6 @@ This is great for showing TODO items immediately as I type them out.
 #+BEGIN_SRC emacs-lisp
 (global-font-lock-mode 1)
 #+END_SRC
-
 *** Bullets Mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -1533,21 +1374,53 @@ Enable toggle in case it does not work.
   ;;   (iimage-mode))
 #+END_SRC
 
-** Searching & Viewing
-*** Agenda
-**** Keybindings for Agenda Mode
+*** Agenda icons
+First, remove categories from the default agenda mode and set the icon list to nil.
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-prefix-format '((agenda . " %i %?-12t% s")
+                                 (timeline . "  % s")
+                                 (todo . " %i %-12:c")
+                                 (tags . " %i %-12:c")
+                                 (search . " %i %-12:c")))
+
+
+(setq org-agenda-category-icon-alist nil)
+#+END_SRC
+
+Most of my agenda icons exist within project files. But there are a few non-project ones I use.
+#+BEGIN_SRC emacs-lisp
+;; emacs customization
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("personal-emacs-configuration"
+                    "~/.s2e/images/emacs_icon_16.png"
+                    nil nil :ascent center )))
+
+;; Birthday
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("Birthday"
+                    "~/.s2e/images/birthday_icon_16.svg"
+                    nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("to_file"
+                    "~/.s2e/images/arrow_icon_16.svg"
+                    nil nil :ascent center )))
+#+END_SRC
+** Agenda
+*** Keybindings for Agenda Mode
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
 
-**** Agenda Files
+*** Agenda Files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files (quote ("~/.org/todo"
                                  "~/.org/personal/"
                                  "~/.org/work/library")))
 #+END_SRC
-**** Basic Settings
+*** Basic Settings
 #+BEGIN_SRC emacs-lisp
 ;;Start with the agenda log ON
 (setq org-agenda-show-log t)
@@ -1558,7 +1431,7 @@ Enable toggle in case it does not work.
 ;; Set the agenda to skip deadlines if they are done
 (setq org-agenda-skip-deadline-if-done t)
 #+END_SRC
-**** Agenda todo item configuration
+*** Agenda todo item configuration
 #+BEGIN_SRC emacs-lisp
 ;; Keep tasks with dates on the global todo lists
 (setq org-agenda-todo-ignore-with-date nil)
@@ -1582,16 +1455,15 @@ Enable toggle in case it does not work.
 (setq org-agenda-skip-timestamp-if-done t)
 #+END_SRC
 
-**** Display
-
-***** Always hilight the current agenda line
+*** Display
+**** Always hilight the current agenda line
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-agenda-mode-hook
           '(lambda () (hl-line-mode 1))
           'append)
 #+END_SRC
 
-***** Time Grid
+**** Time Grid
 #+BEGIN_SRC emacs-lisp
 ;;Set time grid ON for day
 (setq org-agenda-use-time-grid t)
@@ -1603,14 +1475,14 @@ Enable toggle in case it does not work.
        (600 800 1000 1200 1400 1600 1800 2000)))
 #+END_SRC
 
-***** Custom clock faces
+**** Custom clock faces
 #+BEGIN_SRC emacs-lisp
 ;; The following custom-set-faces create the highlights
 (custom-set-faces
  '(org-mode-line-clock ((t (:background "grey75" :foreground "red" :box (:line-width -1 :style released-button)))) t))
 #+END_SRC
 
-**** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
+*** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
 #+BEGIN_SRC emacs-lisp
 ;; Inhibit agenda files startup options (Org > 8.0)
 ;; http://orgmode.org/worg/agenda-optimization.html#sec-4
@@ -1620,7 +1492,7 @@ Enable toggle in case it does not work.
 (setq org-agenda-dim-blocked-tasks nil)
 #+END_SRC
 
-**** Custom agenda commands
+*** Custom agenda commands
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-custom-commands
       (quote (("ts"
@@ -1677,7 +1549,7 @@ Enable toggle in case it does not work.
 
 #+END_SRC
 
-*** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
+** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
 This currently breaks when it tries to load the directors defined by org-mode as files.
 #+BEGIN_SRC emacs-lisp
 ;(require 'org-registry)
@@ -1771,8 +1643,8 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
 (setq org-clock-history-length 23)
 ;; Resume clocking task on clock-in if the clock is open
 (setq org-clock-in-resume t)
-;; Change tasks to NEXT when clocking in
-(setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+;; Change tasks to ACTIVE when clocking in
+(setq org-clock-in-switch-to-state 'bh/clock-in-to-active)
 ;; Separate drawers for clocking and logs
 (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
 ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
@@ -1834,16 +1706,16 @@ To file todo-state changes into LOGBOOK drawer
               (setq has-subtask t))))
         (and is-a-task has-subtask))))
 
-  (defun bh/clock-in-to-next (kw)
-    "Switch a task from TODO to NEXT when clocking in.
+  (defun bh/clock-in-to-active (kw)
+    "Switch a task from TODO to ACTIVE when clocking in.
   Skips capture tasks, projects, and subprojects.
-  Switch projects and subprojects from NEXT back to TODO"
+  Switch projects and subprojects from ACTIVE back to TODO"
     (when (not (and (boundp 'org-capture-mode) org-capture-mode))
       (cond
        ((and (member (org-get-todo-state) (list "TODO"))
              (bh/is-task-p))
-        "NEXT")
-       ((and (member (org-get-todo-state) (list "NEXT"))
+        "ACTIVE")
+       ((and (member (org-get-todo-state) (list "ACTIVE"))
              (bh/is-project-p))
         "TODO"))))
 
@@ -2000,6 +1872,602 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
 *** [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
 **** TODO Org-Doco does not currently allow headlines. So, I will have to modify it to do that before I can use it.
 http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
+
+** Org-Project Workflow
+*** Colors
+#+BEGIN_SRC emacs-lisp
+(defvar org-todo-colors-status-future "MediumSpringGreen")
+(defvar org-todo-colors-status-current "DarkOrange1")
+(defvar org-todo-colors-status-upcoming "DarkGoldenrod1")
+(defvar org-todo-colors-status-urgent "red1")
+(defvar org-todo-colors-status-completed "DarkTurquoise")
+#+END_SRC
+
+*** Projects
+Properties are the core object of my time-tracking system. They are how I organize what I can track time against and do billing with. +Unlike other org systems I want to keep my tasks seperate from my top-level project headers. This will allow me to cleanly seperate my projects from a variety of task files that relate to them.+
+
+**** Project File
+Projects should be stored somewhere. I am going to store them in a central file.
+
+#+BEGIN_SRC emacs-lisp
+(defvar org-project-project-file (file-truename "~/.org/projects.org"))
+(add-to-list 'org-agenda-files org-project-project-file)
+#+END_SRC
+
+**** Project Properties
+#+BEGIN_EXAMPLE
+ *** Project Template
+    :PROPERTIES:
+    :BILLABLE: (t/f) if the project is billable
+    :PERCENT: percent of billable time to use
+    :CATEGORY: the major project code to be used for billing purposes
+    :START_DATE: start date of project
+    :END_DATE: end date of project (when to remove from clocking percent
+    :GLOSSARY: The glossary of the key terms of the project for tagging notes and links
+    :ID:  the UUID of an object
+    :END:
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-project-template
+  "* %^{Project Stage|ONGOING|IDEA|GLIMMER|CAPTURE|LIVE|KICKOFF|STARTUP|ACTIVE|CLOSEOUT|DONE|CANCELED} %?
+  :CONTACTS:\n:END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :BILLABLE: %^{Billable?|y|n}
+  :PERCENT: %^{Percent of Time}
+  :CATEGORY: %^{Project Category}
+  :START_DATE:
+  :END_DATE:
+  :GLOSSARY:
+  :ID: %(org-id-uuid)
+  :TYPE: project
+  :END:"
+  "Project Template for org-project")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+    (setq org-todo-keyword-faces
+          (append org-todo-keyword-faces
+                  '(("ONGOING" :foreground "DarkOrange1")
+                    ("IDEA" :foreground "MediumSpringGreen")
+                    ("GLIMMER" :foreground "MediumSpringGreen")
+                    ("CAPTURE" :foreground "DarkGoldenrod1" :weight bold)
+                    ("LIVE" :foreground "DarkGoldenrod1" :weight bold)
+                    ("KICKOFF" :foreground "red1" :weight bold)
+                    ("STARTUP" :foreground "DarkOrange1" :weight bold)
+                    ("ACTIVE" :foreground "DarkOrange1" :weight bold)
+                    ("CLOSEOUT" :foreground "red1" :weight bold)
+                    ("DONE" :foreground "DarkTurquoise")
+                    ("CANCELED" :foreground "DarkTurquoise"))))
+#+END_SRC
+
+**** Project States
+Projects follow a basic set of project stages so that I can keep track of the progression of a project in the future.
+- Ongoing: These are projects that never end. Like fund-raising, administration, etc.
+- Idea: This state is saved for ideas for projects that have not yet gelled into full projects, and have no identified funding opportunity.
+- Glimmer: These are projects that have are more fleshed out, but only have a possible future funding line identified.
+- Capture: These are projects that have an
+- Live: When a RFP has dropped and we are exploring the project.
+- Kickoff:
+- Startup: The actual start up of the project once funding has been received.
+- Active: The actual project management portion of the project.
+- Closeout: The closeout of the project and sunsetting of technical componenets.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+               '((sequence "ONGOING" "IDEA(!)" "GLIMMER(!)" "CAPTURE(!)" "LIVE(!)" "KICKOFF(!)" "STARTUP(!)" "ACTIVE(!)" "CLOSEOUT(!)" "|" "DONE(d!)" "CANCELED(@!)")))
+#+END_SRC
+
+**** TODO Identifying active projects
+#+BEGIN_SRC emacs-lisp
+  (defun org-projects-get-projects-all ()
+    (org-map-entries (nth 4 (org-heading-components)) t '(org-project-project-file)))
+
+;; A helm source for my projects
+;; http://kitchingroup.cheme.cmu.edu/blog/2015/01/24/Anatomy-of-a-helm-source/
+
+  (defun prompt-for-current-projects ()
+    (helm :sources '(org-projects-helm-source-current-projects)))
+
+  (defun org-projects-get-projects-current ()
+    (org-map-entries (nth 4 (org-heading-components)) "/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING" (list org-project-project-file)))
+
+  (setq org-projects-helm-source-current-projects
+        '((name . "Get current projects using helm.")
+          (candidates . org-projects-get-projects-current)
+          (action . (lambda (candidate)
+                      candidate))))
+
+
+  (defun prompt-for-current-projects-category ()
+    (helm :sources '(org-projects-helm-source-current-projects-category)))
+
+  (defun org-projects-get-project-category-current ()
+    (org-map-entries '(let ((category (org-entry-get (point) "CATEGORY"))
+                            (name (nth 4 (org-heading-components))))
+                        (cons name category)) "/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING" (list org-project-project-file)))
+
+  (setq org-projects-helm-source-current-projects-category
+        '((name . "Get current projects using helm.")
+          (candidates . org-projects-get-project-category-current)
+          (action . (lambda (candidate)
+                      candidate))))
+
+#+END_SRC
+
+**** TODO Project directories and projectile
+**** TODO Have babel blocks in projects evaluated on start up so that projects contain their own specs.
+*** Tasks
+**** Task File
+Tasks should be stored seperate from projects
+
+#+BEGIN_SRC emacs-lisp
+(defvar org-project-tasks-file (file-truename "~/.org/tasks.org"))
+(add-to-list 'org-agenda-files org-project-tasks-file)
+#+END_SRC
+
+**** Task helpers
+**** Types of tasks
+#+BEGIN_EXAMPLE
+ *** TODO
+    SCHEDULED: <2015-06-19 Fri> DEADLINE: <2015-06-19 Fri>
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH:
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :STAGE: The stage of the project to activate this task if it is to be delayed.
+    :END:
+ *** ACTIVE
+    SCHEDULED: <2015-06-19 Fri> DEADLINE: <2015-06-19 Fri>
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH:
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :END:
+ *** CLOSED
+    SCHEDULED: <2015-06-19 Fri> DEADLINE: <2015-06-19 Fri>
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH:
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :END:
+ *** WAIT
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH:
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :END:
+#+END_EXAMPLE
+
+Task capture  templates
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-task-template-todo
+  "* TODO %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :AT:
+  :STATE: todo
+  :TYPE: task
+  :END:"
+  "TODO Template for org-project")
+
+  (defvar org-project-task-template-active
+  "* ACTIVE %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :AT:
+  :STATUS: active
+  :TYPE:
+  :END:"
+  "ACTIVE Template for org-project")
+
+  (defvar org-project-task-template-contact
+  "* CONTACT RE: %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :WHO: %(helm-prompt-for-current-org-contact)
+  :STATUS: active
+  :TYPE: task
+  :END:"
+  "CONTACT Template for org-project")
+
+  (defvar org-project-task-template-reply
+  "* CONTACT [[notmuch:id:%:message-id][%? - %:subject]]
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :WHO: %:from
+  :STATUS: active
+  :TYPE: task
+  :END:"
+  "CONTACT Template for org-project")
+
+  (defvar org-project-task-template-wait
+  "* WAIT RE: %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :FROM: %(helm-prompt-for-current-org-contact)
+  :STATUS: active
+  :TYPE: task
+  :END:"
+  "WAIT Template for org-project")
+
+  (defvar org-project-task-template-closed
+  "* %^{STATUS|DONE|SOMEDAY|CANCELED|FAILED} %?
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :AT:
+  :STATUS: closed
+  :TYPE: task
+  :END:"
+  "CLOSED Template for org-project")
+#+END_SRC
+Task faces
+#+BEGIN_SRC emacs-lisp
+    (setq org-todo-keyword-faces
+          (append org-todo-keyword-faces
+                  '(("TODO" :foreground "red1")
+                    ("ACTIVE" :foreground "DarkOrange1")
+                    ("CONTACT" :foreground "DarkOrange1")
+                    ("WAIT" :foreground "DarkGoldenrod1" :weight bold)
+                    ("DONE" :foreground "DarkTurquoise" :weight bold)
+                    ("SOMEDAY" :foreground "DarkTurquoise" :weight bold)
+                    ("CANCELED" :foreground "DarkTurquoise" :weight bold)
+                    ("FAILED" :foreground "DarkTurquoise" :weight bold))))
+#+END_SRC
+
+**** Task States
+***** Basic Tasks
+TODO keywords and workflow
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-todo-keywords
+               '(sequence "TODO(t!)" "CONTACT(c!)" "ACTIVE(a!)" "WAIT(w/!)" "|" "DONE(d!)" "SOMEDAY(s!)" "CANCELED(C!)" "FAILED(f!)"))
+#+END_SRC
+
+***** Updating a tasks status when states change
+
+This is how I ensure that my status objects are updated
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq org-project-task-states
+        '(("active" . ("ACTIVE" "WAIT" "REPLY"))
+         ("todo" . ("TODO" "CONTACT"))
+         ("closed" . ("FAILED" "CANCELED" "SOMEDAY" "DONE"))))
+
+  (defun org-project-task-update-status-on-todo-changes ()
+    "Update the state property for a task to represent complex states.
+     Hook function for 'org-after-todo-state-change-hook'
+     Check the org-project-task-states to see if the current state is one that"
+    (if (equal (org-entry-get (point) "TYPE") "task")
+    (let ((check-states org-project-task-states))
+      (while check-states
+        (let ((cur-state (car check-states)))
+          (if (member org-state (cdr cur-state))
+              (org-entry-put (point) "STATUS" (car cur-state))))
+          (setq check-states (cdr check-states))))))
+
+  (add-hook 'org-after-todo-state-change-hook
+            'org-project-task-update-status-on-todo-changes)
+#+END_SRC
+
+*** Events
+**** Basic Events
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-todo-keywords
+               '(sequence "EVENT(e!)" "MEETING(m!)" "|" "DONE(d!)" "SOMEDAY(s!)" "CANCELED(C!)" "FAILED(f!)"))
+#+END_SRC
+**** Events File
+Task File
+Tasks should be stored seperate from projects
+
+#+BEGIN_SRC emacs-lisp
+(defvar org-project-events-file (file-truename "~/.org/events.org"))
+(add-to-list 'org-agenda-files org-project-events-file)
+#+END_SRC
+**** Event Properties
+#+BEGIN_EXAMPLE
+ *** EVENT
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH:
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :END:
+ *** MEET about TASK
+    :PROPERTIES:
+    :CATEGORY: the major project code to be used for billing purposes
+    :ID:  the UUID of an object
+    :WITH: [CONTACT(s)]
+    :AT:
+    :EFFORT:
+    :STATUS:
+    :TYPE:
+    :END:
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-task-template-meet
+  "* MEET about %?
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :STATUS: active
+  :TYPE: event
+  :END:"
+  "Task Template for org-project")
+
+  (defvar org-project-task-template-event
+  "* EVENT
+   SCHEDULED:  %^t
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :STATUS: todo
+  :TYPE: event
+  :END:"
+  "Task Template for org-project")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+      (setq org-todo-keyword-faces
+            (append org-todo-keyword-faces
+                    '(("EVENT" :foreground "DarkGoldenrod1" :weight bold)
+                      ("MEET" :foreground "DarkOrange1"))))
+#+END_SRC
+
+*** Email
+**** TODO Received new message
+***** If encrypted
+****** decrypt for parsing
+***** get projects
+****** get project glossaries
+******* check content and subject for terms
+******* tag to project if found
+****** check from, cc & to for group memebers
+******* tag to project if found
+**** TODO Open a message
+***** Create an org entry of the email
+***** Add project category to entry from message tag
+***** Start clocking to the message
+***** Create global variable of message that was opened (so that when we stop clocking we don't have to query the original message that opened the thread)
+***** decrypt message
+**** TODO Close a message
+***** If clocking this message,
+****** Stop clocking and close the message.
+***** If not clocking for some reason
+****** Close the message without closing current clock
+**** TODO Reply to a message
+***** Create an org-entry for the reply
+****** Add project category to entry from message tag
+****** Temporary ID created and stored in global value list
+***** If adding contacts
+****** helm-contacts uses tags and members of the thread to give a sub-list of probable contacts
+**** TODO Send Reply
+***** Check to,cc,bcc contacts
+****** If contact in to,cc,or bcc requires encryption
+******* Encrypt message
+***** Get message ID from server and replace temporary ID with that ID
+***** Stop clocking
+**** TODO Close reply without sending
+***** stop clocking
+*** Capture
+**** Capture Files
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'org-agenda-files (car org-contacts-files))
+#+END_SRC
+**** Adding/Capturing Objects
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+        `(("P" "Projects")
+          ("Pc" "Create Project" entry (file org-project-project-file)
+            ,org-project-project-template :clock-in t :clock-resume t)
+          ("t" "Tasks")
+          ("tt" "Create TODO" entry (file org-project-tasks-file)
+            ,org-project-task-template-todo :clock-in t :clock-resume t)
+          ("ta" "Create ACTIVE" entry (file org-project-tasks-file)
+            ,org-project-task-template-active :clock-in t :clock-resume t)
+          ("tc" "Create CONTACT" entry (file org-project-tasks-file)
+            ,org-project-task-template-contact :clock-in t :clock-resume t)
+          ("tw" "Create WAIT" entry (file org-project-tasks-file)
+            ,org-project-task-template-wait :clock-in t :clock-resume t)
+          ("tC" "Create Closed" entry (file org-project-tasks-file)
+            ,org-project-task-template-closed :clock-in t :clock-resume t)
+          ("tr" "REPLY TO EMAIL" entry (file org-project-tasks-file)
+            ,org-project-task-template-reply :clock-in t :clock-resume t)
+          ("e" "Events")
+          ("ee" "Create EVENT" entry (file org-project-events-file)
+            ,org-project-task-template-event :clock-in t :clock-resume t)
+          ("em" "Create MEETING" entry (file org-project-events-file)
+            ,org-project-task-template-meet :clock-in t :clock-resume t)))
+#+END_SRC
+**** Archiving Objects
+***** Projects
+***** Tasks
+***** Events
+*** Contacts
+**** Helm Search for contacts
+This searches the org-contacts file and returns the name of the contact.
+#+BEGIN_SRC emacs-lisp
+    (defun org-projects-helm-get-contacts ()
+      (org-map-entries '(let ((email (org-entry-get (point) "EMAIL"))
+                              (name (nth 4 (org-heading-components))))
+                          (cons (concat name " ( " email " ) ") name)) t org-contacts-files))
+
+      (setq org-projects-helm-contacts-source
+              `((name . "Helm capture for Org-Contacts")
+                (candidates . org-projects-helm-get-contacts)
+                (action . (lambda (candidate)
+                            (mapconcat 'identity (helm-marked-candidates) ", ")))))
+
+      (defun helm-prompt-for-current-org-contact ()
+            (interactive)
+            (helm :sources '(org-projects-helm-contacts-source)))
+#+END_SRC
+***** TODO How do I use helm in capture templates
+This is just a quick function to remind me that I have to figure out how to use helm in capture templates.
+#+BEGIN_SRC emacs-lisp
+  (defun org-project-task-template-contacts-test ()
+      (interactive)
+      (format "* TODO DELETE THIS TEST
+    SCHEDULED: %t
+    :PROPERTIES:
+    :CONTACTS: %s
+    :TYPE: test
+    :END:" (mapconcat 'identity (prompt-for-current-org-contact) ", ")))
+
+  (defun org-projects-get-clean-contacts-list ()
+              (mapconcat 'identity (prompt-for-current-org-contact) ", "))
+#+END_SRC
+
+**** TODO Contacts tagged with projects and teams that they are involved in
+
+**** TODO contacts with "encrypt" category force encryption of messages sent to them
+
+*** Bookmarking from the browser and org-protocol
+
+https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
+;; Searches for the current kill-ring head and adds the text under it.
+;; If kill ring head is not found it creates it at the bottom of the file.
+;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
+#+BEGIN_SRC emacs-lisp
+(defun dont-dup-headline ()
+  (let* ((org-refile-targets '((nil :maxlevel . 9)))
+         (hd (eval (current-kill 0))))
+    (goto-char (point-min))
+    (outline-next-heading)
+    (if (re-search-forward
+         (format org-complex-heading-regexp-format (regexp-quote hd))
+         nil t)
+        (goto-char (point-at-bol))
+      (goto-char (point-max))
+      (or (bolp) (insert "\n"))
+      (insert "* " hd "\n")))
+    (end-of-line))
+#+END_SRC
+
+I add my org-protocol captures here.
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates
+  (append org-capture-templates '(
+                                   ("p" "Org-Protocol")
+                                   ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
+                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+                                   ("pc" "org-protocol-to-clocked" entry (clock)
+                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+                                   ("pG" "Guides and Manuals (AUTO)" plain (file+function "~/.org/work/library/guides.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pB" "Best Practices (AUTO)" plain (file+function "~/.org/work/library/b_practices.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pT" "Tools (AUTO)" plain (file+function "~/.org/work/library/tools.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pL" "Lessons Learned (AUTO)" plain (file+function "~/.org/work/library/lessons.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pO" "Organizations (AUTO)" plain (file+function "~/.org/work/library/orgs.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+                                   ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
+                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
+#+END_SRC
+
+*** Capturing Org-Contacts
+#+BEGIN_SRC emacs-lisp
+  (setq org-capture-templates
+      (append org-capture-templates '(
+                                      ("@" "Contacts" entry (file "~/.s2e/contacts.org")
+                                       "* %(org-contacts-template-name)
+  :PROPERTIES:
+  :EMAIL: %(org-contacts-template-email)
+  :PHONE:
+  :ALIAS:
+  :NICKNAME:
+  :IGNORE:
+  :ICON:
+  :NOTE:
+  :ADDRESS:
+  :BIRTHDAY:
+  :FROM_TAGS:
+  :TO_TAGS:
+  :END:"))))
+#+END_SRC
+
+*** References
+- http://juanreyero.com/article/emacs/org-teams.html
 
 * Projects
 ** Identify all projects from project directory

@@ -1,0 +1,74 @@
+* Imports
+#+BEGIN_SRC python
+from rake import Rake
+import sys
+import argparse
+#+END_SRC
+
+* Read text from file
+#+BEGIN_SRC python
+  def get_plain_text(text_file):
+      with open(text_file, 'r') as f:
+          read_data = f.read()
+      return read_data
+#+END_SRC
+
+* extraction
+Almost entirely taken from https://github.com/aneesha/RAKE
+#+BEGIN_SRC python
+  def get_keywords(text, stopwords="SmartStoplist.txt"):
+      #commented out text below uses the rake-tutorial code, which I like better, but is less recently updated
+      #https://github.com/zelandiya/RAKE-tutorial
+      #phrase_max_words = 3
+      #min_word_chars = 5
+      #min_kw_repeat_rate = 4
+      #rake = Rake(stopwords, min_word_chars, phrase_max_words, min_kw_repeat_rate)
+      rake = Rake(stopwords)
+      keywords = rake.run(text)
+      return keywords
+#+END_SRC
+
+* Command Line
+
+#+BEGIN_SRC python
+  def parse_arguments():
+      arg_p = argparse.ArgumentParser("Get a summary of some text")
+      arg_p.add_argument("-i", "--input-file", type=str, help="A file containing plain text to parse")
+      arg_p.add_argument("-s", "--stopwords-file", type=str, help="A file containing stop words to use to parse text.")
+      args = arg_p.parse_args()
+      return args
+#+END_SRC
+
+#+BEGIN_SRC python
+  def usage():
+      print("get_summary [-i <file> | -u <url> ] ")
+#+END_SRC
+
+* Main
+#+BEGIN_SRC python
+  def main():
+      args = parse_arguments()
+      if args.input_file:
+          text = get_plain_text(args.input_file)
+      else:
+          usage()
+          sys.exit(64)
+      #lang = get_lang(text)
+      _keywords = get_keywords(text)
+      for i in _keywords:
+          sys.stdout.write(str(i).encode("UTF-8"))
+          sys.stdout.write("\n")
+      sys.exit(0)
+
+  if __name__ == "__main__":
+      main()
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.bin/get_keywords
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env python
+#+DESCRIPTION: Get keywords
