@@ -26,6 +26,7 @@ NONE
   readonly emacs_package_dir=~/.emacs.d/packages
   readonly prog_name=$(basename $0)
   readonly prog_dir=$(readlink -m $(dirname $0))
+  readonly setup_dir=/tmp/setup
 #+END_SRC
 
 * Installation
@@ -45,10 +46,11 @@ NONE
           pylint \
           gnutls-bin \
           offlineimap \
-          dovecot-imapd \
           notmuch \
           python-notmuch \
-          python-bs4
+          python-bs4 \
+          libncurses5-dev \
+          ncurses-devel
   }
 #+END_SRC
 
@@ -68,6 +70,8 @@ NONE
       install_offlineimap
       install_twittering
       install_org_notmuch_clocking
+      install_string_utils
+      install_cv
   }
 #+END_SRC
 
@@ -200,6 +204,30 @@ Module for automatic summarization of text documents and HTML pages.
       cp ~/.dotfiles/elisp/org-notmuch-clocking.el "$emacs_package_dir"/org-notmuch-clocking/org-notmuch-clocking.el
   }
 #+END_SRC
+** emacs string utils
+#+BEGIN_SRC sh
+  install_string_utils() {
+      get_git_package "$emacs_package_dir"/string-utils https://github.com/rolandwalker/string-utils.git
+  }
+
+
+
+#+END_SRC
+** CV
+[[https://github.com/Xfennec/cv][cv - Coreutils Viewer]]
+This tool can be described as a Tiny, Dirty, Linux-and-OSX-Only C command that looks for coreutils basic commands (cp, mv, dd, tar, gzip/gunzip, cat, etc.) currently running on your system and displays the percentage of copied data.
+#+BEGIN_SRC sh
+  install_cv() {
+    local BUILD_DIRECTORY=$(mktemp -d)
+    cd "$BUILD_DIRECTORY"
+    git clone https://github.com/Xfennec/cv.git
+    cd cv
+    make
+    sudo make install
+  }
+
+#+END_SRC
+
 * Utilities
 ** Git Package Grabber
 #+BEGIN_SRC sh
@@ -233,13 +261,12 @@ create_emacs_paths(){
   }
 #+END_SRC
 
-
 * Configuration
 
 ** Master Preparer
 #+BEGIN_SRC sh
   prepare_packages() {
-      prepare_imap
+#      prepare_imap
       prepare_sumy
   }
 #+END_SRC

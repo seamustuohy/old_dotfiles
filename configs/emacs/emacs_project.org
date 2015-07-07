@@ -35,7 +35,7 @@ Either the Key ID or set to nil to use symmetric encryption.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-;;(add-to-list 'auth-sources (in-private-dir ".authinfo.gpg"))
+(setq auth-sources '("~/.s2e/.authinfo.gpg"))
 #+END_SRC
 
 * Personal key space
@@ -108,6 +108,7 @@ Load each package individually. Too busy with the re-write today to script up a 
 (add-to-list 'load-path (in-package-d "writegood-mode"))
 (add-to-list 'load-path (in-package-d "guru-mode"))
 (add-to-list 'load-path (in-package-d "org-bullets"))
+(add-to-list 'load-path (in-package-d "string-utils"))
 #+END_SRC
 
 ** Use Package
@@ -190,6 +191,7 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-protocol)
   (require 'org-id)
   (require 'org-bullets)
+  (require 'string-utils)
 #+END_SRC
 
 * Emacs Environment
@@ -243,6 +245,18 @@ Huge time saver.
 (global-set-key (kbd "C--") 'er/contract-region)
 #+END_SRC
 
+** Unfill Paragraph
+[[https://emacs.stackexchange.com/questions/2606/opposite-of-fill-paragraph][From Stack Overflow user King Marvel]]
+#+BEGIN_SRC emacs-lisp
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+ ;; Handy key definition
+ (define-key global-map "\M-Q" 'unfill-paragraph)
+#+END_SRC
 * Security
 I use epa file to open encrypted files automatically
 #+BEGIN_SRC emacs-lisp
@@ -346,7 +360,8 @@ All calendar configuration is done in projects
      notmuch-fcc-dirs "Sent"
      ;; === Crypto ===
      ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
-     notmuch-crypto-process-mime t
+     ;; Does not seem to do anything anyway
+     ;; notmuch-crypto-process-mime t
     ;; == SENDING MAIL
      message-kill-buffer-on-exit t))
 
@@ -765,12 +780,13 @@ org-agenda persp
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (defun custom-persp/org-agenda-start ()
-      (interactive)
-      (custom-persp "org")
-      (org-agenda nil "ta"))
+  (defun custom-persp/org-agenda-start ()
+    (interactive)
+    (custom-persp "org")
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (org-agenda nil "tw"))
 
-      (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
+    (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
 #+END_SRC
 
 *** IRC
@@ -905,11 +921,6 @@ uniquify shows a files location when it shares the same name as another file.
   uniquify-separator ":")
 #+END_SRC
 
-I like my desktop to be saved across sessions.
-#+BEGIN_SRC emacs-lisp
-(desktop-save-mode 1)
-(setq desktop-restore-eager 10)
-#+END_SRC
 ** Backups
 
 I use close to the basic backup setup described in the [[http://emacswiki.org/emacs/BackupDirectory][emacswiki.]]
@@ -1217,12 +1228,6 @@ If point was already at that position, move point to beginning of line."
 (global-set-key (kbd "C-a") 'smart-beginning-of-line)
 #+END_SRC
 
-** Projectile
-#+BEGIN_SRC emacs-lisp
-  (require 'projectile)
-  (projectile-global-mode)
-#+END_SRC
-
 ** Helm
 
 Use helm and turn the delay to nothing.
@@ -1250,11 +1255,67 @@ Use helm and turn the delay to nothing.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(use-package helm-swoop
- :bind (("C-S-s" . helm-swoop)))
+  (use-package helm-swoop
+    :bind ("C-c C-M-s" . helm-swoop))
+#+END_SRC
+
+** Projectile
+#+BEGIN_SRC emacs-lisp
+    (use-package helm-projectile
+      :config
+      (projectile-global-mode)
+      (setq projectile-completion-system 'helm)
+      (helm-projectile-on))
 #+END_SRC
 
 * Org-Mode
+Helper snippets I use to make my code cleaner.
+
+** Utilities
+
+*** Header components
+#+BEGIN_SRC emacs-lisp
+;; org-heading-components
+;; Return the components of the current heading.
+;; This is a list with the following elements:
+;; 0 - the level as an integer
+;; 1 - the reduced level, different if `org-odd-levels-only' is set.
+;; 2 - the TODO keyword, or nil
+;; 3 - the priority character, like ?A, or nil if no priority is given
+;; 4 - the headline text itself, or the tags string if no headline text
+;; 5 - the tags string, or nil.
+
+(defun org-utils-get-level-at-point()
+  (nth 0 (org-heading-components)))
+(defun org-utils-get-level-reduced-at-point()
+  (nth 1 (org-heading-components)))
+(defun org-utils-get-todo-keyword-at-point()
+  (nth 2 (org-heading-components)))
+(defun org-utils-get-priority-at-point()
+  (nth 3 (org-heading-components)))
+(defun org-utils-get-header-at-point()
+  (nth 4 (org-heading-components)))
+(defun org-utils-get-tag-string-at-point()
+  (nth 5 (org-heading-components)))
+#+END_SRC
+
+*** Time
+
+This function was slightly modded from org-insert-time-stamp which can be found in org-el
+
+#+BEGIN_SRC emacs-lisp
+(defun org-utils-get-time-stamp (time &optional with-hm inactive)
+  "Return a date stamp for the date given by the internal TIME.
+WITH-HM means use the stamp format that includes the time of the day.
+INACTIVE means use square brackets instead of angular ones, so that the
+stamp will not contribute to the agenda.
+The command returns the requested time stamp."
+  (let ((fmt (funcall (if with-hm 'cdr 'car) org-time-stamp-formats))
+        stamp)
+    (if inactive (setq fmt (concat "[" (substring fmt 1 -1) "]")))
+    (setq stamp (format-time-string fmt time))))
+#+END_SRC
+
 ** Requirements
 *** Org-Modules
 
@@ -1380,7 +1441,7 @@ First, remove categories from the default agenda mode and set the icon list to n
 (setq org-agenda-prefix-format '((agenda . " %i %?-12t% s")
                                  (timeline . "  % s")
                                  (todo . " %i %-12:c")
-                                 (tags . " %i %-12:c")
+                                 (tags . " %i ")
                                  (search . " %i %-12:c")))
 
 
@@ -1406,6 +1467,19 @@ Most of my agenda icons exist within project files. But there are a few non-proj
              (quote("to_file"
                     "~/.s2e/images/arrow_icon_16.svg"
                     nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("lunch"
+                    "~/.s2e/images/cheese_icon_16.svg"
+                    nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("organization"
+                    "~/.s2e/images/gear_icon_16.svg"
+                    nil nil :ascent center )))
+
 #+END_SRC
 ** Agenda
 *** Keybindings for Agenda Mode
@@ -1494,61 +1568,98 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 
 *** Custom agenda commands
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-custom-commands
-      (quote (("ts"
-               "TODAY's SHORT"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 1)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil))
-              ("tl"
-               "TODAY's LOG"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 1)
-                 (org-agenda-show-log t)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil))
-              ("ta"
-               "TODAY's Question"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                        ((org-agenda-ndays 1)
-                         (org-agenda-show-log t)
-                         (org-agenda-log-mode-items '(clock closed))
-                         (org-agenda-skip-function
-                          '(org-agenda-skip-entry-if 'todo '("CANCELED" "SOMEDAY")))))
-                nil))
-              ("wa"
-               "This Weeks's ALL TASKS"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (tags "+SCHEDULED>=\"<+1w>\"TODO=\"TODO\"|+DEADLINE>=\"<+1w>\"+TODO=\"TODO\""
-                      ((org-agenda-overriding-header "Upcoming tasks")))
-                (agenda ""
-                ((org-agenda-ndays 7)
-                 (org-agenda-log-mode-items '(clock closed))))
-                nil))
-              ("wl"
-               "This Weeks's LOGS"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 7)
-                 (org-agenda-show-log t)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil)))))
+      (setq org-agenda-custom-commands
+            (quote (("ts"
+                     "TODAY's SHORT"
+                     ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                            ((org-agenda-overriding-header "Core Clocking Tasks")))
+                      (agenda ""
+                      ((org-agenda-ndays 1)
+                       (org-agenda-log-mode-items '(clock closed))
+                       (org-agenda-entry-types '())))
+                      nil))
+                    ("tl"
+                     "TODAY's LOG"
+                     ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                            ((org-agenda-overriding-header "Core Clocking Tasks")))
+                      (agenda ""
+                      ((org-agenda-ndays 1)
+                       (org-agenda-show-log t)
+                       (org-agenda-log-mode-items '(clock closed))
+                       (org-agenda-entry-types '())))
+                      nil))
+                    ("tw"
+                     "TODAY's WORK Agenda"
+                     ((tags "TYPE=\"project\"+LEVEL=1/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
+                            ((org-agenda-overriding-header "Core Clocking Tasks")))
+                      (agenda ""
+                              ((org-agenda-ndays 1)
+                               (org-agenda-show-log t)
+                               (org-agenda-log-mode-items '(clock closed))
+                               (org-agenda-skip-function 'stwo-skip-non-work-entries)))
+                      nil))
+                    ("ta"
+                     "TODAY's Agenda"
+                     ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                            ((org-agenda-overriding-header "Current Projects")))
+                      (agenda ""
+                              ((org-agenda-ndays 1)
+                               (org-agenda-show-log t)
+                               (org-agenda-log-mode-items '(clock closed))
+                               (org-agenda-skip-function
+                                '(org-agenda-skip-entry-if 'todo '("CANCELED" "SOMEDAY")))))
+                      nil))
+                    ("wa"
+                     "This Weeks's ALL TASKS"
+                     ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                            ((org-agenda-overriding-header "Core Clocking Tasks")))
+                      (tags "+SCHEDULED>=\"<+1w>\"TODO=\"TODO\"|+DEADLINE>=\"<+1w>\"+TODO=\"TODO\""
+                            ((org-agenda-overriding-header "Upcoming tasks")))
+                      (agenda ""
+                      ((org-agenda-ndays 7)
+                       (org-agenda-log-mode-items '(clock closed))))
+                      nil))
+                    ("wl"
+                     "This Weeks's LOGS"
+                     ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                            ((org-agenda-overriding-header "Core Clocking Tasks")))
+                      (agenda ""
+                      ((org-agenda-ndays 7)
+                       (org-agenda-show-log t)
+                       (org-agenda-log-mode-items '(clock closed))
+                       (org-agenda-entry-types '())))
+                      nil)))))
 
 
 #+END_SRC
 
+*** Agenda Functions
+
+#+BEGIN_SRC emacs-lisp
+  (defun stwoe-skip-non-work-entries ()
+    "Skip trees that are not waiting"
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (if (or (stwoe-entry-at-point-is-personal-project)
+              (stwoe-entry-at-point-is-done))
+          t
+        nil)))
+
+  (defun stwoe-entry-at-point-is-personal-project ()
+    "An entry at current point is a personal project"
+    (let ((personal-categories '("personal-emacs-configuration" "ypersonal-website-seamustuohy.com"))
+          (current-category (org-entry-get (point) "CATEGORY")))
+      (if (member current-category personal-categories)
+          t
+        nil)))
+
+  (defun stwoe-entry-at-point-is-done ()
+    "An entry at current point is completed"
+    (let ((personal-categories '("CANCELED" "SOMEDAY" "DONE" "FAILED") )
+          (current-category (org-entry-get (point) "TODO")))
+      (if (member current-category personal-categories)
+          t
+        nil)))
+#+END_SRC
 ** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
 This currently breaks when it tries to load the directors defined by org-mode as files.
 #+BEGIN_SRC emacs-lisp
@@ -1631,9 +1742,20 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
 
 #+BEGIN_SRC emacs-lisp
 (require 'org-protocol)
-
 #+END_SRC
 
+*** Linking to Archive URL's
+
+**** TODO Add putting the wayback script into .emacs.d/bin into install.org
+
+**** Replace a selected link with the archive version if available
+#+BEGIN_SRC emacs-lisp
+  (defun internet-archive-replace-link ()
+    (interactive)
+    (shell-command-on-region
+     (point-min) (point-max)
+     "xargs -I % python ~/.emacs.d/bin/wb.py %" t))
+#+END_SRC
 ** Time CLocking
 *** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -1980,7 +2102,6 @@ Projects follow a basic set of project stages so that I can keep track of the pr
           (candidates . org-projects-get-projects-current)
           (action . (lambda (candidate)
                       candidate))))
-
 
   (defun prompt-for-current-projects-category ()
     (helm :sources '(org-projects-helm-source-current-projects-category)))
@@ -2468,6 +2589,114 @@ I add my org-protocol captures here.
 
 *** References
 - http://juanreyero.com/article/emacs/org-teams.html
+
+*** Reporting
+**** Getting Clock Times
+***** TODO Get a list of an items clock times for each day from (time start) to (time end)
+****** e.g. for <2015-06-01 Mon> to  <2015-06-20 Sat>
+|             |    M |  Tu |  W | Th |    F |  Sa | Su |    M |  Tu |   W | Th |  F | Sa | Su |  M | Tu |  W | Th |  F | Sa |
+|             |   01 |  02 | 03 | 04 |   05 |  06 | 07 |   08 |  09 |  10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+|-------------+------+-----+----+----+------+-----+----+------+-----+-----+----+----+----+----+----+----+----+----+----+----|
+| MY thing    | 1:01 | :20 |  0 |  0 | 4:10 | :02 | :2 |    0 |   0 |   0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |
+| Other thing |  :14 |   0 |  0 |  0 |    0 |   0 |  0 | 3:12 | :23 | :10 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |
+|             |      |     |    |    |      |     |    |      |     |     |    |    |    |    |    |    |    |    |    |    |
+***** TODO Project "correct" billing viewer
+****** TODO Get a list of total time for each project per day
+******* First, a function to run a anonymous function over and over for a period of days
+#+BEGIN_SRC emacs-lisp
+(defun org-project-do-for-date-in-range (function dstart dend)
+"Run a function for each day in a range from dstart to dend.
+dstart and dend will be included in this.
+The function will be passed the days date as an org-mode active time-stamp"
+  ;; Make sure that the start is before the end.
+  ;; time-less-p takes a time value not a time string
+  (if (time-less-p (org-time-string-to-time dstart)
+                   (org-time-string-to-time dend))
+      (let ((days (+ 1 (days-between dend dstart)))
+            (target-date dstart))
+        (while (> days 0)
+          ;; Run our function with the targeted date
+          (funcall function target-date)
+          ;; Set target date to the next days time-string
+          (setq target-date (org-utils-get-time-stamp
+                             (time-add (org-time-string-to-time target-date) (days-to-time 1))))
+          (setq days (- days 1))))
+    (message "End date was earlier than start date. You must move forward in time.")))
+#+END_SRC
+******* TODO Next an org-map-entries function that that finds all days with clocked values within a range and then passses those dates to our "run function over range function"
+#+BEGIN_SRC emacs-list
+;;TODO
+#+END_SRC
+******* TODO Finally the function that gets the time for each day
+#+BEGIN_SRC emacs-lisp
+;;TODO
+#+END_SRC
+
+
+
+****** TODO Get total time clocked for each day
+
+
+******* Notes
+******** org-minutes-to-clocksum-string (m)
+  "Format number of minutes as a clocksum string.
+The format is determined by `org-time-clocksum-format',
+`org-time-clocksum-use-fractional' and
+`org-time-clocksum-fractional-format' and
+`org-time-clocksum-use-effort-durations'."
+
+
+****** TODO Get the total time for each day that I should have spent on each project based upon its percentage and the total time for the day
+****** TODO Show a "corrected" time for each project and where it came from
+
+| CORRECTED     |  % | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | 2h   | 3h  | 4h   | 1h  |
+| project B     | 55 | 6h   | 2h  | 1h   | 7h  |
+| project C     | 30 | 10m  | 4h  | 2h   | 3h  |
+| project C     |  0 | 0    | 0   | 0    | 0   |
+|---------------+----+------+-----+------+-----|
+| Modifications |    | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | -1h  | +3h | -4h  | +1h |
+| project B     | 55 | -30m | -2h | +1h  | +7h |
+| project C     | 30 | +10m | +4h | -2h  | +3h |
+| project C     |  0 | -30m | -2h | -35m | -1h |
+|---------------+----+------+-----+------+-----|
+| Original Time |    | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | 1h   | 3h  | 4h   | 1h  |
+| project B     | 55 | 30m  | 2h  | 1h   | 7h  |
+| project C     | 30 | 10m  | 4h  | 2h   | 3h  |
+| project C     |  0 | 30m  | 2h  | 35m  | 1h  |
+
+***** Get a projects items and the time clocked under them
+#+BEGIN_SRC emacs-lisp
+  (defun org-project-get-clocked-items-by-category (category &optional tstart tend)
+    "org-project-get-time-by-category filtered by items with clocked time"
+    (let ((item (org-project-get-time-by-category category tstart tend)))
+      (-filter (lambda (x) (/= 0 (car (cdr x)))) item)))
+
+    (defun org-project-get-time-by-category (category &optional tstart tend)
+  "Return header and total minutes clocked by that task in time period for all tasks in a specific time period."
+          (org-map-entries
+           '(list (org-utils-get-header) (org-project-clock-sum-current-item tstart tend))
+           (format "CATEGORY=\"%s\"" category) 'agenda))
+
+
+    (defun org-project-clock-sum-current-item (&optional tstart tend headline-filter propname)
+      "Return time, clocked on current item in total.
+    Puts the resulting times in minutes as a text property on each headline.
+    - TSTART and TEND can mark a time range to be considered.
+    - HEADLINE-FILTER is a zero-arg function that, if specified, is called for each headline in the time range with point at the headline. Headlines for which HEADLINE-FILTER returns nil are excluded from the clock summation.
+    - PROPNAME lets you set a custom text property instead of :org-clock-minutes."
+      (save-excursion
+        (save-restriction
+          (org-narrow-to-subtree)
+          (org-clock-sum tstart tend headline-filter propname)
+          org-clock-file-total-minutes)))
+
+#+END_SRC
 
 * Projects
 ** Identify all projects from project directory
