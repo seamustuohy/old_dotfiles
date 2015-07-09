@@ -12,15 +12,18 @@
   # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-
-#set default editor to emacs
+set default editor to emacs
+#+BEGIN_SRC sh
 export EDITOR=emacs
+#+END_SRC
 
-# If not running interactively, don't do anything
+If not running interactively, don't do anything
+#+BEGIN_SRC sh
 case $- in
     *i*) ;;
       *) return;;
 esac
+#+END_SRC
 
 * History
 
@@ -28,21 +31,29 @@ esac
 #        HISTORY CONTROLS
 #==================================
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
+ don't put duplicate lines or lines starting with space in the history.
+ See bash(1) for more options
+#+BEGIN_SRC sh
 HISTCONTROL=ignoreboth
+#+END_SRC
 
-# append to the history file, don't overwrite it
+ append to the history file, don't overwrite it
+#+BEGIN_SRC sh
 shopt -s histappend
+#+END_SRC
 
-#ALSO See: PROMPT_COMMAND below
+ALSO See: PROMPT_COMMAND below
 
-# remove duplicates while preserving input order
+remove duplicates while preserving input order
+
+#+BEGIN_SRC sh
 function dedup {
    awk '! x[$0]++' $@
 }
+#+END_SRC
 
-# removes $HISTIGNORE commands from input
+ removes $HISTIGNORE commands from input
+#+BEGIN_SRC sh
 function remove_histignore {
    if [ -n "$HISTIGNORE" ]; then
       # replace : with |, then * with .*
@@ -53,9 +64,10 @@ function remove_histignore {
       cat $@
    fi
 }
+#+END_SRC
 
-# clean up the history file by remove duplicates and commands matching
-# $HISTIGNORE entries
+ clean up the history file by remove duplicates and commands matching $HISTIGNORE entries
+#+BEGIN_SRC sh
 function history_cleanup {
    local HISTFILE_SRC=~/.bash_history
    local HISTFILE_DST=/tmp/.$USER.bash_history.clean
@@ -68,13 +80,21 @@ function history_cleanup {
       history -r
    fi
 }
+#+END_SRC
 
 #run histroy cleanup on bash startup
-history_cleanup
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+#+BEGIN_SRC sh
+history_cleanup
+#+END_SRC
+
+
+ for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+#+BEGIN_SRC sh
 HISTSIZE=1000
 HISTFILESIZE=2000
+#+END_SRC
+
 
 #==============================
 
@@ -109,11 +129,11 @@ Add additional prompt commands to the function below
 
 #+BEGIN_SRC sh
 prompt_commands() {
-	history -a
+        history -a
 }
 #+END_SRC
 
-* Display 
+* Display
 
 Check the window size after each command and, if necessary, update the values of LINES and COLUMNS.
 #+BEGIN_SRC sh
