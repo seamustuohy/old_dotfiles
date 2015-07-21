@@ -1,0 +1,798 @@
+#+TITLE: Org Project
+#+AUTHOR: seamus tuohy
+#+EMAIL: stuohy@internews.org
+#+DATE: 2015 Jul 21
+#+TAGS: org emacs projects clocking
+
+
+* Setup
+
+** TODO require org-utilities package
+#+BEGIN_SRC emacs-lisp
+(require 'org-utils)
+(require 'helm-custom-prompts)
+#+END_SRC
+
+
+
+* Objects
+
+** Configuration Variables
+
+Projects and tasks have a set of states that they can be assigned.
+#+BEGIN_SRC emacs-lisp
+
+  (defvar org-project-states/task (list "todo" "active" "closed"))
+  (defvar org-project-states/project (list "idea" "active" "closed"))
+
+#+END_SRC
+
+** Object Properties
+
+*** Project File
+Projects should be stored somewhere. I am going to store them in a central file.
+
+#+BEGIN_SRC emacs-lisp
+    (defvar org-project-project-file (file-truename "~/.emacs.d/org-projects.org"))
+#+END_SRC
+
+*** Task File
+Tasks should be stored seperate from projects
+
+#+BEGIN_SRC emacs-lisp
+(defvar org-project-tasks-file (file-truename "~/.emacs.d/tasks.org"))
+#+END_SRC
+
+*** Events File
+#+BEGIN_SRC emacs-lisp
+(defvar org-project-events-file (file-truename "~/.emacs.d/events.org"))
+#+END_SRC
+
+** Workflows
+
+*** Project States
+Projects follow a basic set of project stages so that I can keep track of the progression of a project in the future.
+- Ongoing: These are projects that never end. Like fund-raising, administration, etc.
+- Idea: This state is saved for ideas for projects that have not yet gelled into full projects, and have no identified funding opportunity.
+- Glimmer: These are projects that have are more fleshed out, but only have a possible future funding line identified.
+- Capture: These are projects that have an
+- Live: When a RFP has dropped and we are exploring the project.
+- Kickoff:
+- Startup: The actual start up of the project once funding has been received.
+- Active: The actual project management portion of the project.
+- Closeout: The closeout of the project and sunsetting of technical componenets.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-todo-keywords
+               '((sequence "ONGOING" "IDEA(!)" "GLIMMER(!)" "CAPTURE(!)" "LIVE(!)" "KICKOFF(!)" "STARTUP(!)" "ACTIVE(!)" "CLOSEOUT(!)" "|" "DONE(d!)" "CANCELED(@!)")))
+#+END_SRC
+
+*** Task States
+
+TODO keywords and workflow
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-todo-keywords
+               '(sequence "TODO(t!)" "CONTACT(c!)" "ACTIVE(a!)" "WAIT(w/!)" "|" "DONE(d!)" "SOMEDAY(s!)" "CANCELED(C!)" "FAILED(f!)"))
+#+END_SRC
+
+Task "states" are linked to specific "status'". A CONTACT status, for instance, means a task is in the todo state
+
+The states are
+- todo: tasks that have not been started yet.
+- active: tasks that are currently being worked on in some form, or part of an ongoing process.
+- closed: tasks that are in some state of completion.
+
+#+BEGIN_SRC emacs-lisp
+  (setq org-project-task-states
+        '(("active" . ("ACTIVE" "WAIT" "REPLY"))
+         ("todo" . ("TODO" "CONTACT"))
+         ("closed" . ("FAILED" "CANCELED" "SOMEDAY" "DONE"))))
+#+END_SRC
+
+*** Event States
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-todo-keywords
+               '(sequence "EVENT(e!)" "MEETING(m!)" "|" "DONE(d!)" "SOMEDAY(s!)" "CANCELED(C!)" "FAILED(f!)"))
+#+END_SRC
+
+** Capture
+
+*** Project Capture
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-project-template
+  "* %^{Project Stage|ONGOING|IDEA|GLIMMER|CAPTURE|LIVE|KICKOFF|STARTUP|ACTIVE|CLOSEOUT|DONE|CANCELED} %?
+  :CONTACTS:\n:END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :BILLABLE: %^{Billable?|y|n}
+  :PERCENT: %^{Percent of Time}
+  :CATEGORY: %^{Project Category}
+  :START_DATE:
+  :PERSONAL: %^{Personal?|y|n}
+  :END_DATE:
+  :GLOSSARY:
+  :ID: %(org-id-uuid)
+  :TYPE: project
+  :END:"
+  "Project Template for org-project")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates (append org-capture-templates
+        `(("P" "Projects")
+          ("Pc" "Create Project" entry (file org-project-project-file)
+            ,org-project-project-template :clock-in t :clock-resume t))))
+#+END_SRC
+
+*** Task capture templates
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-task-template-todo
+  "* TODO %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :AT:
+  :STATE: todo
+  :TYPE: task
+  :END:"
+  "TODO Template for org-project")
+
+  (defvar org-project-task-template-active
+  "* ACTIVE %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :AT:
+  :STATE: active
+  :TYPE:
+  :END:"
+  "ACTIVE Template for org-project")
+
+  (defvar org-project-task-template-contact
+  "* CONTACT RE: %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :WHO: %(helm-prompt-for-current-org-contact)
+  :STATE: todo
+  :TYPE: task
+  :END:"
+  "CONTACT Template for org-project")
+
+  (defvar org-project-task-template-reply
+  "* CONTACT [[notmuch:id:%:message-id][%? - %:subject]]
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :WHO: %:from
+  :STATE: todo
+  :TYPE: task
+  :END:"
+  "CONTACT Template for org-project")
+
+  (defvar org-project-task-template-wait
+  "* WAIT RE: %?
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :ID: %(org-id-uuid)
+  :IMPORTANCE:
+  :URGENCY:
+  :FROM: %(helm-prompt-for-current-org-contact)
+  :STATUS: active
+  :TYPE: task
+  :END:"
+  "WAIT Template for org-project")
+
+  (defvar org-project-task-template-closed
+  "* %^{STATUS|DONE|SOMEDAY|CANCELED|FAILED} %?
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :AT:
+  :STATUS: closed
+  :TYPE: task
+  :END:"
+  "CLOSED Template for org-project")
+#+END_SRC
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates (append org-capture-templates
+        `(("t" "Tasks")
+          ("tt" "Create TODO" entry (file org-project-tasks-file)
+            ,org-project-task-template-todo :clock-in t :clock-resume t)
+          ("ta" "Create ACTIVE" entry (file org-project-tasks-file)
+            ,org-project-task-template-active :clock-in t :clock-resume t)
+          ("tc" "Create CONTACT" entry (file org-project-tasks-file)
+            ,org-project-task-template-contact :clock-in t :clock-resume t)
+          ("tw" "Create WAIT" entry (file org-project-tasks-file)
+            ,org-project-task-template-wait :clock-in t :clock-resume t)
+          ("tC" "Create Closed" entry (file org-project-tasks-file)
+            ,org-project-task-template-closed :clock-in t :clock-resume t)
+          ("tr" "REPLY TO EMAIL" entry (file org-project-tasks-file)
+            ,org-project-task-template-reply :clock-in t :clock-resume t))))
+#+END_SRC
+*** Event capture templates
+#+BEGIN_SRC emacs-lisp
+  (defvar org-project-task-template-meet
+  "* MEET about %?
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :STATUS: active
+  :TYPE: event
+  :END:"
+  "Task Template for org-project")
+
+  (defvar org-project-task-template-event
+  "* EVENT
+   SCHEDULED:  %^t
+  :PROPERTIES:
+  :CATEGORY: %(prompt-for-current-projects-category)
+  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
+  :ID: %(org-id-uuid)
+  :ASSIGNED:
+  :IMPORTANCE:
+  :URGENCY:
+  :WITH: %(helm-prompt-for-current-org-contact)
+  :STATUS: todo
+  :TYPE: event
+  :END:"
+  "Task Template for org-project")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq org-capture-templates (append org-capture-templates
+        `(("e" "Events")
+          ("ee" "Create EVENT" entry (file org-project-events-file)
+            ,org-project-task-template-event :clock-in t :clock-resume t)
+          ("em" "Create MEETING" entry (file org-project-events-file)
+            ,org-project-task-template-meet :clock-in t :clock-resume t))))
+#+END_SRC
+
+** Display
+
+*** TODO Colors
+#+BEGIN_SRC emacs-lisp
+(defvar org-todo-colors-status-future "MediumSpringGreen")
+(defvar org-todo-colors-status-current "DarkOrange1")
+(defvar org-todo-colors-status-upcoming "DarkGoldenrod1")
+(defvar org-todo-colors-status-urgent "red1")
+(defvar org-todo-colors-status-completed "DarkTurquoise")
+#+END_SRC
+
+*** Faces
+**** Project Faces
+#+BEGIN_SRC emacs-lisp
+    (setq org-todo-keyword-faces
+          (append org-todo-keyword-faces
+                  '(("ONGOING" :foreground "DarkOrange1")
+                    ("IDEA" :foreground "MediumSpringGreen")
+                    ("GLIMMER" :foreground "MediumSpringGreen")
+                    ("CAPTURE" :foreground "DarkGoldenrod1" :weight bold)
+                    ("LIVE" :foreground "DarkGoldenrod1" :weight bold)
+                    ("KICKOFF" :foreground "red1" :weight bold)
+                    ("STARTUP" :foreground "DarkOrange1" :weight bold)
+                    ("ACTIVE" :foreground "DarkOrange1" :weight bold)
+                    ("CLOSEOUT" :foreground "red1" :weight bold)
+                    ("DONE" :foreground "DarkTurquoise")
+                    ("CANCELED" :foreground "DarkTurquoise"))))
+#+END_SRC
+
+**** Task faces
+#+BEGIN_SRC emacs-lisp
+    (setq org-todo-keyword-faces
+          (append org-todo-keyword-faces
+                  '(("TODO" :foreground "red1")
+                    ("ACTIVE" :foreground "DarkOrange1")
+                    ("CONTACT" :foreground "DarkOrange1")
+                    ("WAIT" :foreground "DarkGoldenrod1" :weight bold)
+                    ("DONE" :foreground "DarkTurquoise" :weight bold)
+                    ("SOMEDAY" :foreground "DarkTurquoise" :weight bold)
+                    ("CANCELED" :foreground "DarkTurquoise" :weight bold)
+                    ("FAILED" :foreground "DarkTurquoise" :weight bold))))
+#+END_SRC
+
+
+**** Event faces
+#+BEGIN_SRC emacs-lisp
+      (setq org-todo-keyword-faces
+            (append org-todo-keyword-faces
+                    '(("EVENT" :foreground "DarkGoldenrod1" :weight bold)
+                      ("MEET" :foreground "DarkOrange1"))))
+#+END_SRC
+
+
+* Functionality
+** Utilities
+** Inspection
+#+BEGIN_SRC emacs-lisp
+  (defun org-projects-get-properties (entry)
+    "
+               Returns:
+                   Returns a plist with all org-project attributes
+                "
+    (let ((type (org-project-id-entry-type object)))
+      (cond ((string-equal "event" type) org-projects-get-properties/event)
+            ((string-equal "project" type) org-projects-get-properties/project)
+            ((string-equal "task" type) org-projects-get-properties/task)
+
+            (message "TODO: Make this function create a plist that holds all the objects properties to make manipulation of project objects easier."))))
+
+  (defun org-project-id-entry-type (object)
+    (error "TODO: Write this function")
+    )
+
+  (defun org-projects-get-properties/task ()
+    "
+    (type) should be the object type (project, task, event, etc.)
+
+    Returns:
+      Returns a list of cons cells with all org-project attributes.
+      - HEADING: The title of the task entry. [string]
+      - TODO: The TODO status of the task entry. [strings]
+      - TAGS: The non-propert tags of the task entry. [list of strings]
+      - PROJECT: The project (CATEGORY) of the task entry [string]
+      - EFFORT: The effort assigned to the task entry. [string]
+      - ID: The task entries ID. [string]
+      - ASSIGNED: The individual assigned to the task (if not me) [string]
+      - IMPORTANCE: The level of importance of the task entry. [string] (currently unassigned)
+      - URGENCY: The urgency of the task entry. [string] (currently unassigned)
+      - WITH: The list of those involved. [list of strings]
+      - WHO: The person(s) to contact in a commms task. [list of strings]
+      - AT: The location of the event. [string]
+      - STATE: The current state of the task. [string - : see org-project-task-states]
+      - TYPE: The type of object this entry is. This should be 'task' or something has gone. wrong. [string]"
+    (let ((properties
+           (list
+            `("heading" . ,(org-utils-get-header-at-point))
+            `("todo" . ,(org-utils-get-todo-keyword-at-point))
+            `("tags" . ,(org-get-tags))
+            `("project" . ,(org-get-category))
+            `("effort" . ,(org-entry-get nil org-effort-property))
+            `("id" . ,(org-id-get))
+            `("assigned" . ,(org-entry-get nil "ASSIGNED"))
+            `("importance" . ,(org-entry-get nil "IMPORTANCE"))
+            `("urgency" . ,(org-entry-get nil "URGENCY"))
+            `("with" . ,(org-entry-get nil "WITH"))
+            `("who" . ,(org-entry-get nil "WHO"))
+            `("at" . ,(org-entry-get nil "AT"))
+            `("state" . ,(org-entry-get nil "STATE"))
+            `("type" . ,(org-entry-get nil "TYPE")))))
+      properties))
+
+  (defun org-projects-get-properties/event ()
+    " A function that gathers the properties of an event.
+  Returns:
+      Returns a plist with all org-project attributes
+      - HEADING
+      - ICAL_EVENT
+      - ID
+      - DT
+      - ORGANIZER
+      - LOCATION
+      - RRULE
+      - REPLY
+      - CATEGORY
+      - EFFORT
+      - ID
+      - ASSIGNED
+      - IMPORTANCE
+      - URGENCY
+      - WITH
+      - STATUS
+      - TYPE"
+    (let ((properties
+           (list
+            `("heading" . ,(org-utils-get-header-at-point))
+            `("todo" . ,(org-utils-get-todo-keyword-at-point))
+            `("tags" . ,(org-get-tags))
+            `("project" . ,(org-get-category))
+            `("effort" . ,(org-entry-get nil org-effort-property))
+            `("id" . ,(org-id-get))
+            `("assigned" . ,(org-entry-get nil "ASSIGNED"))
+            `("ical_event" . ,(org-entry-get nil "ICAL_EVENT"))
+            `("dt" . ,(org-entry-get nil "DT"))
+            `("organizer" . ,(org-entry-get nil "ORGANIZER"))
+            `("r_rule" . ,(org-entry-get nil "RRULE"))
+            `("reply" . ,(org-entry-get nil "REPLY"))
+            `("location" . ,(org-entry-get nil "LOCATION"))
+            `("importance" . ,(org-entry-get nil "IMPORTANCE"))
+            `("urgency" . ,(org-entry-get nil "URGENCY"))
+            `("with" . ,(org-entry-get nil "WITH"))
+            `("who" . ,(org-entry-get nil "WHO"))
+            `("at" . ,(org-entry-get nil "AT"))
+            `("state" . ,(org-entry-get nil "STATE"))
+            `("type" . ,(org-entry-get nil "TYPE")))))
+      properties))
+
+  (defun org-projects-get-properties/project ()
+    "
+    Returns:
+    Returns a plist with all org-project attributes
+      - HEADING
+    Project Attributes:
+      - STAGE
+      - BILLABLE
+      - PERCENT
+      - CATEGORY
+      - SHORT_TERM
+      - START_DATE
+      - PERSONAL
+      - END_DATE
+      - GLOSSARY
+      - ID
+      - TYPE
+      - SETUP: If project code should be initialized on setup. [(string - true)"
+    (let ((properties
+           (list
+            `("heading" . ,(org-utils-get-header-at-point))
+            `("todo" . ,(org-utils-get-todo-keyword-at-point))
+            `("tags" . ,(org-get-tags))
+            `("project" . ,(org-get-category))
+            `("effort" . ,(org-entry-get nil org-effort-property))
+            `("id" . ,(org-id-get))
+            `("billable" . ,(org-entry-get nil "BILLABLE"))
+            `("percent" . ,(org-entry-get nil "PERCENT"))
+            `("short_term" . ,(org-entry-get nil "SHORT_TERM"))
+            `("start_date" . ,(org-entry-get nil "START_DATE"))
+            `("end_date" . ,(org-entry-get nil "END_DATE"))
+            `("personal" . ,(org-entry-get nil "PERSONAL"))
+            `("init" . ,(org-entry-get nil "INIT"))
+            `("glossary" . ,(org-entry-get nil "GLOSSARY"))
+            `("with" . ,(org-entry-get nil "WITH"))
+            `("who" . ,(org-entry-get nil "WHO"))
+            `("at" . ,(org-entry-get nil "AT"))
+            `("state" . ,(org-entry-get nil "STATE"))
+            `("type" . ,(org-entry-get nil "TYPE")))))
+      properties))
+
+
+#+END_SRC
+
+** Searching
+
+*** TODO Identifying active projects
+#+BEGIN_SRC emacs-lisp
+    (defun org-projects-get-projects-all ()
+      (org-map-entries (nth 4 (org-heading-components)) t '(list org-project-project-file)))
+
+  ;; A helm source for my projects
+  ;; http://kitchingroup.cheme.cmu.edu/blog/2015/01/24/Anatomy-of-a-helm-source/
+
+    (defun prompt-for-current-projects ()
+      (helm :sources '(org-projects-helm-source-current-projects)))
+
+    (defun org-projects-get-projects-current ()
+      (org-map-entries (nth 4 (org-heading-components)) "/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING" (list org-project-project-file)))
+
+    (defun org-projects-get-projects-all ()
+      (org-map-entries (nth 4 (org-heading-components)) t (list org-project-project-file)))
+
+    (setq org-projects-helm-source-current-projects
+          '((name . "Get current projects using helm.")
+            (candidates . org-projects-get-projects-current)
+            (action . (lambda (candidate)
+                        candidate))))
+
+    (defun prompt-for-current-projects-category ()
+      (helm :sources '(org-projects-helm-source-all-projects-category)))
+
+    (defun org-projects-get-project-category-current ()
+      (org-map-entries '(let ((category (org-entry-get (point) "CATEGORY"))
+                              (name (nth 4 (org-heading-components))))
+                          (cons name category)) "/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING" (list org-project-project-file)))
+
+    (defun org-projects-get-project-category-all ()
+      (org-map-entries '(let ((category (org-entry-get (point) "CATEGORY"))
+                              (name (nth 4 (org-heading-components))))
+                          (cons name category)) "+TYPE=\"project\"" (list org-project-project-file)))
+
+
+  ;; Helm source for current projects
+    (setq org-projects-helm-source-current-projects-category
+          '((name . "Get current projects using helm.")
+            (candidates . org-projects-get-project-category-current)
+            (action . (lambda (candidate)
+                        candidate))))
+
+    ;;helm fallback source for all projects
+    (setq org-projects-helm-source-all-projects-category
+          '((name . "Get current projects using helm.")
+            (candidates . org-projects-get-project-category-all)
+            (action . (lambda (candidate)
+                        candidate))))
+
+#+END_SRC
+
+*** TODO Integrating  projectile into projects
+- When working on files in project directories it would be great to auto track time spent working on those files.
+*** TODO Integrating persp-mode into projects
+- It would be nice to have each project automatically get its own perspective.
+** Project Initialization
+- Babel blocks in projects are evaluated on start up so that project requirements can be loaded from only active projects.
+
+I have a lot of initialization code that is project specific. Different projects require different settings for e-mail, various accounts, etc. To keep this orderly I have my init file iterate over the org-projects file and look for projects that need initialization and run the code that they have underneath them.
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-project-init-projects()
+"Iterates over all projects. If a project is tagged as a project that requires initialization use org-babel to run any code under that project."
+    (org-map-entries
+     '(org-babel-execute-subtree)
+     "INIT=\"true\""
+    (list org-project-project-file)))
+#+END_SRC
+
+** Updating
+**** Updating a tasks status when states change
+
+This is how I ensure that my status objects are updated
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-project-task-update-status-on-todo-changes ()
+    "Update the state property for a task to represent complex states.
+     Hook function for 'org-after-todo-state-change-hook'
+     Check the org-project-task-states to see if the current state is one that"
+    (if (equal (org-entry-get (point) "TYPE") "task")
+    (let ((check-states org-project-task-states))
+      (while check-states
+        (let ((cur-state (car check-states)))
+          (if (member org-state (cdr cur-state))
+              (org-entry-put (point) "STATUS" (car cur-state))))
+          (setq check-states (cdr check-states))))))
+
+  (add-hook 'org-after-todo-state-change-hook
+            'org-project-task-update-status-on-todo-changes)
+#+END_SRC
+
+** TODO Archiving
+**** Projects
+**** Tasks
+**** Events
+** Reporting
+*** Org-Projects Clocktable
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-dblock-write:clocktable-by-project (params)
+"Creates a clocktable-by-project clocktable. This returns a clocktable organized by the project tag (category) of tasks that it finds."
+    (insert "| Project | Headline | Total Time (h)| | Percent |\n")
+    ;; Get (PROJECT_NAME . PROJECT_CATEGORY) cons cell.
+    (let ((projects (org-projects-get-project-category-all)))
+        ;; Iterate over the projects and insert each one.
+        (mapcar (lambda (project)
+                  ;; Create a category tag for org-clock-get-table-data
+                  ;; This can be in any format that can be parsed by org-make-tags-matcher
+                  ;; Tasks use categories to be assigned to a project
+                  ;; We use a property based tag search here.
+                  (setq params (plist-put params
+                                          :tags (format "CATEGORY=\"%s\""
+                                                        (cdr project))))
+                  (clocktable-by-project/insert-project params project))
+                projects)))
+
+  (defun clocktable-by-project/insert-project (params project)
+    (let* ((project-name (car project))
+          (project-category (cdr project)))
+      (insert "|--\n") ; Add a hline element
+      ;; Set project blank here
+      (insert (format "| %s | *Project Time* |\n" project-name))
+      (let ((total 0))
+        (mapcar
+         (lambda (file)
+           ;; This actually does the searching by file.
+           ;; See: function help for org-clock-get-table-data to get clock-data structure return
+           (let ((clock-data (with-current-buffer (find-file-noselect file)
+                               (org-clock-get-table-data (buffer-name) params))))
+             (when (> (nth 1 clock-data) 0)
+               (setq total (+ total (nth 1 clock-data)))
+               (insert (format "| | File *%s* | %.2f |\n"
+                               (file-name-nondirectory file)
+                               (/ (nth 1 clock-data) 60.0)))
+               (dolist (entry (nth 2 clock-data))
+                 (insert (format "| | . %s%s | %s %.2f |\n"
+                                 (org-clocktable-indent-string (nth 0 entry))
+                                 (nth 1 entry)
+                                 (clocktable-by-project/shift-cell (nth 0 entry))
+                                 (/ (nth 3 entry) 60.0)))))))
+         (org-agenda-files))
+        (save-excursion
+          ;; Go to cell holding *Project Time* text.
+          (re-search-backward "*Project Time*")
+          ;; Go to the next field over
+          (org-table-next-field)
+          ;; Clear this field
+          (org-table-blank-field)
+          ;; Insert the total time in hours
+          (insert (format "*%.2f*" (/ total 60.0)))))
+      (org-table-align)))
+
+  (defun clocktable-by-project/shift-cell (n)
+    (let ((str ""))
+      (dotimes (i n)
+        (setq str (concat str "| ")))
+      str))
+
+#+END_SRC
+*** CANCELED Create a function to build a custom for projects
+    :LOGBOOK:
+    - State "CANCELED"   from "TODO"    [2015-07-20 Mon 13:15]
+    :END:
+**** TODO Get a list of an items clock times for each day from (time start) to (time end)
+***** e.g. for <2015-06-01 Mon> to  <2015-06-20 Sat>
+|             |    M |  Tu |  W | Th |    F |  Sa | Su |    M |  Tu |   W | Th |  F | Sa | Su |  M | Tu |  W | Th |  F | Sa |
+|             |   01 |  02 | 03 | 04 |   05 |  06 | 07 |   08 |  09 |  10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+|-------------+------+-----+----+----+------+-----+----+------+-----+-----+----+----+----+----+----+----+----+----+----+----|
+| MY thing    | 1:01 | :20 |  0 |  0 | 4:10 | :02 | :2 |    0 |   0 |   0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |
+| Other thing |  :14 |   0 |  0 |  0 |    0 |   0 |  0 | 3:12 | :23 | :10 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |  0 |
+|             |      |     |    |    |      |     |    |      |     |     |    |    |    |    |    |    |    |    |    |    |
+**** TODO Project "correct" billing viewer
+***** TODO Get a list of total time for each project per day
+****** First, a function to run a anonymous function over and over for a period of days
+#+BEGIN_SRC emacs-lisp
+  ;; (defun org-project-do-for-date-in-range (function dstart dend)
+  ;; "Run a function for each day in a range from dstart to dend.
+  ;; dstart and dend will be included in this.
+  ;; The function will be passed the days date as an org-mode active time-stamp"
+  ;;   ;; Make sure that the start is before the end.
+  ;;   ;; time-less-p takes a time value not a time string
+  ;;   (if (time-less-p (org-time-string-to-time dstart)
+  ;;                    (org-time-string-to-time dend))
+  ;;       (let ((days (+ 1 (days-between dend dstart)))
+  ;;             (target-date dstart))
+  ;;         (while (> days 0)
+  ;;           ;; Run our function with the targeted date
+  ;;           (funcall function target-date)
+  ;;           ;; Set target date to the next days time-string
+  ;;           (setq target-date (org-utils-get-time-stamp
+  ;;                              (time-add (org-time-string-to-time target-date) (days-to-time 1))))
+  ;;           (setq days (- days 1))))
+  ;;     (message "End date was earlier than start date. You must move forward in time.")))
+#+END_SRC
+
+****** TODO Next an org-map-entries function that that finds all days with clocked values within a range and then passses those dates to our "run function over range function"
+#+BEGIN_SRC emacs-lisp
+;; TODO
+#+END_SRC
+****** TODO Finally the function that gets the time for each day
+#+BEGIN_SRC emacs-lisp
+;; TODO
+#+END_SRC
+***** TODO Get total time clocked for each day
+****** Notes
+******* org-minutes-to-clocksum-string (m)
+  "Format number of minutes as a clocksum string.
+The format is determined by `org-time-clocksum-format',
+`org-time-clocksum-use-fractional' and
+`org-time-clocksum-fractional-format' and
+`org-time-clocksum-use-effort-durations'."
+
+***** TODO Get the total time for each day that I should have spent on each project based upon its percentage and the total time for the day
+***** TODO Show a "corrected" time for each project and where it came from
+
+| CORRECTED     |  % | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | 2h   | 3h  | 4h   | 1h  |
+| project B     | 55 | 6h   | 2h  | 1h   | 7h  |
+| project C     | 30 | 10m  | 4h  | 2h   | 3h  |
+| project C     |  0 | 0    | 0   | 0    | 0   |
+|---------------+----+------+-----+------+-----|
+| Modifications |    | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | -1h  | +3h | -4h  | +1h |
+| project B     | 55 | -30m | -2h | +1h  | +7h |
+| project C     | 30 | +10m | +4h | -2h  | +3h |
+| project C     |  0 | -30m | -2h | -35m | -1h |
+|---------------+----+------+-----+------+-----|
+| Original Time |    | 01   | 02  | 03   | 04  |
+|---------------+----+------+-----+------+-----|
+| project A     | 15 | 1h   | 3h  | 4h   | 1h  |
+| project B     | 55 | 30m  | 2h  | 1h   | 7h  |
+| project C     | 30 | 10m  | 4h  | 2h   | 3h  |
+| project C     |  0 | 30m  | 2h  | 35m  | 1h  |
+
+**** Get a projects items and the time clocked under them
+#+BEGIN_SRC emacs-lisp
+  ;; (defun org-project-get-clocked-items-by-category (category &optional tstart tend)
+  ;;     "org-project-get-time-by-category filtered by items with clocked time"
+  ;;     (let ((item (org-project-get-time-by-category category tstart tend)))
+  ;;       (-filter (lambda (x) (/= 0 (car (cdr x)))) item)))
+
+  ;;     (defun org-project-get-time-by-category (category &optional tstart tend)
+  ;;   "Return header and total minutes clocked by that task in time period for all tasks in a specific time period."
+  ;;           (org-map-entries
+  ;;            '(list (org-utils-get-header) (org-project-clock-sum-current-item tstart tend))
+  ;;            (format "CATEGORY=\"%s\"" category) 'agenda))
+
+
+  ;;     (defun org-project-clock-sum-current-item (&optional tstart tend headline-filter propname)
+  ;;       "Return time, clocked on current item in total.
+  ;;     Puts the resulting times in minutes as a text property on each headline.
+  ;;     - TSTART and TEND can mark a time range to be considered.
+  ;;     - HEADLINE-FILTER is a zero-arg function that, if specified, is called for each headline in the time range with point at the headline. Headlines for which HEADLINE-FILTER returns nil are excluded from the clock summation.
+  ;;     - PROPNAME lets you set a custom text property instead of :org-clock-minutes."
+  ;;       (save-excursion
+  ;;         (save-restriction
+  ;;           (org-narrow-to-subtree)
+  ;;           (org-clock-sum tstart tend headline-filter propname)
+  ;;           org-clock-file-total-minutes)))
+
+#+END_SRC
+
+
+
+
+
+
+* Setup
+#+BEGIN_SRC emacs-lisp
+        (defun org-project-initialize ()
+          (add-to-list 'org-agenda-files org-project-project-file)
+          (add-to-list 'org-agenda-files org-project-tasks-file)
+          (add-to-list 'org-agenda-files org-project-events-file)
+        )
+
+#+END_SRC
+* References
+- http://juanreyero.com/article/emacs/org-teams.html
+
+* Technical Artifacts
+
+  Make sure that we can simply =require= this library.
+
+#+BEGIN_SRC elisp
+  (provide 'org-project)
+
+;;; org-package.el ends here
+#+END_SRC
+
+  Before you can build this on a new system, make sure that you put
+  the cursor over any of these properties, and hit: =C-c C-c=
+
+#+DESCRIPTION: An experimental package that helps support project workflows.
+#+PROPERTY:    results silent
+#+PROPERTY:    tangle ~/.emacs.d/elisp/org-project.el
+#+PROPERTY:    eval no-export
+#+PROPERTY:    comments org
+#+OPTIONS:     num:nil toc:nil todo:nil tasks:nil tags:nil
+#+OPTIONS:     skip:nil author:nil email:nil creator:nil timestamp:nil
+#+INFOJS_OPT:  view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js

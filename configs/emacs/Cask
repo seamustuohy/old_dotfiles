@@ -14,6 +14,7 @@
 (depends-on "helm")
 (depends-on "helm-dash")
 (depends-on "helm-projectile")
+(depends-on "persp-projectile")
 (depends-on "lua-mode")
 (depends-on "wrap-region")
 (depends-on "markdown-mode")

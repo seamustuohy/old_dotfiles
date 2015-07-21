@@ -5,6 +5,7 @@
 #+TAGS: emacs core
 
 
+
 #+BEGIN_SRC emacs-lisp
 ;;(setq debug-on-error t)
 #+END_SRC
@@ -35,7 +36,7 @@ Either the Key ID or set to nil to use symmetric encryption.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-;;(add-to-list 'auth-sources (in-private-dir ".authinfo.gpg"))
+(setq auth-sources '("~/.s2e/.authinfo.gpg"))
 #+END_SRC
 
 * Personal key space
@@ -81,8 +82,6 @@ Set up my emacs main directory path.
 (defun in-emacs-d (path)
   (concat emacs-dir path))
 #+END_SRC
-
-
 ** Cask
 
 #+BEGIN_SRC emacs-lisp
@@ -90,7 +89,6 @@ Set up my emacs main directory path.
   (setq cask-filename (file-truename "~/.emacs.d/Cask"))
   (cask-initialize)
 #+END_SRC
-
 
 ** Local
 Create shortcut to packages directory
@@ -108,7 +106,14 @@ Load each package individually. Too busy with the re-write today to script up a 
 (add-to-list 'load-path (in-package-d "writegood-mode"))
 (add-to-list 'load-path (in-package-d "guru-mode"))
 (add-to-list 'load-path (in-package-d "org-bullets"))
+(add-to-list 'load-path (in-package-d "string-utils"))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq my-elisp-dir (in-emacs-d "elisp/"))
+  (add-to-list 'load-path my-elisp-dir)
+#+END_SRC
+
 
 ** Use Package
 
@@ -190,10 +195,13 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-protocol)
   (require 'org-id)
   (require 'org-bullets)
+  (require 'string-utils)
 #+END_SRC
 
-
 * Emacs Environment
+#+BEGIN_SRC emacs-lisp
+(message "Initializing Emacs Environment")
+#+END_SRC
 ** Server
 
 Start a server when there is not a server already running.
@@ -225,6 +233,9 @@ yes/no turns to y/n
   (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 #+END_SRC
 * Text Manipulation
+#+BEGIN_SRC emacs-lisp
+(message "Initializing text manipulation")
+#+END_SRC
 ** Drag Stuff
 Use the super key and the control key to drag lines in any file anywhere I want.
 #+BEGIN_SRC emacs-lisp
@@ -244,7 +255,22 @@ Huge time saver.
 (global-set-key (kbd "C--") 'er/contract-region)
 #+END_SRC
 
+** Unfill Paragraph
+[[https://emacs.stackexchange.com/questions/2606/opposite-of-fill-paragraph][From Stack Overflow user King Marvel]]
+#+BEGIN_SRC emacs-lisp
+(defun unfill-paragraph ()
+  "Takes a multi-line paragraph and makes it into a single line of text."
+  (interactive)
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
+
+ ;; Handy key definition
+ (define-key global-map "\M-Q" 'unfill-paragraph)
+#+END_SRC
 * Security
+#+BEGIN_SRC emacs-lisp
+(message "Initializing security")
+#+END_SRC
 I use epa file to open encrypted files automatically
 #+BEGIN_SRC emacs-lisp
   ;; (use-package epa-file
@@ -257,6 +283,10 @@ I use epa file to open encrypted files automatically
 #+END_SRC
 
 * Hacks
+#+BEGIN_SRC emacs-lisp
+(message "Initializing hacks")
+#+END_SRC
+
 This little hack saves me from when pasting becomes VERY slow. It occurs at seeming random intervals.
 - [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2015-04/msg00222.html][Problem]]
 - [[https://debbugs.gnu.org/cgi/bugreport.cgi?bug=16737][Solution]]
@@ -265,6 +295,9 @@ This little hack saves me from when pasting becomes VERY slow. It occurs at seem
 #+END_SRC
 
 * Calendar
+#+BEGIN_SRC emacs-lisp
+(message "Initializing calendar")
+#+END_SRC
 ** Setup Calendar
 All calendar configuration is done in projects
 
@@ -298,16 +331,25 @@ All calendar configuration is done in projects
         cfw:fchar-top-right-corner ?╗)
 #+END_SRC
 
-** Gnus integration
+** Notmuch integration
+
 #+BEGIN_SRC emacs-lisp
-  ;; (require 'gnus-icalendar)
-  ;; (setq gnus-icalendar-org-capture-file "~/.org/calendar/email.org")
-  ;; (setq gnus-icalendar-org-capture-headline '("Calendar"))
-  ;; (gnus-icalendar-setup)
-  ;; (gnus-icalendar-org-setup)
+ (add-to-list 'load-path (in-package-d "ical-event"))
+ (require 'notmuch-calendar)
+
+;; to enable optional iCalendar->Org sync functionality
+;; NOTE: both the capture file and the headline(s) inside must already exist
+
+ (setq mail-calendar-org-capture-file "/home/s2e/.org/events.org")
+ (setq mail-calendar-org-capture-headline '("Work Events"))
+
+ (mail-calendar-org-setup)
 #+END_SRC
 
 * Communication
+#+BEGIN_SRC emacs-lisp
+(message "Initializing communications")
+#+END_SRC
 ** IRC
 #+BEGIN_SRC emacs-lisp
   (use-package erc
@@ -347,7 +389,8 @@ All calendar configuration is done in projects
      notmuch-fcc-dirs "Sent"
      ;; === Crypto ===
      ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
-     notmuch-crypto-process-mime t
+     ;; Does not seem to do anything anyway
+     ;; notmuch-crypto-process-mime t
     ;; == SENDING MAIL
      message-kill-buffer-on-exit t))
 
@@ -368,10 +411,13 @@ All calendar configuration is done in projects
 ;(setq notmuch-fcc-dirs "Sent/")
 #+END_SRC
 
+
+
 **** Contacts
 
 #+BEGIN_SRC emacs-lisp
-(setq org-contacts-files '("~/.s2e/contacts.org"))
+  (setq org-contacts-files '("~/.s2e/contacts.org"))
+  (add-to-list 'org-agenda-files (car org-contacts-files))
 #+END_SRC
 
 Look at my emacs-org.org setup for org contacts capture.
@@ -388,7 +434,24 @@ Look at my emacs-org.org setup for org contacts capture.
 #+BEGIN_SRC emacs-lisp
 (setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
 #+END_SRC
-**** OfflineImap
+
+**** [[id:903d388c-96f1-4589-9a2a-88bddac19ed2][SEE: Capture Calendar Events]]
+Modified gnus-calendar to work with notmuch.
+
+#+BEGIN_SRC emacs-lisp
+  ;;  (add-to-list 'load-path (in-package-d "ical-event"))
+  ;;  (require 'notmuch-calendar)
+
+  ;; ;; to enable optional iCalendar->Org sync functionality
+  ;; ;; NOTE: both the capture file and the headline(s) inside must already exist
+
+  ;;  (setq mail-calendar-org-capture-file "/home/s2e/.org/events.org")
+  ;;  (setq mail-calendar-org-capture-headline '("Work Events"))
+
+  ;;  (mail-calendar-org-setup)
+#+END_SRC
+
+**** TODO OfflineImap
 Commented out becuase it never seems to work.
 #+BEGIN_SRC emacs-lisp
 ; (use-package offlineimap
@@ -422,9 +485,11 @@ Commented out becuase it never seems to work.
   (setq twittering-use-master-password t))
 #+END_SRC
 
-
-
+** Contacts
 * Time Clocking
+#+BEGIN_SRC emacs-lisp
+(message "Initializing time clocking")
+#+END_SRC
 ** Display
 
 When clocked in for a task, display the current task and accumulated time in the frame title.
@@ -439,6 +504,9 @@ I want to be able to clock to major projects as well as to the websites I visit,
 ** TODO Cross Mode Clocking
 
 * Code Support
+#+BEGIN_SRC emacs-lisp
+(message "Initializing code support")
+#+END_SRC
 ** Text Manipulation
 *** Return and indent on prog-mode variants
 #+BEGIN_SRC emacs-lisp
@@ -571,6 +639,9 @@ by using nxml's indentation rules."
 #+END_SRC
 
 * Display
+#+BEGIN_SRC emacs-lisp
+(message "Initializing display")
+#+END_SRC
 ** Mark and Cursor
 
 I like to have the mark always active when I am selecting text.  This highlights the mark area.
@@ -757,6 +828,45 @@ Easily switch to your last perspective
       (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
 #+END_SRC
 
+*** TODO Future Email
+**** TODO Encryption
+http://www.emacswiki.org/emacs/MailCrypt
+https://web.archive.org/web/20030413005614/www.kaidea.freeserve.co.uk/mc-bbdb.el
+**** TODO Received new message
+***** If encrypted
+****** decrypt for parsing
+***** get projects
+****** get project glossaries
+******* check content and subject for terms
+******* tag to project if found
+****** check from, cc & to for group memebers
+******* tag to project if found
+**** TODO Open a message
+***** Create an org entry of the email
+***** Add project category to entry from message tag
+***** Start clocking to the message
+***** Create global variable of message that was opened (so that when we stop clocking we don't have to query the original message that opened the thread)
+***** decrypt message
+**** TODO Close a message
+***** If clocking this message,
+****** Stop clocking and close the message.
+***** If not clocking for some reason
+****** Close the message without closing current clock
+**** TODO Reply to a message
+***** Create an org-entry for the reply
+****** Add project category to entry from message tag
+****** Temporary ID created and stored in global value list
+***** If adding contacts
+****** helm-contacts uses tags and members of the thread to give a sub-list of probable contacts
+**** TODO Send Reply
+***** Check to,cc,bcc contacts
+****** If contact in to,cc,or bcc requires encryption
+******* Encrypt message
+***** Get message ID from server and replace temporary ID with that ID
+***** Stop clocking
+**** TODO Close reply without sending
+***** stop clocking
+
 *** Org Agenda
 org-agenda persp
 #+BEGIN_SRC emacs-lisp
@@ -768,15 +878,17 @@ org-agenda persp
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-    (defun custom-persp/org-agenda-start ()
-      (interactive)
-      (custom-persp "org")
-      (org-agenda nil "ta"))
+  (defun custom-persp/org-agenda-start ()
+    (interactive)
+    (custom-persp "org")
+    (delete-other-windows) ;Delete all windows in this perspective.
+    (org-agenda nil "tw"))
 
-      (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
+    (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
 #+END_SRC
 
 *** IRC
+I actually do not like ERC at all. One of these days I will have to figure out a way to make it worth it. But, for now it is not going to happen.
 #+BEGIN_SRC emacs-lisp
       (defun custom-persp/start-irc ()
         (interactive)
@@ -786,8 +898,21 @@ org-agenda persp
         (interactive)
         (custom-persp "irc"))
 
-        (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
-        (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
+        ;; (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
+        ;; (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
+#+END_SRC
+*** Init
+#+BEGIN_SRC emacs-lisp
+      (defun custom-persp/start-init ()
+        (interactive)
+        (custom-persp "init")
+        (find-file (file-truename "~/.dotfiles/configs/emacs/emacs.org")))
+      (defun custom-persp/init ()
+        (interactive)
+        (custom-persp "init"))
+
+        (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-init)
+        (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/init)
 #+END_SRC
 
 ** Pretty Things
@@ -844,6 +969,9 @@ Load my current theme.
 #+END_SRC
 
 * File Management
+#+BEGIN_SRC emacs-lisp
+(message "Initializing file management")
+#+END_SRC
 ** Cleanup
 
 I use these files for cleaning buffers when I save, or get annoyed by red highlighted spaces everywhere.
@@ -908,11 +1036,6 @@ uniquify shows a files location when it shares the same name as another file.
   uniquify-separator ":")
 #+END_SRC
 
-I like my desktop to be saved across sessions.
-#+BEGIN_SRC emacs-lisp
-(desktop-save-mode 1)
-(setq desktop-restore-eager 10)
-#+END_SRC
 ** Backups
 
 I use close to the basic backup setup described in the [[http://emacswiki.org/emacs/BackupDirectory][emacswiki.]]
@@ -955,6 +1078,9 @@ Automatically purge backup files not accessed in a week:
 #+END_SRC
 
 * Help
+#+BEGIN_SRC emacs-lisp
+(message "Initializing help")
+#+END_SRC
 ** Writing Help
 *** Spell Checking
 I use flyspell mode for spell checking for any text files.
@@ -1179,6 +1305,9 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 #+END_SRC
 
 * Navigation
+#+BEGIN_SRC emacs-lisp
+(message "Initializing navigation")
+#+END_SRC
 ** In-File
 
   Movement and line based commands should operate on the lines that I see (even if they are using word wrap) by default.
@@ -1220,12 +1349,6 @@ If point was already at that position, move point to beginning of line."
 (global-set-key (kbd "C-a") 'smart-beginning-of-line)
 #+END_SRC
 
-** Projectile
-#+BEGIN_SRC emacs-lisp
-  (require 'projectile)
-  (projectile-global-mode)
-#+END_SRC
-
 ** Helm
 
 Use helm and turn the delay to nothing.
@@ -1252,13 +1375,34 @@ Use helm and turn the delay to nothing.
            ("M-i" . helm-semantic-or-imenu)))
 #+END_SRC
 
+Helm swoop is amazing! I use it far more than search, but I am still afraid to replace search with it.
+
 #+BEGIN_SRC emacs-lisp
-(use-package helm-swoop
- :bind (("C-S-s" . helm-swoop)))
+  (use-package helm-swoop
+    :bind ("C-c C-M-s" . helm-swoop))
+#+END_SRC
+
+** Projectile
+#+BEGIN_SRC emacs-lisp
+    (use-package helm-projectile
+      :config
+      (projectile-global-mode)
+      (setq projectile-completion-system 'helm)
+      (helm-projectile-on))
+#+END_SRC
+
+[[https://github.com/bbatsov/projectile/blob/master/persp-projectile.el][Persp-Projectile]] allows me to push projects into new perspectives. This makes it far easier for me to switch between tasks.
+#+BEGIN_SRC emacs-lisp
+  (use-package persp-projectile
+    :bind ("C-x p p" . projectile-persp-switch-project))
 #+END_SRC
 
 * Org-Mode
-** General
+#+BEGIN_SRC emacs-lisp
+(message "Initializing org mode")
+#+END_SRC
+
+** Requirements
 *** Org-Modules
 
 [[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
@@ -1280,9 +1424,12 @@ Use helm and turn the delay to nothing.
 *** Requirements
 #+BEGIN_SRC emacs-lisp
 (require 'org)
+(require 'org-utils)
+(require 'org-project)
+(require 'helm-custom-prompts)
 #+END_SRC
 
-*** Files to activate org for
+** Files to activate org for
 Open org-mode for .org files and for .org.gpg files.
 Read [[http://ergoemacs.org/emacs/emacs_auto-activate_a_major-mode.html][this]] for how to format these strings. Then go and buy his book. It is the same content, but it is really good content and should be supported.
 
@@ -1297,98 +1444,40 @@ Ends with ".org"
 ;;   (add-to-list 'auto-mode-alist '("\\(\\.org\\.gpg\\)?$" . org-mode))
 #+END_SRC
 
-*** Auto Save
+** Auto Save
  Set auto-save for org mode files every hour, on the hour.
 #+BEGIN_SRC emacs-lisp
 (run-at-time "00:59" 3600 'org-save-all-org-buffers)
 #+END_SRC
-** Filing
-*** Keywords
-#+BEGIN_SRC emacs-lisp
-;; keyword bindings
-(setq org-todo-keywords (quote ((sequence "TODO(t)" "NEXT(n)" "TASK(T)" "|" "DONE(d!)")
-                                (sequence "WAIT(w@!/@!)"  "SOMEDAY(s)" "CANCELED(C)")
-                                (sequence "REPLY(r@/!)" "CONTACT(c@/!)" "MEETING(M)"))))
-#+END_SRC
-
-Set the colors and properties for org mode tags
-#+BEGIN_SRC emacs-lisp
-  (setq org-todo-keyword-faces
-        (quote (
-                ("TODO" :foreground "red" :weight bold)
-                ("TASK" :foreground "red" :weight bold)
-                ("NEXT" :foreground "red" :weight bold)
-                ("CONTACT" :foreground "orange" :weight bold)
-                ("REPLY" :foreground "orange" :weight bold)
-                ("WAIT" :foreground "orange" :weight bold)
-                ("MEETING" :foreground "DarkGoldenrod2" :weight bold)
-                ("EVENT" :foreground "DarkGoldenrod2" :weight bold)
-                ("DONE" :foreground "cornflower blue" :weight bold)
-                ("SOMEDAY" :foreground "cornflower blue" :weight bold)
-                ("IDEA" :foreground "blue" :weight bold))))
-
-  (setq org-todo-state-tags-triggers
-        (quote (("SOMEDAY" ("SOMEDAY" . t))
-                ("WAIT" ("WAIT" . t))
-                ("TODO" ("WAIT") ("SOMEDAY"))
-                ("TASK" ("WAIT") ("SOMEDAY"))
-                ("CONTACT" ("WAIT" .t))
-                ("DONE" ("WAIT") ("SOMEDAY"))
-                ("NEXT" ("WAIT")))))
-#+END_SRC
-*** Capture
+** Capture
 
 Capture Mode
 #+BEGIN_SRC emacs-lisp
 (setq org-default-notes-file "~/.org/todo/to_file.org")
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
-
-
+*** Capturing Org-Contacts
 #+BEGIN_SRC emacs-lisp
-
-#+END_SRC
-
-Capture templates for TODO tasks, Notes, appointments, phone calls, meetings,
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates '(
-                                      ("f" "TO FILE")
-                                      ("ft" "todo" entry (file "~/.org/todo/to_file.org")
-                                       "* TODO %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fT" "task" entry (file "~/.org/todo/to_file.org")
-                                       "* TASK %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:WITH:%^{Do With?}\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fr" "respond" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t)
-                                      ("fn" "note" entry (file "~/.org/todo/to_file.org")
-                                       "* %? :NOTE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fm" "Meeting" entry (file "~/.org/todo/to_file.org")
-                                       "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
-                                      ("fp" "Phone call" entry (file "~/.org/todo/to_file.org")
-                                       "* PHONE %? :PHONE:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:" :clock-in t :clock-resume t)
-                                      ("fh" "Habit" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT %?\nSCHEDULED: %(format-time-string \"<%Y-%m-%d %a .+1d/3d>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n)")
-                                      ("fi" "idea" entry (file "~/.org/todo/to_file.org")
-                                       "* IDEA %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fw" "wait" entry (file "~/.org/todo/to_file.org")
-                                       "* WAIT for %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fc" "Contact" entry (file "~/.org/todo/to_file.org")
-                                       "* CONTACT %?\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)
-                                      ("fe" "Event" entry (file "~/.org/todo/to_file.org")
-                                       "* EVENT %?:EVENT:\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :clock-in t :clock-resume t)))
-
-#+END_SRC
-
-
-#+BEGIN_SRC emacs-lisp
-    (setq org-capture-templates
+  (setq org-capture-templates
       (append org-capture-templates '(
-                                      ("e" "Calendar Event" entry (file "~/.org/calendar/work.org")
-                                        "* %(notmuch-show-get-subject)\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n%T\n%i"))))
-
+                                      ("@" "Contacts" entry (file "~/.s2e/contacts.org")
+                                       "* %(org-contacts-template-name)
+  :PROPERTIES:
+  :EMAIL: %(org-contacts-template-email)
+  :PHONE:
+  :ALIAS:
+  :NICKNAME:
+  :IGNORE:
+  :ICON:
+  :NOTE:
+  :ADDRESS:
+  :BIRTHDAY:
+  :FROM_TAGS:
+  :TO_TAGS:
+  :END:"))))
 #+END_SRC
 
-
-
+** Bookmarking from the browser and org-protocol
 
 https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
 ;; Searches for the current kill-ring head and adds the text under it.
@@ -1408,7 +1497,6 @@ https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-w
       (or (bolp) (insert "\n"))
       (insert "* " hd "\n")))
     (end-of-line))
-
 #+END_SRC
 
 I add my org-protocol captures here.
@@ -1436,35 +1524,6 @@ I add my org-protocol captures here.
                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (setq org-capture-templates
-      (append org-capture-templates '(
-                                      ("@" "Contacts" entry (file "~/.s2e/contacts.org")
-                                       "* %(org-contacts-template-name)
-  :PROPERTIES:
-  :EMAIL: %(org-contacts-template-email)
-  :PHONE:
-  :ALIAS:
-  :NICKNAME:
-  :IGNORE:
-  :ICON:
-  :NOTE:
-  :ADDRESS:
-  :BIRTHDAY:
-  :FROM_TAGS:
-  :TO_TAGS:
-  :END:"))))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-    (append org-capture-templates '(
-                                      ("Q" "TEST-respond" entry (file "~/.org/todo/to_file.org")
-                                       "* NEXT [[notmuch:id:%:message-id][Respond to %:from on %:subject]]\nSCHEDULED: %t\n%U\n" :clock-in t :clock-resume t :immediate-finish t))))
-#+END_SRC
-
-*** References
-- http://juanreyero.com/article/emacs/org-teams.html
 ** Refile
 
 Targets include this file and any file contributing to the agenda - up to 3 levels deep
@@ -1500,6 +1559,21 @@ This is great for showing TODO items immediately as I type them out.
 (global-font-lock-mode 1)
 #+END_SRC
 
+Also fold plain lists within major list items.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-cycle-include-plain-lists t)
+#+END_SRC
+
+Always use UTF-8 everywhere.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-export-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-charset-priority 'unicode)
+(setq default-process-coding-system '(utf-8-unix . utf-8-unix))
+#+END_SRC
+
 *** Bullets Mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
@@ -1533,21 +1607,66 @@ Enable toggle in case it does not work.
   ;;   (iimage-mode))
 #+END_SRC
 
-** Searching & Viewing
-*** Agenda
-**** Keybindings for Agenda Mode
+*** Agenda icons
+First, remove categories from the default agenda mode and set the icon list to nil.
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-prefix-format '((agenda . " %i %?-12t% s")
+                                 (timeline . "  % s")
+                                 (todo . " %i %-12:c")
+                                 (tags . " %i ")
+                                 (search . " %i %-12:c")))
+
+
+(setq org-agenda-category-icon-alist nil)
+#+END_SRC
+
+Most of my agenda icons exist within project files. But there are a few non-project ones I use.
+#+BEGIN_SRC emacs-lisp
+;; emacs customization
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("personal-emacs-configuration"
+                    "~/.s2e/images/emacs_icon_16.png"
+                    nil nil :ascent center )))
+
+;; Birthday
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("Birthday"
+                    "~/.s2e/images/birthday_icon_16.svg"
+                    nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("to_file"
+                    "~/.s2e/images/arrow_icon_16.svg"
+                    nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("lunch"
+                    "~/.s2e/images/cheese_icon_16.svg"
+                    nil nil :ascent center )))
+
+;; to_file
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("organization"
+                    "~/.s2e/images/gear_icon_16.svg"
+                    nil nil :ascent center )))
+
+#+END_SRC
+** Agenda
+*** Keybindings for Agenda Mode
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
 
-**** Agenda Files
+*** Agenda Files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files (quote ("~/.org/todo"
                                  "~/.org/personal/"
                                  "~/.org/work/library")))
 #+END_SRC
-**** Basic Settings
+*** Basic Settings
 #+BEGIN_SRC emacs-lisp
 ;;Start with the agenda log ON
 (setq org-agenda-show-log t)
@@ -1558,7 +1677,7 @@ Enable toggle in case it does not work.
 ;; Set the agenda to skip deadlines if they are done
 (setq org-agenda-skip-deadline-if-done t)
 #+END_SRC
-**** Agenda todo item configuration
+*** Agenda todo item configuration
 #+BEGIN_SRC emacs-lisp
 ;; Keep tasks with dates on the global todo lists
 (setq org-agenda-todo-ignore-with-date nil)
@@ -1582,16 +1701,15 @@ Enable toggle in case it does not work.
 (setq org-agenda-skip-timestamp-if-done t)
 #+END_SRC
 
-**** Display
-
-***** Always hilight the current agenda line
+*** Display
+**** Always hilight the current agenda line
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-agenda-mode-hook
           '(lambda () (hl-line-mode 1))
           'append)
 #+END_SRC
 
-***** Time Grid
+**** Time Grid
 #+BEGIN_SRC emacs-lisp
 ;;Set time grid ON for day
 (setq org-agenda-use-time-grid t)
@@ -1603,14 +1721,14 @@ Enable toggle in case it does not work.
        (600 800 1000 1200 1400 1600 1800 2000)))
 #+END_SRC
 
-***** Custom clock faces
+**** Custom clock faces
 #+BEGIN_SRC emacs-lisp
 ;; The following custom-set-faces create the highlights
 (custom-set-faces
  '(org-mode-line-clock ((t (:background "grey75" :foreground "red" :box (:line-width -1 :style released-button)))) t))
 #+END_SRC
 
-**** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
+*** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
 #+BEGIN_SRC emacs-lisp
 ;; Inhibit agenda files startup options (Org > 8.0)
 ;; http://orgmode.org/worg/agenda-optimization.html#sec-4
@@ -1620,64 +1738,110 @@ Enable toggle in case it does not work.
 (setq org-agenda-dim-blocked-tasks nil)
 #+END_SRC
 
-**** Custom agenda commands
+*** Custom agenda commands
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-custom-commands
-      (quote (("ts"
-               "TODAY's SHORT"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 1)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil))
-              ("tl"
-               "TODAY's LOG"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 1)
-                 (org-agenda-show-log t)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil))
-              ("ta"
-               "TODAY's Question"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                        ((org-agenda-ndays 1)
-                         (org-agenda-show-log t)
-                         (org-agenda-log-mode-items '(clock closed))
-                         (org-agenda-skip-function
-                          '(org-agenda-skip-entry-if 'todo '("CANCELED" "SOMEDAY")))))
-                nil))
-              ("wa"
-               "This Weeks's ALL TASKS"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (tags "+SCHEDULED>=\"<+1w>\"TODO=\"TODO\"|+DEADLINE>=\"<+1w>\"+TODO=\"TODO\""
-                      ((org-agenda-overriding-header "Upcoming tasks")))
-                (agenda ""
-                ((org-agenda-ndays 7)
-                 (org-agenda-log-mode-items '(clock closed))))
-                nil))
-              ("wl"
-               "This Weeks's LOGS"
-               ((tags "CORE_TASK=\"true\"+LEVEL=1"
-                      ((org-agenda-overriding-header "Core Clocking Tasks")))
-                (agenda ""
-                ((org-agenda-ndays 7)
-                 (org-agenda-show-log t)
-                 (org-agenda-log-mode-items '(clock closed))
-                 (org-agenda-entry-types '())))
-                nil)))))
+                (setq org-agenda-custom-commands
+                      (quote (("ts"
+                               "TODAY's SHORT"
+                               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (agenda ""
+                                ((org-agenda-ndays 1)
+                                 (org-agenda-log-mode-items '(clock closed))
+                                 (org-agenda-entry-types '())))
+                                nil))
+                              ("tl"
+                               "TODAY's LOG"
+                               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (agenda ""
+                                ((org-agenda-ndays 1)
+                                 (org-agenda-show-log t)
+                                 (org-agenda-log-mode-items '(clock closed))
+                                 (org-agenda-entry-types '())))
+                                nil))
+                              ("tw"
+                               "TODAY's WORK Agenda"
+                               ;;Only show projects, that are not personal, and are active in the top bar
+                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (agenda ""
+                                        ;;This skip-project variable gets project categories marked as personal
+                                        ;; It is used by the org-agenda-skip-function below
+                                        ((skip-project (org-map-entries '(org-entry-get (point) "CATEGORY") "+PERSONAL=\"y\"" (list org-project-project-file)))
+                                         (org-agenda-ndays 1)
+                                         (org-agenda-show-log t)
+                                         (org-agenda-log-mode-items '(clock closed))
+                                         (org-agenda-skip-function 'org-project-skip-project)))
+                                nil))
+                              ("tp"
+                               "TODAY's Personal Agenda"
+                               ;;Only show projects, that are not personal, and are active in the top bar
+                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (agenda ""
+                                        ;;This skip-project variable gets project categories marked as personal
+                                        ;; It is used by the org-agenda-skip-function below
+                                        ((skip-project (org-map-entries '(org-entry-get (point) "CATEGORY") "+PERSONAL=\"n\"" (list org-project-project-file)))
+                                         (org-agenda-ndays 1)
+                                         (org-agenda-show-log t)
+                                         (org-agenda-log-mode-items '(clock closed))
+                                         (org-agenda-skip-function 'org-project-skip-project)))
+                                nil))
+                              ("ta"
+                               "TODAY's Agenda"
+                               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                                      ((org-agenda-overriding-header "Current Projects")))
+                                (agenda ""
+                                        ((org-agenda-ndays 1)
+                                         (org-agenda-show-log t)
+                                         (org-agenda-log-mode-items '(clock closed))
+                                         (org-agenda-skip-function
+                                          '(org-agenda-skip-entry-if 'todo '("CANCELED" "SOMEDAY")))))
+                                nil))
+                              ("wa"
+                               "This Weeks's ALL TASKS"
+                               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (tags "+SCHEDULED>=\"<+1w>\"TODO=\"TODO\"|+DEADLINE>=\"<+1w>\"+TODO=\"TODO\""
+                                      ((org-agenda-overriding-header "Upcoming tasks")))
+                                (agenda ""
+                                ((org-agenda-ndays 7)
+                                 (org-agenda-log-mode-items '(clock closed))))
+                                nil))
+                              ("wl"
+                               "This Weeks's LOGS"
+                               ((tags "CORE_TASK=\"true\"+LEVEL=1"
+                                      ((org-agenda-overriding-header "Core Clocking Tasks")))
+                                (agenda ""
+                                ((org-agenda-ndays 7)
+                                 (org-agenda-show-log t)
+                                 (org-agenda-log-mode-items '(clock closed))
+                                 (org-agenda-entry-types '())))
+                                nil)))))
 
 
 #+END_SRC
 
-*** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
+*** Agenda Functions
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-project-skip-project ()
+    "Skip trees that "
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      ;;You need to have set a "skip-project" variable in your custom agenda block
+      (if (org-project-entry-is-project-category skip-project)
+          subtree-end
+        nil)))
+
+  (defun org-project-entry-is-project-category (project-categories)
+    "An entry at current point is a member of project-categories"
+    (let ((current-category (org-entry-get (point) "CATEGORY")))
+      (if (member current-category project-categories)
+          t
+        nil)))
+#+END_SRC
+** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
 This currently breaks when it tries to load the directors defined by org-mode as files.
 #+BEGIN_SRC emacs-lisp
 ;(require 'org-registry)
@@ -1741,7 +1905,12 @@ I use gpg encryption to secure my org-notes
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance (quote ("crypt")))
 #+END_SRC
-
+*** TODO wrap encryption functions in an overloaded encryption function
+If I have a region selected, encrypt it.
+If im in an e-mail encrypt it.
+*** TODO wrap decryption functions in an overloaded decryption function
+If I have a region selected, and that region is an encrypted message decrypt it.
+If im in an e-mail and that e-mail is encrypted decrypt it.
 ** Linking and Bookmarking
 
 *** Linking
@@ -1759,9 +1928,19 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
 
 #+BEGIN_SRC emacs-lisp
 (require 'org-protocol)
-
 #+END_SRC
 
+*** Linking to Archive URL's
+
+**** TODO Add putting the wayback script into .emacs.d/bin into install.org
+**** Replace a selected link with the archive version if available
+#+BEGIN_SRC emacs-lisp
+  (defun internet-archive-replace-link ()
+    (interactive)
+    (shell-command-on-region
+     (point-min) (point-max)
+     "xargs -I % python ~/.emacs.d/bin/wb.py %" t))
+#+END_SRC
 ** Time CLocking
 *** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -1771,8 +1950,8 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
 (setq org-clock-history-length 23)
 ;; Resume clocking task on clock-in if the clock is open
 (setq org-clock-in-resume t)
-;; Change tasks to NEXT when clocking in
-(setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+;; Change tasks to ACTIVE when clocking in
+(setq org-clock-in-switch-to-state 'bh/clock-in-to-active)
 ;; Separate drawers for clocking and logs
 (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
 ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
@@ -1834,16 +2013,16 @@ To file todo-state changes into LOGBOOK drawer
               (setq has-subtask t))))
         (and is-a-task has-subtask))))
 
-  (defun bh/clock-in-to-next (kw)
-    "Switch a task from TODO to NEXT when clocking in.
+  (defun bh/clock-in-to-active (kw)
+    "Switch a task from TODO to ACTIVE when clocking in.
   Skips capture tasks, projects, and subprojects.
-  Switch projects and subprojects from NEXT back to TODO"
+  Switch projects and subprojects from ACTIVE back to TODO"
     (when (not (and (boundp 'org-capture-mode) org-capture-mode))
       (cond
        ((and (member (org-get-todo-state) (list "TODO"))
              (bh/is-task-p))
-        "NEXT")
-       ((and (member (org-get-todo-state) (list "NEXT"))
+        "ACTIVE")
+       ((and (member (org-get-todo-state) (list "ACTIVE"))
              (bh/is-project-p))
         "TODO"))))
 
@@ -2000,34 +2179,34 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
 *** [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
 **** TODO Org-Doco does not currently allow headlines. So, I will have to modify it to do that before I can use it.
 http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
-
 * Projects
-** Identify all projects from project directory
-
-Define where project files are ( ~/.s2e/projects)
 #+BEGIN_SRC emacs-lisp
-(setq personal-projects-dir (in-private-dir "projects/"))
+(message "Initializing projects")
+(require 'org-project)
+(setq org-project-project-file (file-truename "~/.org/projects.org"))
+(setq org-project-tasks-file (file-truename "~/.org/tasks.org"))
+(setq org-project-events-file (file-truename "~/.org/events.org"))
+
+(org-project-initialize)
 #+END_SRC
 
-Function to load any file not starting with . in the elisp dir
+The following snippet
+
 #+BEGIN_SRC emacs-lisp
-(defun load-visible-project (part-name)
-  (if (not (string-prefix-p "." part-name))
-      (load-file (concat personal-projects-dir "/" part-name))))
+;; Turn off requests to evaluate every code block as you iterate over all code-blocks
+(setq org-confirm-babel-evaluate nil)
+;; Run all project code.
+(org-project-init-projects)
+;; Turn it back on
+(setq org-confirm-babel-evaluate t)
 #+END_SRC
 
-Hook to actually iterate through all projects
-#+BEGIN_SRC emacs-lisp
-(defun load-private-projects()
-(mapcar 'load-visible-project (sort (directory-files personal-projects-dir) 'string<)))
-(load-private-projects)
-#+END_SRC
 
 * Technical Artifacts
 
   Make sure that we can simply =require= this library.
 
-#+BEGIN_SRC elisp
+#+BEGIN_SRC emacs-lisp
 ;;  (provide 'init-emacs)
 #+END_SRC
 

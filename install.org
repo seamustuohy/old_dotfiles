@@ -57,22 +57,23 @@ NONE
 ** Master Instaler
 
 #+BEGIN_SRC sh
-  install_emacs_deps() {
-      install_thesaurus
-      install_write_good
-      install_guru_mode
-      install_cask
-      install_code_checkers
-      install_calfw
-      install_orgcaldav
-      install_org-bullets
-      install_sumy
-      install_offlineimap
-      install_twittering
-      install_org_notmuch_clocking
-      install_string_utils
-      install_cv
-  }
+    install_emacs_deps() {
+        install_thesaurus
+        install_write_good
+        install_guru_mode
+        install_cask
+        install_code_checkers
+        install_calfw
+        install_orgcaldav
+        install_org-bullets
+        install_sumy
+        install_offlineimap
+        install_twittering
+        install_org_notmuch_clocking
+        install_string_utils
+        install_cv
+        install_pycal
+    }
 #+END_SRC
 
 ** Thesarus
@@ -228,6 +229,15 @@ This tool can be described as a Tiny, Dirty, Linux-and-OSX-Only C command that l
 
 #+END_SRC
 
+** Python icalendar
+
+#+BEGIN_SRC sh
+    install_pycal() {
+      sudo pip install icalendar
+
+    }
+
+#+END_SRC
 * Utilities
 ** Git Package Grabber
 #+BEGIN_SRC sh
