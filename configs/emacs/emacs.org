@@ -376,48 +376,51 @@ All calendar configuration is done in projects
 *** Notmuch
 **** Setup
 #+BEGIN_SRC emacs-lisp
-  (use-package notmuch
-    :commands notmuch
-    :init
-    (setq
-     ;; === SHOW  EMAIL ===
-     ; Allows GPG to work cleanly by not indenting messages in threads
-     notmuch-show-indent-messages-width 0
-     notmuch-show-indent-content nil
-     ;; === SEARCH EMAIL ===
-     notmuch-search-oldest-first nil
-     notmuch-fcc-dirs "Sent"
-     ;; === Crypto ===
-     ;multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
-     ;; Does not seem to do anything anyway
-     ;; notmuch-crypto-process-mime t
-    ;; == SENDING MAIL
-     message-kill-buffer-on-exit t))
+    (use-package notmuch
+      :commands notmuch
+      :init
+      (setq
+       ;; === SHOW  EMAIL ===
+       ; Allows GPG to work cleanly by not indenting messages in threads
+       notmuch-show-indent-messages-width 0
+       notmuch-show-indent-content nil
+       ;; === SEARCH EMAIL ===
+       notmuch-search-oldest-first nil
+       notmuch-fcc-dirs "Sent"
+       ;; === Crypto ===
+       ;; multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
+       ;; Does not seem to do anything anyway
+       ;; notmuch-crypto-process-mime t
+      ;; == SENDING MAIL
+       message-kill-buffer-on-exit t))
+    (use-package org-notmuch)
 
-  (use-package org-notmuch)
-
-  (defun notmuch-search-filter-by-date (days)
-    (interactive "NNumber of days to display: ")
-    (let* ((now (current-time))
-           (beg (time-subtract now (days-to-time days)))
-           (filter
-            (concat
-             (format-time-string "%s.." beg)
-             (format-time-string "%s" now))))
-      (notmuch-search-filter filter)))
+    (defun notmuch-search-filter-by-date (days)
+      (interactive "NNumber of days to display: ")
+      (let* ((now (current-time))
+             (beg (time-subtract now (days-to-time days)))
+             (filter
+              (concat
+               (format-time-string "%s.." beg)
+               (format-time-string "%s" now))))
+        (notmuch-search-filter filter)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 ;(setq notmuch-fcc-dirs "Sent/")
 #+END_SRC
 
-
+**** Mimetypes of attachments
+#+BEGIN_SRC emacs-lisp
+  ;; I don't want any of emacs' default mimetypes chosen. I just want it to talk directly to xdg.
+  (setq mailcap-mime-data '(("application" (".*" (viewer . "xdg-open %s")))))
+#+END_SRC
 
 **** Contacts
 
 #+BEGIN_SRC emacs-lisp
-  (setq org-contacts-files '("~/.s2e/contacts.org"))
-  (add-to-list 'org-agenda-files (car org-contacts-files))
+  (setq org-contacts-files (list (file-truename "~/.s2e/contacts.org")))
+;;  (add-to-list 'org-agenda-files (car org-contacts-files)) ; See emacs agenda
 #+END_SRC
 
 Look at my emacs-org.org setup for org contacts capture.
@@ -473,7 +476,7 @@ Commented out becuase it never seems to work.
             (org-notmuch-clocking-email-clock-out)))
       :config
       (setq org-notmuch-clocking-file (file-truename "~/.org/email-tracking.org"))
-      (add-to-list 'org-agenda-files "~/.org/email-tracking.org"))
+;;      (add-to-list 'org-agenda-files "~/.org/email-tracking.org")) ;; see org agenda
 #+END_SRC
 
 ** Twitter
@@ -1640,16 +1643,21 @@ Most of my agenda icons exist within project files. But there are a few non-proj
                     "~/.s2e/images/arrow_icon_16.svg"
                     nil nil :ascent center )))
 
-;; to_file
+;; lunch
 (add-to-list 'org-agenda-category-icon-alist
              (quote("lunch"
                     "~/.s2e/images/cheese_icon_16.svg"
                     nil nil :ascent center )))
 
-;; to_file
+;; organization
 (add-to-list 'org-agenda-category-icon-alist
              (quote("organization"
                     "~/.s2e/images/gear_icon_16.svg"
+                    nil nil :ascent center )))
+;; email
+(add-to-list 'org-agenda-category-icon-alist
+             (quote("email-tracking"
+                    "~/.s2e/images/email_icon_16.svg"
                     nil nil :ascent center )))
 
 #+END_SRC
@@ -1665,6 +1673,8 @@ Most of my agenda icons exist within project files. But there are a few non-proj
   (setq org-agenda-files (quote ("~/.org/todo"
                                  "~/.org/personal/"
                                  "~/.org/work/library")))
+  (add-to-list 'org-agenda-files (car org-contacts-files))
+  (add-to-list 'org-agenda-files "~/.org/email-tracking.org"))
 #+END_SRC
 *** Basic Settings
 #+BEGIN_SRC emacs-lisp
@@ -2181,8 +2191,10 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
 http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
 * Projects
 #+BEGIN_SRC emacs-lisp
+
 (message "Initializing projects")
 (require 'org-project)
+
 (setq org-project-project-file (file-truename "~/.org/projects.org"))
 (setq org-project-tasks-file (file-truename "~/.org/tasks.org"))
 (setq org-project-events-file (file-truename "~/.org/events.org"))
@@ -2200,7 +2212,6 @@ The following snippet
 ;; Turn it back on
 (setq org-confirm-babel-evaluate t)
 #+END_SRC
-
 
 * Technical Artifacts
 

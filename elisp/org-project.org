@@ -13,8 +13,6 @@
 (require 'helm-custom-prompts)
 #+END_SRC
 
-
-
 * Objects
 
 ** Configuration Variables
@@ -333,7 +331,6 @@ The states are
                     ("FAILED" :foreground "DarkTurquoise" :weight bold))))
 #+END_SRC
 
-
 **** Event faces
 #+BEGIN_SRC emacs-lisp
       (setq org-todo-keyword-faces
@@ -341,7 +338,6 @@ The states are
                     '(("EVENT" :foreground "DarkGoldenrod1" :weight bold)
                       ("MEET" :foreground "DarkOrange1"))))
 #+END_SRC
-
 
 * Functionality
 ** Utilities
@@ -757,7 +753,6 @@ The format is determined by `org-time-clocksum-format',
   ;;           org-clock-file-total-minutes)))
 
 #+END_SRC
-
 
 
 
