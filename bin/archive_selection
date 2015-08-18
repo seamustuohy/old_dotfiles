@@ -33,6 +33,7 @@ set -x
 
 main() {
     selected=$(xsel -p)
+    echo "${selected}" >> ~/temp/check_archive
     ~/code/overview_archive/bin/oa -i ${selected} \
                                    -o ~/.org/to_file.org \
                                    -k ~/.s2e/keywords

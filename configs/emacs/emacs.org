@@ -4,14 +4,17 @@
 #+DATE: 2015 Apr 18
 #+TAGS: emacs core
 
-
-
 #+BEGIN_SRC emacs-lisp
-;;(setq debug-on-error t)
+;; (setq debug-on-error t)
 #+END_SRC
+..fix empty..
+
 #+BEGIN_SRC emacs-lisp
+
 ;;(debug)
+
 #+END_SRC
+..fix empty..
 
 * Information
 
@@ -21,6 +24,7 @@ Personal Information
 (setq user-full-name "seamus tuohy"
       user-mail-address "s2e@seamustuohy.com")
 #+END_SRC
+..fix empty..
 
 GPG key to use for encryption
 Either the Key ID or set to nil to use symmetric encryption.
@@ -28,16 +32,19 @@ Either the Key ID or set to nil to use symmetric encryption.
 #+BEGIN_SRC emacs-lisp
 (setq org-crypt-key "F2D7DAC4")
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
   (setq private-dir (file-truename "~/.s2e/"))
   (defun in-private-dir (path)
     (concat private-dir path))
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (setq auth-sources '("~/.s2e/.authinfo.gpg"))
 #+END_SRC
+..fix empty..
 
 * Personal key space
 
@@ -45,6 +52,7 @@ Either the Key ID or set to nil to use symmetric encryption.
 (define-prefix-command 'personal-global-map)
 (global-set-key (kbd "C-C s") 'personal-global-map)
 #+END_SRC
+..fix empty..
 
 * General Configuration
 ** Overwrite Highlighted Text
@@ -53,6 +61,7 @@ cua-selection-mode - enables typing over a region to replace it
 #+BEGIN_SRC emacs-lisp
 (cua-selection-mode t)
 #+END_SRC
+..fix empty..
 
 ** Spaces vs. Tabs
 No tabs for me.
@@ -61,6 +70,7 @@ No tabs for me.
   (setq-default indent-tabs-mode nil)
   (setq tab-width 4)
 #+END_SRC
+..fix empty..
 
 ** UTF-8 by default
 
@@ -70,11 +80,13 @@ No tabs for me.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
+..fix empty..
 * Packages
 
 #+BEGIN_SRC emacs-lisp
 (setq use-package-verbose t)
 #+END_SRC
+..fix empty..
 
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
@@ -82,6 +94,7 @@ Set up my emacs main directory path.
 (defun in-emacs-d (path)
   (concat emacs-dir path))
 #+END_SRC
+..fix empty..
 ** Cask
 
 #+BEGIN_SRC emacs-lisp
@@ -89,6 +102,7 @@ Set up my emacs main directory path.
   (setq cask-filename (file-truename "~/.emacs.d/Cask"))
   (cask-initialize)
 #+END_SRC
+..fix empty..
 
 ** Local
 Create shortcut to packages directory
@@ -97,6 +111,7 @@ Create shortcut to packages directory
 (defun in-package-d (path)
   (concat my-package-dir path))
 #+END_SRC
+..fix empty..
 
 Load each package individually. Too busy with the re-write today to script up a loop.
 #+BEGIN_SRC emacs-lisp
@@ -108,11 +123,13 @@ Load each package individually. Too busy with the re-write today to script up a 
 (add-to-list 'load-path (in-package-d "org-bullets"))
 (add-to-list 'load-path (in-package-d "string-utils"))
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
   (setq my-elisp-dir (in-emacs-d "elisp/"))
   (add-to-list 'load-path my-elisp-dir)
 #+END_SRC
+..fix empty..
 
 
 ** Use Package
@@ -121,10 +138,11 @@ I am switching to use package. It seems to offer a much cleaner package declarat
 #+BEGIN_SRC emacs-lisp
 (require 'use-package)
 #+END_SRC
+..fix empty..
 
 ** Require
 
-[[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
+;;..fix link.. [[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
 
 #+BEGIN_SRC emacs-lisp
   (setq org-modules '(org-bbdb
@@ -140,6 +158,7 @@ I am switching to use package. It seems to offer a much cleaner package declarat
   (eval-after-load 'org
     '(org-load-modules-maybe t))
 #+END_SRC
+..fix empty..
 
 I hate having to track down where I first require a package or have issues with my init ordering.
 #+BEGIN_SRC emacs-lisp
@@ -197,11 +216,13 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-bullets)
   (require 'string-utils)
 #+END_SRC
+..fix empty..
 
 * Emacs Environment
 #+BEGIN_SRC emacs-lisp
 (message "Initializing Emacs Environment")
 #+END_SRC
+..fix empty..
 ** Server
 
 Start a server when there is not a server already running.
@@ -210,6 +231,7 @@ Start a server when there is not a server already running.
 (or (server-running-p)
     (server-start))
 #+END_SRC
+..fix empty..
 
 ** Confirmation
 I like to stay in my emacs environment. Make sure emacs isn't accidentally killed
@@ -220,6 +242,7 @@ I like to stay in my emacs environment. Make sure emacs isn't accidentally kille
    (if (yes-or-no-p "Do you want to exit? ")
        (save-buffers-kill-emacs)))
 #+END_SRC
+..fix empty..
 
 
 I do hate typing the full yes or no though
@@ -227,15 +250,18 @@ yes/no turns to y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+..fix empty..
 
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 #+END_SRC
+..fix empty..
 * Text Manipulation
 #+BEGIN_SRC emacs-lisp
 (message "Initializing text manipulation")
 #+END_SRC
+..fix empty..
 ** Drag Stuff
 Use the super key and the control key to drag lines in any file anywhere I want.
 #+BEGIN_SRC emacs-lisp
@@ -244,6 +270,7 @@ Use the super key and the control key to drag lines in any file anywhere I want.
 (setq drag-stuff-modifier '(super control))
 (drag-stuff-global-mode t)
 #+END_SRC
+..fix empty..
 
 ** Expand Region
 Use C-= and C-- to expand and contract the highlighed portion to include what it currently knows as the region.
@@ -254,9 +281,10 @@ Huge time saver.
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C--") 'er/contract-region)
 #+END_SRC
+..fix empty..
 
 ** Unfill Paragraph
-[[https://emacs.stackexchange.com/questions/2606/opposite-of-fill-paragraph][From Stack Overflow user King Marvel]]
+;;..fix link.. [[https://emacs.stackexchange.com/questions/2606/opposite-of-fill-paragraph][From Stack Overflow user King Marvel]]
 #+BEGIN_SRC emacs-lisp
 (defun unfill-paragraph ()
   "Takes a multi-line paragraph and makes it into a single line of text."
@@ -267,10 +295,12 @@ Huge time saver.
  ;; Handy key definition
  (define-key global-map "\M-Q" 'unfill-paragraph)
 #+END_SRC
+..fix empty..
 * Security
 #+BEGIN_SRC emacs-lisp
 (message "Initializing security")
 #+END_SRC
+..fix empty..
 I use epa file to open encrypted files automatically
 #+BEGIN_SRC emacs-lisp
   ;; (use-package epa-file
@@ -281,11 +311,13 @@ I use epa file to open encrypted files automatically
   ;;     (epa-file-name-regexp-update)
   ;;     (epa-file-enable)))
 #+END_SRC
+..fix empty..
 
 * Hacks
 #+BEGIN_SRC emacs-lisp
 (message "Initializing hacks")
 #+END_SRC
+..fix empty..
 
 This little hack saves me from when pasting becomes VERY slow. It occurs at seeming random intervals.
 - [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2015-04/msg00222.html][Problem]]
@@ -293,11 +325,13 @@ This little hack saves me from when pasting becomes VERY slow. It occurs at seem
 #+BEGIN_SRC emacs-lisp
 (setq x-selection-timeout 10)
 #+END_SRC
+..fix empty..
 
 * Calendar
 #+BEGIN_SRC emacs-lisp
 (message "Initializing calendar")
 #+END_SRC
+..fix empty..
 ** Setup Calendar
 All calendar configuration is done in projects
 
@@ -306,6 +340,7 @@ All calendar configuration is done in projects
 (require 'calfw-org)
 (require 'org-caldav)
 #+END_SRC
+..fix empty..
 
 ** Pretty-ness
 #+BEGIN_SRC emacs-lisp
@@ -330,6 +365,7 @@ All calendar configuration is done in projects
         cfw:fchar-top-left-corner ?╔
         cfw:fchar-top-right-corner ?╗)
 #+END_SRC
+..fix empty..
 
 ** Notmuch integration
 
@@ -345,11 +381,13 @@ All calendar configuration is done in projects
 
  (mail-calendar-org-setup)
 #+END_SRC
+..fix empty..
 
 * Communication
 #+BEGIN_SRC emacs-lisp
 (message "Initializing communications")
 #+END_SRC
+..fix empty..
 ** IRC
 #+BEGIN_SRC emacs-lisp
   (use-package erc
@@ -361,6 +399,7 @@ All calendar configuration is done in projects
     (add-to-list 'erc-modules 'list)
     (erc-update-modules))
 #+END_SRC
+..fix empty..
 
 *** Channels list commented out because it is contained in a project file with other channels.
 #+BEGIN_SRC emacs-lisp
@@ -371,6 +410,7 @@ All calendar configuration is done in projects
     ;;                                      "#recon-ng"
     ;;                                      "#commotion")))
 #+END_SRC
+..fix empty..
 
 ** Email
 *** Notmuch
@@ -389,8 +429,7 @@ All calendar configuration is done in projects
        notmuch-fcc-dirs "Sent"
        ;; === Crypto ===
        ;; multipart/signed messages will be verified and multipart/encrypted parts will be    decrypted
-       ;; Does not seem to do anything anyway
-       ;; notmuch-crypto-process-mime t
+       notmuch-crypto-process-mime t
       ;; == SENDING MAIL
        message-kill-buffer-on-exit t))
     (use-package org-notmuch)
@@ -405,16 +444,20 @@ All calendar configuration is done in projects
                (format-time-string "%s" now))))
         (notmuch-search-filter filter)))
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 ;(setq notmuch-fcc-dirs "Sent/")
 #+END_SRC
+..fix empty..
 
 **** Mimetypes of attachments
 #+BEGIN_SRC emacs-lisp
   ;; I don't want any of emacs' default mimetypes chosen. I just want it to talk directly to xdg.
-  (setq mailcap-mime-data '(("application" (".*" (viewer . "xdg-open %s")))))
+  ;; (setq mailcap-mime-data '(("application" (".*" (viewer . "xdg-open %s")))))
+  ;; That didn't work at all... I'll just mess with /etc/mailcap instead.
 #+END_SRC
+..fix empty..
 
 **** Contacts
 
@@ -422,6 +465,7 @@ All calendar configuration is done in projects
   (setq org-contacts-files (list (file-truename "~/.s2e/contacts.org")))
 ;;  (add-to-list 'org-agenda-files (car org-contacts-files)) ; See emacs agenda
 #+END_SRC
+..fix empty..
 
 Look at my emacs-org.org setup for org contacts capture.
 #+BEGIN_SRC emacs-lisp
@@ -432,13 +476,15 @@ Look at my emacs-org.org setup for org contacts capture.
   ;; :EMAIL: %(org-contacts-template-email)
   ;; :END:"))
 #+END_SRC
+..fix empty..
 
 **** Org
 #+BEGIN_SRC emacs-lisp
 (setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
 #+END_SRC
+..fix empty..
 
-**** [[id:903d388c-96f1-4589-9a2a-88bddac19ed2][SEE: Capture Calendar Events]]
+**** ;;..fix link..  [[id:903d388c-96f1-4589-9a2a-88bddac19ed2][SEE: Capture Calendar Events]]
 Modified gnus-calendar to work with notmuch.
 
 #+BEGIN_SRC emacs-lisp
@@ -453,6 +499,7 @@ Modified gnus-calendar to work with notmuch.
 
   ;;  (mail-calendar-org-setup)
 #+END_SRC
+..fix empty..
 
 **** TODO OfflineImap
 Commented out becuase it never seems to work.
@@ -463,21 +510,34 @@ Commented out becuase it never seems to work.
 ;   :init
 ;   (add-hook 'gnus-before-startup-hook 'offlineimap))
 #+END_SRC
+..fix empty..
 
 **** Clocking
 #+BEGIN_SRC emacs-lisp
-    (use-package org-notmuch-clocking
-      :load-path "packages/org-notmuch-clocking/"
-      :init
-      (defadvice notmuch-search-show-thread (after notmuch-search-show-thread-after activate) (org-notmuch-clocking-email-clock-in))
+  ;; (defun stwoe/clock-in-email-when-puched-in ()
+  ;;   ;; Only clock e-mail time if I am punched in.
+  ;;   (if (equal bh/keep-clock-running t)
+  ;;       (org-notmuch-clocking-email-clock-in)))
+  ;; (defun stwoe/clock-out-email-when-puched-in ()
+  ;;   ;; Only clock e-mail time if I am punched in.
+  ;;   (if (equal bh/keep-clock-running t)
+  ;;       (org-notmuch-clocking-email-clock-out)))
 
-      (defadvice notmuch-bury-or-kill-this-buffer (before notmuch-bury-or-kill-this-buffer-before activate)
-        (if (eq 'notmuch-show-mode major-mode)
-            (org-notmuch-clocking-email-clock-out)))
-      :config
-      (setq org-notmuch-clocking-file (file-truename "~/.org/email-tracking.org"))
-;;      (add-to-list 'org-agenda-files "~/.org/email-tracking.org")) ;; see org agenda
+  ;; (use-package org-notmuch-clocking
+  ;;   :load-path "packages/org-notmuch-clocking/"
+  ;;   :init
+  ;;   (defadvice notmuch-search-show-thread (after notmuch-search-show-thread-after activate) (stwoe/clock-in-email-when-puched-in))
+
+  ;;  (defadvice notmuch-bury-or-kilzl-this-buffer (before notmuch-bury-or-kill-this-buffer-before activate)
+  ;;     (if (eq 'notmuch-show-mode major-mode)
+  ;;         (stwoe/clock-out-email-when-puched-in)))
+
+  ;;   :config
+  ;;   (setq org-notmuch-clocking-file (file-truename "~/.org/email-tracking_archive.org"))
+  ;;   (run-with-idle-timer 10 t 'org-notmuch-clocking-check-email-else-clock-out))
+  ;; ;;      (add-to-list 'org-agenda-files "~/.org/email-tracking.org")) ;; see org agenda
 #+END_SRC
+..fix empty..
 
 ** Twitter
 #+BEGIN_SRC emacs-lisp
@@ -487,12 +547,14 @@ Commented out becuase it never seems to work.
   :config
   (setq twittering-use-master-password t))
 #+END_SRC
+..fix empty..
 
 ** Contacts
 * Time Clocking
 #+BEGIN_SRC emacs-lisp
 (message "Initializing time clocking")
 #+END_SRC
+..fix empty..
 ** Display
 
 When clocked in for a task, display the current task and accumulated time in the frame title.
@@ -500,6 +562,7 @@ When clocked in for a task, display the current task and accumulated time in the
 #+BEGIN_SRC emacs-lisp
 (setq org-clock-clocked-in-display "frame-title")
 #+END_SRC
+..fix empty..
 
 ** TODO Multi-level Time Tracking
 I want to be able to clock to major projects as well as to the websites I visit, emails I am reading and responding to, codebase I am in, emails I am responding to, etc. So, I need to have sub-projects automatically apply closked time to major "project codes" based upon tags (email org), or file location (code).
@@ -510,16 +573,19 @@ I want to be able to clock to major projects as well as to the websites I visit,
 #+BEGIN_SRC emacs-lisp
 (message "Initializing code support")
 #+END_SRC
+..fix empty..
 ** Text Manipulation
 *** Return and indent on prog-mode variants
 #+BEGIN_SRC emacs-lisp
 (defun code/set-newline-and-indent ()
   (local-set-key [(return)] 'newline-and-indent))
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook 'code/set-newline-and-indent)
 #+END_SRC
+..fix empty..
 
 *** Wrap Regions
 #+BEGIN_SRC emacs-lisp
@@ -530,12 +596,14 @@ I want to be able to clock to major projects as well as to the websites I visit,
 
 (wrap-region-add-wrapper "*" "*")
 #+END_SRC
+..fix empty..
 
 ** FlyCheck
 
 #+BEGIN_SRC emacs-lisp
 (require 'flycheck)
 #+END_SRC
+..fix empty..
 
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -548,6 +616,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (global-set-key [(f5)] 'flycheck-previous-error)
 (global-set-key [(f6)] 'flycheck-next-error)
 #+END_SRC
+..fix empty..
 
 *** Mode Hooks
 #+BEGIN_SRC emacs-lisp
@@ -555,6 +624,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (add-hook 'python-mode-hook '(lambda () (flycheck-mode)))
 (add-hook 'sh-mode-hook '(lambda () (flycheck-mode)))
 #+END_SRC
+..fix empty..
 
 ** Language Specific
 *** HTML
@@ -564,6 +634,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
 #+END_SRC
+..fix empty..
 
 *** XML
 Pretty format XML markup in region. You need to have nxml-mode
@@ -587,6 +658,7 @@ by using nxml's indentation rules."
       (indent-region begin end))
     (message "Ah, much better!"))
 #+END_SRC
+..fix empty..
 
 *** Markdown
 #+BEGIN_SRC emacs-lisp
@@ -597,27 +669,32 @@ by using nxml's indentation rules."
 ;; flyspell mode for spell checking in markdown
 (add-hook 'markdown-mode-hook 'turn-on-flyspell 'append)
 #+END_SRC
+..fix empty..
 
 *** YAML
 #+BEGIN_SRC emacs-lisp
 (require 'yaml-mode)
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 #+END_SRC
+..fix empty..
 
 *** LogFiles
 #+BEGIN_SRC emacs-lisp
  (require 'syslog-mode)
  (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode))
 #+END_SRC
+..fix empty..
 
 *** python
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 #+END_SRC
+..fix empty..
 *** Lisp
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-mode))
 #+END_SRC
+..fix empty..
 
 ** Code Folding
 #+BEGIN_SRC emacs-lisp
@@ -640,11 +717,13 @@ by using nxml's indentation rules."
            (hs-show-block)))
 
 #+END_SRC
+..fix empty..
 
 * Display
 #+BEGIN_SRC emacs-lisp
 (message "Initializing display")
 #+END_SRC
+..fix empty..
 ** Mark and Cursor
 
 I like to have the mark always active when I am selecting text.  This highlights the mark area.
@@ -653,12 +732,14 @@ NOTE: I am currently exploring how to correctly use the mark, so this may become
 #+BEGIN_SRC emacs-lisp
   (setq transient-mark-mode t)
 #+END_SRC
+..fix empty..
 
 I like to know exactly what character my cursor is on. This sets the cursor to be a box on top of that character.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default cursor-type 'box)
 #+END_SRC
+..fix empty..
 
 I want to see parens highlighted and I want them immediately.
 
@@ -666,6 +747,7 @@ I want to see parens highlighted and I want them immediately.
   (setq show-paren-delay 0)
   (show-paren-mode)
 #+END_SRC
+..fix empty..
 
 ** Indicators
 *** Line number mode
@@ -673,12 +755,14 @@ I want to know what line number I am on. Line-number-mode keeps track of this fo
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
 #+END_SRC
+..fix empty..
 
 *** Frame shows buffer name
 When not clocked into a task I want to see the full path of the current buffer I am in in the title frame.
 #+BEGIN_SRC emacs-lisp
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 #+END_SRC
+..fix empty..
 
 *** Git Changes in the fringe
 In any programming major mode I use [diff-hl](https://github.com/dgutov/diff-hl) for highlighting uncommitted changes to my files  in the fringe.
@@ -689,6 +773,7 @@ In any programming major mode I use [diff-hl](https://github.com/dgutov/diff-hl)
 
 (add-hook 'prog-mode-hook '(lambda () (diff-hl-mode)))
 #+END_SRC
+..fix empty..
 
 *** Display trailing whitespace in code
 I want trailing whitespaces displayed when I am in programming mode.
@@ -696,12 +781,14 @@ I want trailing whitespaces displayed when I am in programming mode.
   (add-hook 'prog-mode-hook (lambda ()
                               (setq show-trailing-whitespace t)))
 #+END_SRC
+..fix empty..
 
 *** Line Numbers for coding
 When coding I  want to have my line number displayed on every line.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook '(lambda () (linum-mode)))
 #+END_SRC
+..fix empty..
 
 *** visual bells
 
@@ -709,6 +796,7 @@ When coding I  want to have my line number displayed on every line.
 (setq ring-bell-function 'ignore)
 (setq visible-bell t)
 #+END_SRC
+..fix empty..
 
 ** Clean up
 
@@ -722,17 +810,20 @@ Get rid of the annoying menubars, toolbars, scrollbars, bells, and splash screen
   (setq ring-bell-function 'ignore)
   (setq inhibit-splash-screen t)
 #+END_SRC
+..fix empty..
 
 This makes the frame title format the currently active buffer so I can just look up to see the full path of whatever file I am modifying. [[file:emacs-clocking.org][See emacs-clocking for modifications for showing clocked tasks in the title frame.]]
 #+BEGIN_SRC emacs-lisp
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 #+END_SRC
+..fix empty..
 
 I use popwin mode to make sure that temporary buffers act as pop-up windows and can be closed with <C-g>.
 #+BEGIN_SRC emacs-lisp
   (require 'popwin)
   (popwin-mode 1)
 #+END_SRC
+..fix empty..
 
 ** Splitting Windows
 
@@ -754,16 +845,18 @@ This has a better chance of being what I want when splitting strings. See: http:
   (global-set-key (kbd "C-x 2") 'bnb/vplit-last-buffer)
   (global-set-key (kbd "C-x 3") 'bnb/hsplit-last-buffer)
 #+END_SRC
+..fix empty..
 
 ** Perspective
 *** Config
-[[http://www.wickeddutch.com/2014/01/03/gaining-some-perspective-in-emacs/][Mostly taken from Wicked Dutch]]
+;;..fix link.. [[http://www.wickeddutch.com/2014/01/03/gaining-some-perspective-in-emacs/][Mostly taken from Wicked Dutch]]
 Setup perspectives, or workspaces, to switch between
 
 Enable perspective mode
 #+BEGIN_SRC emacs-lisp
 (persp-mode t)
 #+END_SRC
+..fix empty..
 
 loading code for our custom perspectives
 taken from Magnar Sveen
@@ -775,6 +868,7 @@ taken from Magnar Sveen
        (when initialize ,@body)
        (setq persp-last current-perspective)))
 #+END_SRC
+..fix empty..
 
 Jump to last perspective
 taken from Magnar Sveen
@@ -783,11 +877,13 @@ taken from Magnar Sveen
     (interactive)
     (persp-switch (persp-name persp-last)))
 #+END_SRC
+..fix empty..
 
 Easily switch to your last perspective
 #+BEGIN_SRC emacs-lisp
 (define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
 #+END_SRC
+..fix empty..
 
 *** Calendar
 
@@ -812,6 +908,7 @@ Easily switch to your last perspective
   (define-key persp-mode-map (kbd "C-x p C") 'custom-persp/start-calendar) ;;only on first time do we sync
   (define-key persp-mode-map (kbd "C-x p c") 'custom-persp/calendar)
 #+END_SRC
+..fix empty..
 
 *** Email
 #+BEGIN_SRC emacs-lisp
@@ -830,11 +927,12 @@ Easily switch to your last perspective
       (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
       (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
 #+END_SRC
+..fix empty..
 
 *** TODO Future Email
 **** TODO Encryption
-http://www.emacswiki.org/emacs/MailCrypt
-https://web.archive.org/web/20030413005614/www.kaidea.freeserve.co.uk/mc-bbdb.el
+;;..fix link.. http://www.emacswiki.org/emacs/MailCrypt
+;;..fix link.. https://web.archive.org/web/20030413005614/www.kaidea.freeserve.co.uk/mc-bbdb.el
 **** TODO Received new message
 ***** If encrypted
 ****** decrypt for parsing
@@ -879,6 +977,7 @@ org-agenda persp
 
       (define-key persp-mode-map (kbd "C-x p o") 'custom-persp/org-agenda)
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
   (defun custom-persp/org-agenda-start ()
@@ -889,6 +988,7 @@ org-agenda persp
 
     (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
 #+END_SRC
+..fix empty..
 
 *** IRC
 I actually do not like ERC at all. One of these days I will have to figure out a way to make it worth it. But, for now it is not going to happen.
@@ -904,6 +1004,7 @@ I actually do not like ERC at all. One of these days I will have to figure out a
         ;; (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
         ;; (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
 #+END_SRC
+..fix empty..
 *** Init
 #+BEGIN_SRC emacs-lisp
       (defun custom-persp/start-init ()
@@ -917,6 +1018,7 @@ I actually do not like ERC at all. One of these days I will have to figure out a
         (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-init)
         (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/init)
 #+END_SRC
+..fix empty..
 
 ** Pretty Things
 *** Themes
@@ -924,11 +1026,13 @@ I keep my themes in a separate themes directory in my .emacs.d folder.
 #+BEGIN_SRC  emacs-lisp
 (add-to-list 'custom-theme-load-path (in-emacs-d "themes"))
 #+END_SRC
+..fix empty..
 
 Load my current theme.
 #+BEGIN_SRC emacs-lisp
   (load-theme 'tango-dark t)
 #+END_SRC
+..fix empty..
 
 *** Colors
 #+BEGIN_SRC emacs-lisp
@@ -936,6 +1040,7 @@ Load my current theme.
 (add-to-list 'find-file-hook
              (lambda () (unless (derived-mode-p 'web-mode) (rainbow-mode))))
 #+END_SRC
+..fix empty..
 
 *** Fonts
 #+BEGIN_SRC emacs-lisp
@@ -947,6 +1052,7 @@ Load my current theme.
 ;;(set-face-attribute 'default nil :font my/font-family :height 120)
 ;;(set-face-font 'default my/font-family)
 #+END_SRC
+..fix empty..
 *** Quotes
 #+BEGIN_SRC emacs-lisp
 ;; Quote of the Day
@@ -970,11 +1076,13 @@ Load my current theme.
       "Hit any key when done reading")))
 (totd)
 #+END_SRC
+..fix empty..
 
 * File Management
 #+BEGIN_SRC emacs-lisp
 (message "Initializing file management")
 #+END_SRC
+..fix empty..
 ** Cleanup
 
 I use these files for cleaning buffers when I save, or get annoyed by red highlighted spaces everywhere.
@@ -998,16 +1106,19 @@ Including indent-buffer, which should not be called automatically on save."
   (file-management/cleanup-buffer-safe)
   (indent-region (point-min) (point-max)))
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c n") 'file-management/cleanup-buffer)
 #+END_SRC
+..fix empty..
 
 Add the hook.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'before-save-hook 'file-management/cleanup-buffer-safe)
 #+END_SRC
+..fix empty..
 
 ** Syncing
 
@@ -1016,6 +1127,7 @@ I will modify text files in bash while they are open in emacs when I need to do 
 #+BEGIN_SRC emacs-lisp
 (global-auto-revert-mode 1)
 #+END_SRC
+..fix empty..
 
 *** I force emacs to assume new files are always modified. This is useful for  creating empty files.
 #+BEGIN_SRC emacs-lisp
@@ -1023,12 +1135,14 @@ I will modify text files in bash while they are open in emacs when I need to do 
   (when (not (file-exists-p (buffer-file-name)))
     (set-buffer-modified-p t)))
 #+END_SRC
+..fix empty..
 
 Add the hook
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'find-file-hooks 'file-management/assume-new-is-modified)
 #+END_SRC
+..fix empty..
 
 ** Identification
 uniquify shows a files location when it shares the same name as another file.
@@ -1038,6 +1152,7 @@ uniquify shows a files location when it shares the same name as another file.
   uniquify-buffer-name-style 'post-forward
   uniquify-separator ":")
 #+END_SRC
+..fix empty..
 
 ** Backups
 
@@ -1046,6 +1161,7 @@ I use close to the basic backup setup described in the [[http://emacswiki.org/em
 #+BEGIN_SRC emacs-lisp
 ;;(setq temporary-file-directory "/tmp/")
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
   (setq
@@ -1058,6 +1174,7 @@ I use close to the basic backup setup described in the [[http://emacswiki.org/em
    kept-old-versions 2
    version-control t)       ; use versioned backups
 #+END_SRC
+..fix empty..
 
 Automatically purge backup files not accessed in a week:
 #+BEGIN_SRC emacs-lisp
@@ -1071,6 +1188,7 @@ Automatically purge backup files not accessed in a week:
         (message "%s" file)
         (delete-file file))))
 #+END_SRC
+..fix empty..
 
 ** Auto-Save
 
@@ -1079,11 +1197,13 @@ Automatically purge backup files not accessed in a week:
 ;;(add-hook 'prog-mode-hook 'real-auto-save-mode)
 ;;(setq real-auto-save-interval 30)
 #+END_SRC
+..fix empty..
 
 * Help
 #+BEGIN_SRC emacs-lisp
 (message "Initializing help")
 #+END_SRC
+..fix empty..
 ** Writing Help
 *** Spell Checking
 I use flyspell mode for spell checking for any text files.
@@ -1093,6 +1213,7 @@ I use flyspell mode for spell checking for any text files.
 (add-hook 'message-mode-hook 'turn-on-flyspell 'append)
 
 #+END_SRC
+..fix empty..
 
 *** Synonyms
 **** KeyBindings
@@ -1114,6 +1235,7 @@ I use flyspell mode for spell checking for any text files.
 (setq synonyms-cache-file  "~/.emacs.d/cache/thesaurus.txt")
 (require 'synonyms)
 #+END_SRC
+..fix empty..
 
 *** Writegood mode
 
@@ -1122,16 +1244,18 @@ helps me write-good.
 #+BEGIN_SRC emacs-lisp
 (require 'writegood-mode)
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (define-key personal-global-map (kbd "ww") 'writegood-mode)
 (define-key personal-global-map (kbd "wl") 'writegood-grade-level)
 (define-key personal-global-map (kbd "we") 'writegood-reading-ease)
 #+END_SRC
+..fix empty..
 
 ** Emacs Help
 *** Guide Key
-[[https://github.com/kai2nenobu/guide-key][guide-key.el]] displays the available key bindings automatically and dynamically. guide-key aims to be an alternative of one-key.el.
+;;..fix link.. [[https://github.com/kai2nenobu/guide-key][guide-key.el]] displays the available key bindings automatically and dynamically. guide-key aims to be an alternative of one-key.el.
 
 #+BEGIN_SRC emacs-lisp
   (require 'guide-key)
@@ -1140,24 +1264,29 @@ helps me write-good.
   (setq guide-key/idle-delay .5)
   (setq guide-key/popup-window-position 'bottom)
 #+END_SRC
+..fix empty..
 
 *** Emacs Guru Mode
-[[https://github.com/bbatsov/guru-mode][Guru mode]] disables some common keybindings and suggests the use of the established Emacs alternatives instead.
+
+;;..fix link.. [[https://github.com/bbatsov/guru-mode][Guru mode]] disables some common keybindings and suggests the use of the established Emacs alternatives instead.
 
 #+BEGIN_SRC emacs-lisp
 (require 'guru-mode)
 #+END_SRC
+..fix empty..
 
 Currently running this globally. I may want to change this if I get too annoyed.
 #+BEGIN_SRC emacs-lisp
   (guru-global-mode +1)
   ;;(add-hook 'prog-mode-hook 'guru-mode)
 #+END_SRC
+..fix empty..
 
 I only want to get warnings when I use the arrow keys.
 #+BEGIN_SRC emacs-lisp
 (setq guru-warn-only t)
 #+END_SRC
+..fix empty..
 
 *** Undo Help
 Undo tree makes complex undo actions easy
@@ -1165,6 +1294,7 @@ Undo tree makes complex undo actions easy
 (require 'undo-tree)
 (global-undo-tree-mode t)
 #+END_SRC
+..fix empty..
 (define-key personal-global-map (kbd "u") 'undo-tree-visualize)
 
 **** Keep region when undoing in region
@@ -1183,6 +1313,7 @@ Via" [[http://whattheemacsd.com/my-misc.el-02.html][what the emacs.d]]
         (set-marker m nil))
     ad-do-it))
 #+END_SRC
+..fix empty..
 
 ** Text Help
 *** TODO Company Mode
@@ -1199,6 +1330,7 @@ I have found company mode to be mostly annoying when writing because it captures
 
 ;;(add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
+..fix empty..
 
 *** Auto-Complete Mode
 I am currently giving company mode a try out as an alternative to auto-complete mode.
@@ -1209,6 +1341,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 ; (global-auto-complete-mode t)
 ; (ac-config-default)
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 ;(defun ac-python-mode-setup ()
@@ -1216,6 +1349,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 ;
 ;(add-hook 'python-mode-hook 'ac-python-mode-setup)
 #+END_SRC
+..fix empty..
 
 *** Yasnippet
 #+BEGIN_SRC emacs-lisp
@@ -1223,6 +1357,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 (yas/global-mode 1)
 (setq yas/indent-line 'fixed) ; for indented snippets
 #+END_SRC
+..fix empty..
 
 YASnippet - should appear before custom-set-variables
 
@@ -1232,6 +1367,7 @@ YASnippet - should appear before custom-set-variables
   :type 'string
   :group 'yasnippet)
 #+END_SRC
+..fix empty..
 
 Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet has a wrong fallback to the default <tab>, breaking Python's indentation cycling feature, and possibly other things too.
     - See:
@@ -1244,12 +1380,14 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
              (define-key yas-minor-mode-map (kbd "TAB") nil)
              (define-key yas-minor-mode-map  (kbd "<C-tab>") 'yas-expand-from-trigger-key)))
 #+END_SRC
+..fix empty..
 
 *** Helm Dash
 
 #+BEGIN_SRC emacs-lisp
 (require 'helm-dash)
 #+END_SRC
+..fix empty..
 
 **** Install doc-sets via: [[https://github.com/glynnforrest/emacs.d/blob/75589b87af99167517682f1bbbacad1f55de2438/site-lisp/setup-helm.el][glynn forrest]]
 #+BEGIN_SRC emacs-lisp
@@ -1277,6 +1415,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
           "Flask"
           ))
 #+END_SRC
+..fix empty..
 
 **** Set our custom hooks for various modes
 
@@ -1295,22 +1434,26 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 ;;python docs
 (add-hook 'python-mode-hook '(lambda () (setq-local helm-dash-docsets '("Ansible" "Flask" "Python"))))
 #+END_SRC
+..fix empty..
 
 **** Use the eww browser to view docsets
 #+BEGIN_SRC emacs-lisp
 (setq helm-dash-browser-func 'eww-browse-url)
 #+END_SRC
+..fix empty..
 
 **** Create keybindings
 #+BEGIN_SRC emacs-lisp
 (define-key personal-global-map (kbd "h d") 'helm-dash)
 (define-key personal-global-map (kbd "h p") 'helm-dash-at-point)
 #+END_SRC
+..fix empty..
 
 * Navigation
 #+BEGIN_SRC emacs-lisp
 (message "Initializing navigation")
 #+END_SRC
+..fix empty..
 ** In-File
 
   Movement and line based commands should operate on the lines that I see (even if they are using word wrap) by default.
@@ -1318,6 +1461,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 #+BEGIN_SRC emacs-lisp
 (global-visual-line-mode t)
 #+END_SRC
+..fix empty..
 
 # Sublimity provides smooth-scrolling and minimap, like the sublime editor.
 #+BEGIN_SRC emacs-lisp
@@ -1326,12 +1470,14 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 ;  (setq sublimity-scroll-weight 10
 ;        sublimity-scroll-drift-length 5)
 #+END_SRC
+..fix empty..
 
 #Scroll one line at a time without recentering the screen
 #+BEGIN_SRC emacs-lisp
 ;(setq scroll-step 1
 ;      scroll-conservatively 10000)
 #+END_SRC
+..fix empty..
 
 *** Smart beginning of the line
 Move point to the first non-whitespace character on this line. If point was already at that position, move point to beginning of line.
@@ -1351,6 +1497,7 @@ If point was already at that position, move point to beginning of line."
 
 (global-set-key (kbd "C-a") 'smart-beginning-of-line)
 #+END_SRC
+..fix empty..
 
 ** Helm
 
@@ -1377,6 +1524,7 @@ Use helm and turn the delay to nothing.
            ("C-x C-f" . helm-find-files)
            ("M-i" . helm-semantic-or-imenu)))
 #+END_SRC
+..fix empty..
 
 Helm swoop is amazing! I use it far more than search, but I am still afraid to replace search with it.
 
@@ -1384,6 +1532,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
   (use-package helm-swoop
     :bind ("C-c C-M-s" . helm-swoop))
 #+END_SRC
+..fix empty..
 
 ** Projectile
 #+BEGIN_SRC emacs-lisp
@@ -1393,22 +1542,25 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
       (setq projectile-completion-system 'helm)
       (helm-projectile-on))
 #+END_SRC
+..fix empty..
 
-[[https://github.com/bbatsov/projectile/blob/master/persp-projectile.el][Persp-Projectile]] allows me to push projects into new perspectives. This makes it far easier for me to switch between tasks.
+;;..fix link.. [[https://github.com/bbatsov/projectile/blob/master/persp-projectile.el][Persp-Projectile]] allows me to push projects into new perspectives. This makes it far easier for me to switch between tasks.
 #+BEGIN_SRC emacs-lisp
   (use-package persp-projectile
     :bind ("C-x p p" . projectile-persp-switch-project))
 #+END_SRC
+..fix empty..
 
 * Org-Mode
 #+BEGIN_SRC emacs-lisp
 (message "Initializing org mode")
 #+END_SRC
+..fix empty..
 
 ** Requirements
 *** Org-Modules
 
-[[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
+;;..fix link.. [[https://julien.danjou.info/projects/emacs-packages#org-contacts][org-contacts]], [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-notify.el;hb=HEAD][org-notify]]
 
 #+BEGIN_SRC emacs-lisp
   (setq org-modules '(org-bbdb
@@ -1424,6 +1576,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
   (eval-after-load 'org
     '(org-load-modules-maybe t))
 #+END_SRC
+..fix empty..
 *** Requirements
 #+BEGIN_SRC emacs-lisp
 (require 'org)
@@ -1431,6 +1584,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
 (require 'org-project)
 (require 'helm-custom-prompts)
 #+END_SRC
+..fix empty..
 
 ** Files to activate org for
 Open org-mode for .org files and for .org.gpg files.
@@ -1441,17 +1595,20 @@ Ends with ".org"
   (add-to-list 'auto-mode-alist
                '("\\.org\\'" . org-mode))
 #+END_SRC
+..fix empty..
 
 ".org.gpg" occurs at least once in the file name. I use this when I open my archive files.
 #+BEGIN_SRC emacs-lisp
 ;;   (add-to-list 'auto-mode-alist '("\\(\\.org\\.gpg\\)?$" . org-mode))
 #+END_SRC
+..fix empty..
 
 ** Auto Save
  Set auto-save for org mode files every hour, on the hour.
 #+BEGIN_SRC emacs-lisp
 (run-at-time "00:59" 3600 'org-save-all-org-buffers)
 #+END_SRC
+..fix empty..
 ** Capture
 
 Capture Mode
@@ -1459,6 +1616,7 @@ Capture Mode
 (setq org-default-notes-file "~/.org/todo/to_file.org")
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
+..fix empty..
 *** Capturing Org-Contacts
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
@@ -1479,10 +1637,11 @@ Capture Mode
   :TO_TAGS:
   :END:"))))
 #+END_SRC
+..fix empty..
 
 ** Bookmarking from the browser and org-protocol
 
-https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
+;; https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
 ;; Searches for the current kill-ring head and adds the text under it.
 ;; If kill ring head is not found it creates it at the bottom of the file.
 ;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
@@ -1501,6 +1660,7 @@ https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-w
       (insert "* " hd "\n")))
     (end-of-line))
 #+END_SRC
+..fix empty..
 
 I add my org-protocol captures here.
 #+BEGIN_SRC emacs-lisp
@@ -1526,6 +1686,7 @@ I add my org-protocol captures here.
                                    ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
 #+END_SRC
+..fix empty..
 
 ** Refile
 
@@ -1534,16 +1695,19 @@ Targets include this file and any file contributing to the agenda - up to 3 leve
 (setq org-refile-targets (quote ((nil :maxlevel . 4)
                                  (org-agenda-files :maxlevel . 4))))
 #+END_SRC
+..fix empty..
 
 Allow refile to create parent tasks with confirmation
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
 #+END_SRC
+..fix empty..
 
 Targets complete in steps so we start with filename, TAB shows the next level of targets etc
 #+BEGIN_SRC emacs-lisp
 (setq org-outline-path-complete-in-steps t)
 #+END_SRC
+..fix empty..
 
 Dont give me DONE tasks as targets for refiling
 
@@ -1554,6 +1718,7 @@ Dont give me DONE tasks as targets for refiling
 
 (setq org-refile-target-verify-function 'org-init/verify-refile-target)
 #+END_SRC
+..fix empty..
 
 ** Display
 Font-lock-mode will colorize/fontify text as I type it.
@@ -1561,12 +1726,14 @@ This is great for showing TODO items immediately as I type them out.
 #+BEGIN_SRC emacs-lisp
 (global-font-lock-mode 1)
 #+END_SRC
+..fix empty..
 
 Also fold plain lists within major list items.
 
 #+BEGIN_SRC emacs-lisp
 (setq org-cycle-include-plain-lists t)
 #+END_SRC
+..fix empty..
 
 Always use UTF-8 everywhere.
 
@@ -1576,11 +1743,13 @@ Always use UTF-8 everywhere.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
+..fix empty..
 
 *** Bullets Mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+END_SRC
+..fix empty..
 
 *** Inline images
 
@@ -1590,6 +1759,7 @@ When you see an image link, make it the image.
   ;;              (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex
   ;;                            "\\)\\]") 1))
 #+END_SRC
+..fix empty..
 
 
 Enable iimage-mode every time an org-mode file is opened
@@ -1598,6 +1768,7 @@ Enable iimage-mode every time an org-mode file is opened
   ;;           (lambda ()
   ;;             (iimage-mode)))
 #+END_SRC
+..fix empty..
 
 Enable toggle in case it does not work.
 #+BEGIN_SRC emacs-lisp
@@ -1609,6 +1780,7 @@ Enable toggle in case it does not work.
   ;;     (set-face-underline-p 'org-link t))
   ;;   (iimage-mode))
 #+END_SRC
+..fix empty..
 
 *** Agenda icons
 First, remove categories from the default agenda mode and set the icon list to nil.
@@ -1622,6 +1794,7 @@ First, remove categories from the default agenda mode and set the icon list to n
 
 (setq org-agenda-category-icon-alist nil)
 #+END_SRC
+..fix empty..
 
 Most of my agenda icons exist within project files. But there are a few non-project ones I use.
 #+BEGIN_SRC emacs-lisp
@@ -1661,21 +1834,24 @@ Most of my agenda icons exist within project files. But there are a few non-proj
                     nil nil :ascent center )))
 
 #+END_SRC
+..fix empty..
 ** Agenda
 *** Keybindings for Agenda Mode
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
+..fix empty..
 
 *** Agenda Files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files (quote ("~/.org/todo"
                                  "~/.org/personal/"
-                                 "~/.org/work/library")))
+                                 "~/.org/work/library/")))
   (add-to-list 'org-agenda-files (car org-contacts-files))
-  (add-to-list 'org-agenda-files "~/.org/email-tracking.org"))
+;;  (add-to-list 'org-agenda-files "~/.org/email-tracking_archive.org")
 #+END_SRC
+..fix empty..
 *** Basic Settings
 #+BEGIN_SRC emacs-lisp
 ;;Start with the agenda log ON
@@ -1687,6 +1863,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 ;; Set the agenda to skip deadlines if they are done
 (setq org-agenda-skip-deadline-if-done t)
 #+END_SRC
+..fix empty..
 *** Agenda todo item configuration
 #+BEGIN_SRC emacs-lisp
 ;; Keep tasks with dates on the global todo lists
@@ -1710,6 +1887,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 ;; Remove completed items from search results
 (setq org-agenda-skip-timestamp-if-done t)
 #+END_SRC
+..fix empty..
 
 *** Display
 **** Always hilight the current agenda line
@@ -1718,6 +1896,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
           '(lambda () (hl-line-mode 1))
           'append)
 #+END_SRC
+..fix empty..
 
 **** Time Grid
 #+BEGIN_SRC emacs-lisp
@@ -1730,6 +1909,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
        "----------------"
        (600 800 1000 1200 1400 1600 1800 2000)))
 #+END_SRC
+..fix empty..
 
 **** Custom clock faces
 #+BEGIN_SRC emacs-lisp
@@ -1737,16 +1917,18 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 (custom-set-faces
  '(org-mode-line-clock ((t (:background "grey75" :foreground "red" :box (:line-width -1 :style released-button)))) t))
 #+END_SRC
+..fix empty..
 
-*** [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
+*** ;;..fix link.. [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
 #+BEGIN_SRC emacs-lisp
 ;; Inhibit agenda files startup options (Org > 8.0)
 ;; http://orgmode.org/worg/agenda-optimization.html#sec-4
 (setq org-agenda-inhibit-startup t)
-
+(setq org-agenda-use-tag-inheritance nil)
 ;; Do not dim blocked tasks
 (setq org-agenda-dim-blocked-tasks nil)
 #+END_SRC
+..fix empty..
 
 *** Custom agenda commands
 #+BEGIN_SRC emacs-lisp
@@ -1832,6 +2014,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 
 
 #+END_SRC
+..fix empty..
 
 *** Agenda Functions
 
@@ -1851,12 +2034,139 @@ Most of my agenda icons exist within project files. But there are a few non-proj
           t
         nil)))
 #+END_SRC
-** [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
+..fix empty..
+
+*** Clocking States
+    :PROPERTIES:
+    :ID:       f76d9891-9df0-4928-99a7-4091d6210d50
+    :END:
+#+BEGIN_SRC emacs-lisp
+    (defvar org-state-prefix-regex "[ \t]*- State\\s-*"
+    "The regex for identifying the prefix for state changes")
+
+    (defvar org-state-done-heads-regex (concat "\"\\(" (regexp-opt org-done-keywords) "\\)\"")
+    "The regex for identifying completed items in state changes")
+
+    (defvar org-state-not-done-heads-regex (concat "\"\\(" (regexp-opt org-not-done-keywords) "\\)\"")
+    "The regex for identifying incomplete items in  state changes")
+
+    (defvar org-state-todo-heads-regex (concat "\"\\(" (regexp-opt org-todo-heads) "\\)\"")
+    "The regex for identifying TODO items in state changes")
+
+    (defvar org-state-clock-entry-regex (concat "\\[\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}"
+                                                "\\s-+\\sw+\\s-+"
+                                                "[012][0-9]:[0-5][0-9]\\)\\]")
+    "The regex for identifying clock items in state changes")
+
+
+  (defun org-state-get-state-change-regex (to-regex from-regex)
+"Creates a regular expression that can be used to get a specific kind of state change.
+
+This function relies on state changes using the style shown in the this example syntax.
+
+- State \"DONE\"       from \"ACTIVE\"     [2015-07-22 Wed 18:10]
+
+Usage example: To search for state changes that have moved from an non-done to done state one could use the following snippet.
+
+(search-forward-regexp (org-state-get-state-change-regex org-state-done-heads-regex org-state-not-done-heads-regex))
+"
+  (concat org-state-prefix-regex to-regex "\\s-+from\\s-+" from-regex "\\s-+" org-state-clock-entry-regex))
+#+END_SRC
+..fix empty..
+*** Archiving
+    :PROPERTIES:
+    :ID:       b4d45769-0060-42d6-8f6f-67c7aab00a94
+    :END:
+Taken from: [[http://web.archive.org/web/20150804221736/https://osdir.com/ml/emacs.orgmode/2007-09/msg00082.html][emacs.orgmode - Re: Autoarchiving done entries - msg#00082 - Recent Discussion OSDir.com]]
+#+BEGIN_SRC emacs-lisp
+          (defvar org-my-archive-expiry-days 30
+            "The number of days after which a completed task should be auto-archived.
+          This can be 0 for immediate, or a floating point value.")
+
+  (defun org-archive-subtree-by-state (state-regex)
+    (interactive "P")
+    (save-excursion
+      ;; Go to the start of the buffer no matter where we are
+      (goto-char (point-min))
+      ;; TODO map entries (only first level headers)
+      ;; TODO if subtree make sure they are all done as well
+      ;; TODO if not completed then move on to the next one
+      ;; NOTE: All top level headers will have to be major project deliverables and meetings
+      ;; NOTE: This is going to require a massive refactor on project files
+      ;; NOTE: This will be diffficult for github issues
+    ))
+
+  (defun org-archive-subtree-done (state-regex)
+    (interactive "P")
+    )
+
+    ;; (defun org-my-archive-done-tasks ()
+    ;;   (interactive)
+    ;;   (save-excursion
+    ;;     (goto-char (point-min))
+    ;;     (let ((done-regexp
+    ;;            (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
+    ;;           (state-regexp
+    ;;            (concat "- State \"\\(?:" (regexp-opt org-done-keywords)
+    ;;                    "\\)\"\\s-*\\[\\([^]\n]+\\)\\]"))
+    ;;           (inactive-regexp))
+    ;;       (while (re-search-forward done-regexp nil t)
+    ;;         (let ((end (save-excursion
+    ;;                      (outline-next-heading)
+    ;;                      (point)))
+    ;;               begin)
+    ;;           (goto-char (line-beginning-position))
+    ;;           (setq begin (point))
+    ;;           (if (or (re-search-forward state-regexp end t)
+    ;;                   (re-search-forward org-my-ts-regexp end t))
+    ;;               (let* ((time-string (match-string 1))
+    ;;                      (when-closed (org-parse-time-string time-string)))
+    ;;                 (if (>= (time-to-number-of-days
+    ;;                          (time-subtract (current-time)
+    ;;                                         (apply #'encode-time when-closed)))
+    ;;                         org-my-archive-expiry-days)
+    ;;                     (org-archive-subtree)))
+    ;;             (goto-char end)))))
+    ;;     (save-buffer)))
+
+          (defun org-my-archive-done-tasks ()
+            (interactive)
+            (save-excursion
+              (goto-char (point-min))
+              (let ((done-regexp
+                     (concat "\\* \\(" (regexp-opt org-done-keywords) "\\) "))
+                    (state-regexp
+                     (concat "- State \"\\(" (regexp-opt org-done-keywords)
+                             "\\)\"\\s-*from \"[A-Za-z]+\"\\s-*\\[\\([^]\n]+\\)\\]")))
+                (while (re-search-forward done-regexp nil t)
+                  (let ((end (save-excursion
+                               (outline-next-heading)
+                               (point)))
+                        begin)
+                    (goto-char (line-beginning-position))
+                    (setq begin (point))
+                    (when (re-search-forward state-regexp end t)
+                      (let* ((time-string (match-string 2))
+                             (when-closed (org-parse-time-string time-string)))
+                        (if (>= (time-to-number-of-days
+                                 (time-subtract (current-time)
+                                                (apply #'encode-time when-closed)))
+                                org-my-archive-expiry-days)
+                            (org-archive-subtree)
+                          ))))))))
+
+          (defalias 'archive-done-tasks 'org-my-archive-done-tasks)
+
+#+END_SRC
+..fix empty..
+
+** ;;..fix link.. [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
 This currently breaks when it tries to load the directors defined by org-mode as files.
 #+BEGIN_SRC emacs-lisp
 ;(require 'org-registry)
 ;(org-registry-initialize)
 #+END_SRC
+..fix empty..
 
 ** Notification
 
@@ -1865,6 +2175,7 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
 ;;  (require 'org-notify)
 ;;  (org-notify-start)
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
   ;; (org-notify-add 'appt
@@ -1890,6 +2201,7 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
   ;;                 '(:time "3d"
   ;;                         :actions -email))
 #+END_SRC
+..fix empty..
 
 ** Text Manipulation
 
@@ -1897,12 +2209,14 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
 #+BEGIN_SRC emacs-lisp
 (setq org-catch-invisible-edits 'error)
 #+END_SRC
+..fix empty..
 
 *** Allow sub-tasks to block tasks above it.
 I actually really hate this. But it forces me to address tasks below an item to identify old TODO's I will never do.
 #+BEGIN_SRC emacs-lisp
 (setq org-enforce-todo-dependencies t)
 #+END_SRC
+..fix empty..
 ** Security
 
 I use gpg encryption to secure my org-notes
@@ -1915,6 +2229,7 @@ I use gpg encryption to secure my org-notes
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance (quote ("crypt")))
 #+END_SRC
+..fix empty..
 *** TODO wrap encryption functions in an overloaded encryption function
 If I have a region selected, encrypt it.
 If im in an e-mail encrypt it.
@@ -1927,18 +2242,21 @@ If im in an e-mail and that e-mail is encrypted decrypt it.
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
 #+END_SRC
+..fix empty..
 
 **** Link to custom ID, not to file location
 #+BEGIN_SRC emacs-lisp
 (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 #+END_SRC
+..fix empty..
 
 *** Bookmarks with firefox
-http://orgmode.org/worg/org-contrib/org-protocol.html
+;; http://orgmode.org/worg/org-contrib/org-protocol.html
 
 #+BEGIN_SRC emacs-lisp
 (require 'org-protocol)
 #+END_SRC
+..fix empty..
 
 *** Linking to Archive URL's
 
@@ -1951,6 +2269,7 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
      (point-min) (point-max)
      "xargs -I % python ~/.emacs.d/bin/wb.py %" t))
 #+END_SRC
+..fix empty..
 ** Time CLocking
 *** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -1977,6 +2296,7 @@ http://orgmode.org/worg/org-contrib/org-protocol.html
 ;; Include current clocking task in clock reports
 (setq org-clock-report-include-clocking-task t)
 #+END_SRC
+..fix empty..
 
 To file todo-state changes into LOGBOOK drawer
 #+BEGIN_SRC emacs-lisp
@@ -1984,6 +2304,7 @@ To file todo-state changes into LOGBOOK drawer
 ;; Save clock data and state changes and notes in the LOGBOOK drawer
 (setq org-clock-into-drawer t)
 #+END_SRC
+..fix empty..
 
 *** Clocking Functions
 #+BEGIN_SRC emacs-lisp
@@ -2138,22 +2459,26 @@ To file todo-state changes into LOGBOOK drawer
         (org-clock-in nil))))
 
 #+END_SRC
+..fix empty..
 
 *** Clock Keys
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<f9> I") 'bh/punch-in)
 (global-set-key (kbd "<f9> O") 'bh/punch-out)
 #+END_SRC
+..fix empty..
 ** Exporting
 
 #+BEGIN_SRC emacs-lisp
 (setq org-odt-content-template-file "~/.dotfiles/templates/emacs/OrgOdtContentTemplate.xml")
 #+END_SRC
+..fix empty..
 
 Sadly most people use Microsoft Word. So, I just export my .odt files as .doc files.
 #+BEGIN_SRC emacs-lisp
 (setq org-odt-preferred-output-format "doc")
 #+END_SRC
+..fix empty..
 
 ** Babel
 
@@ -2178,6 +2503,7 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
     (dot        . t)
     (css        . t)))
 #+END_SRC
+..fix empty..
 
 *** Make code-blocks pretty
 
@@ -2185,10 +2511,45 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
   (setq org-src-tab-acts-natively t)
   (setq org-src-fontify-natively t)
 #+END_SRC
+..fix empty..
 
-*** [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
+***  [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
 **** TODO Org-Doco does not currently allow headlines. So, I will have to modify it to do that before I can use it.
-http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
+;; http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.org;hb=HEAD
+** Fix Drawers
+
+#+BEGIN_SRC emacs-lisp
+(defun org-repair-property-drawers ()
+  "Fix properties drawers in current buffer.
+ Ignore non Org buffers."
+  (when (eq major-mode 'org-mode)
+    (org-with-wide-buffer
+     (goto-char (point-min))
+     (let ((case-fold-search t)
+           (inline-re (and (featurep 'org-inlinetask)
+                           (concat (org-inlinetask-outline-regexp)
+                                   "END[ \t]*$"))))
+       (org-map-entries
+        (lambda ()
+          (unless (and inline-re (org-looking-at-p inline-re))
+            (save-excursion
+              (let ((end (save-excursion (outline-next-heading) (point))))
+                (forward-line)
+                (when (org-looking-at-p org-planning-line-re) (forward-line))
+                (when (and (< (point) end)
+                           (not (org-looking-at-p org-property-drawer-re))
+                           (save-excursion
+                             (and (re-search-forward org-property-drawer-re end t)
+                                  (eq (org-element-type
+                                       (save-match-data (org-element-at-point)))
+                                      'drawer))))
+                  (insert (delete-and-extract-region
+                           (match-beginning 0)
+                           (min (1+ (match-end 0)) end)))
+                  (unless (bolp) (insert "\n"))))))))))))
+
+#+END_SRC
+..fix empty..
 * Projects
 #+BEGIN_SRC emacs-lisp
 
@@ -2201,6 +2562,7 @@ http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/scripts/org-docco.or
 
 (org-project-initialize)
 #+END_SRC
+..fix empty..
 
 The following snippet
 
@@ -2212,6 +2574,19 @@ The following snippet
 ;; Turn it back on
 (setq org-confirm-babel-evaluate t)
 #+END_SRC
+..fix empty..
+** Add all project org files to the org-mode agenda.
+
+#+BEGIN_SRC emacs-lisp
+    (defun org-projects-add-project-agenda-files ()
+      (org-map-entries '(let ((project-org-file (org-entry-get (point) "ORG_FILE")))
+                          (if project-org-file
+                              (add-to-list 'org-agenda-files project-org-file)))
+  t (list org-project-project-file)))
+
+  (org-projects-add-project-agenda-files)
+#+END_SRC
+..fix empty..
 
 * Technical Artifacts
 
@@ -2220,6 +2595,7 @@ The following snippet
 #+BEGIN_SRC emacs-lisp
 ;;  (provide 'init-emacs)
 #+END_SRC
+..fix empty
 
   Before you can build this on a new system, make sure that you put
   the cursor over any of these properties, and hit: =C-c C-c=

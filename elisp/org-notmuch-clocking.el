@@ -37,6 +37,15 @@
 
 (setq org-notmuch-clocking-clocked-email nil)
 
+(defun org-notmuch-clocking-check-email-else-clock-out ()
+  "Checks if you are in the e-mail that id set as the currently clocked e-mail. if you are no longer in that e-mail it clocks you out of the email
+
+This function is intended to be set using run-with-idle-timer"
+  (if (or (and (equal (format "%s" major-mode) "notmuch-show-mode")
+               (not (equal org-notmuch-clocking-clocked-email (notmuch-show-get-message-id))))
+          (not (equal (format "%s" major-mode) "notmuch-show-mode")))
+      (org-notmuch-clocking-email-clock-out)))
+
 (defun org-notmuch-clocking-email-clock ()
   (interactive)
   (let ((message_id (notmuch-show-get-message-id))
@@ -64,8 +73,8 @@
           (set-marker email_mrkr (cdr email_loc) (get-file-buffer (car email_loc)))
           (if (string-equal message_id (org-entry-get org-clock-marker "ID"))
               (org-with-point-at email_mrkr
-                (org-clock-out)))))
-        (setq org-notmuch-clocking-clocked-email nil)))
+                (org-clock-out))))
+        (setq org-notmuch-clocking-clocked-email nil))))
 
 (defun org-notmuch-clocking-email-clock-in ()
   "Clock in to the header for the current email. If the header does not exist, this function will create it first."

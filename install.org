@@ -50,7 +50,8 @@ NONE
           python-notmuch \
           python-bs4 \
           libncurses5-dev \
-          ncurses-devel
+          ncurses-devel \
+          silversearcher-ag
   }
 #+END_SRC
 

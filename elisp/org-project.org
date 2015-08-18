@@ -94,15 +94,10 @@ The states are
 #+END_SRC
 
 ** Capture
-
 *** Project Capture
 #+BEGIN_SRC emacs-lisp
   (defvar org-project-project-template
   "* %^{Project Stage|ONGOING|IDEA|GLIMMER|CAPTURE|LIVE|KICKOFF|STARTUP|ACTIVE|CLOSEOUT|DONE|CANCELED} %?
-  :CONTACTS:\n:END:
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :BILLABLE: %^{Billable?|y|n}
   :PERCENT: %^{Percent of Time}
@@ -113,9 +108,14 @@ The states are
   :GLOSSARY:
   :ID: %(org-id-uuid)
   :TYPE: project
+  :END:
+  :CONTACTS:\n:END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
   :END:"
   "Project Template for org-project")
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (setq org-capture-templates (append org-capture-templates
@@ -123,14 +123,12 @@ The states are
           ("Pc" "Create Project" entry (file org-project-project-file)
             ,org-project-project-template :clock-in t :clock-resume t))))
 #+END_SRC
+..fix empty..
 
 *** Task capture templates
 #+BEGIN_SRC emacs-lisp
   (defvar org-project-task-template-todo
   "* TODO %?
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
@@ -142,14 +140,14 @@ The states are
   :AT:
   :STATE: todo
   :TYPE: task
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
   :END:"
   "TODO Template for org-project")
 
   (defvar org-project-task-template-active
   "* ACTIVE %?
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
@@ -161,14 +159,14 @@ The states are
   :AT:
   :STATE: active
   :TYPE:
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
   :END:"
   "ACTIVE Template for org-project")
 
   (defvar org-project-task-template-contact
   "* CONTACT RE: %?
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
@@ -183,9 +181,6 @@ The states are
 
   (defvar org-project-task-template-reply
   "* CONTACT [[notmuch:id:%:message-id][%? - %:subject]]
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
@@ -195,14 +190,14 @@ The states are
   :WHO: %:from
   :STATE: todo
   :TYPE: task
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
   :END:"
   "CONTACT Template for org-project")
 
   (defvar org-project-task-template-wait
   "* WAIT RE: %?
-  :LOGBOOK:
-  - State \"CREATED\"       from \"NONE\"       %U
-  :END:
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :ID: %(org-id-uuid)
@@ -211,6 +206,9 @@ The states are
   :FROM: %(helm-prompt-for-current-org-contact)
   :STATUS: active
   :TYPE: task
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
   :END:"
   "WAIT Template for org-project")
 
@@ -229,6 +227,9 @@ The states are
   :END:"
   "CLOSED Template for org-project")
 #+END_SRC
+..fix empty..
+
+
 #+BEGIN_SRC emacs-lisp
 (setq org-capture-templates (append org-capture-templates
         `(("t" "Tasks")
@@ -245,6 +246,7 @@ The states are
           ("tr" "REPLY TO EMAIL" entry (file org-project-tasks-file)
             ,org-project-task-template-reply :clock-in t :clock-resume t))))
 #+END_SRC
+..fix empty..
 *** Event capture templates
 #+BEGIN_SRC emacs-lisp
   (defvar org-project-task-template-meet
@@ -259,12 +261,15 @@ The states are
   :WITH: %(helm-prompt-for-current-org-contact)
   :STATUS: active
   :TYPE: event
-  :END:"
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+%^t"
   "Task Template for org-project")
 
   (defvar org-project-task-template-event
   "* EVENT
-   SCHEDULED:  %^t
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
   :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
@@ -275,9 +280,14 @@ The states are
   :WITH: %(helm-prompt-for-current-org-contact)
   :STATUS: todo
   :TYPE: event
-  :END:"
+  :END:
+  :LOGBOOK:
+  - State \"CREATED\"       from \"NONE\"       %U
+  :END:
+%^t"
   "Task Template for org-project")
 #+END_SRC
+..fix empty..
 
 #+BEGIN_SRC emacs-lisp
 (setq org-capture-templates (append org-capture-templates
@@ -287,7 +297,27 @@ The states are
           ("em" "Create MEETING" entry (file org-project-events-file)
             ,org-project-task-template-meet :clock-in t :clock-resume t))))
 #+END_SRC
+..fix empty..
 
+*** Refiling
+#+BEGIN_SRC emacs-lisp
+(defun org-project-refile-to-file (file)
+  (let ((pos (save-excursion
+               (find-file file)
+               (point-max))))
+    (org-refile nil nil (list nil file nil nil))))
+
+(defun org-project-refile-all-by-project()
+  (interactive)
+  (let* ((pid (prompt-for-all-projects-id))
+         (filename (org-entry-get (org-id-find pid t) "ORG_FILE"))
+         (category (org-entry-get (org-id-find pid t) "CATEGORY")))
+    (org-map-entries '(org-project-refile-to-file filename)
+                     (format "LEVEL=1+CATEGORY=\"%s\"" category)
+                     nil)))
+
+#+END_SRC
+..fix empty..
 ** Display
 
 *** TODO Colors
@@ -298,6 +328,7 @@ The states are
 (defvar org-todo-colors-status-urgent "red1")
 (defvar org-todo-colors-status-completed "DarkTurquoise")
 #+END_SRC
+..fix empty..
 
 *** Faces
 **** Project Faces
@@ -316,6 +347,7 @@ The states are
                     ("DONE" :foreground "DarkTurquoise")
                     ("CANCELED" :foreground "DarkTurquoise"))))
 #+END_SRC
+..fix empty..
 
 **** Task faces
 #+BEGIN_SRC emacs-lisp
@@ -330,6 +362,7 @@ The states are
                     ("CANCELED" :foreground "DarkTurquoise" :weight bold)
                     ("FAILED" :foreground "DarkTurquoise" :weight bold))))
 #+END_SRC
+..fix empty..
 
 **** Event faces
 #+BEGIN_SRC emacs-lisp
@@ -338,6 +371,7 @@ The states are
                     '(("EVENT" :foreground "DarkGoldenrod1" :weight bold)
                       ("MEET" :foreground "DarkOrange1"))))
 #+END_SRC
+..fix empty..
 
 * Functionality
 ** Utilities
@@ -485,6 +519,7 @@ The states are
 
 
 #+END_SRC
+..fix empty..
 
 ** Searching
 
@@ -514,6 +549,12 @@ The states are
     (defun prompt-for-current-projects-category ()
       (helm :sources '(org-projects-helm-source-all-projects-category)))
 
+    (defun prompt-for-all-projects-file ()
+      (helm :sources '(org-projects-helm-source-all-projects-file)))
+
+    (defun prompt-for-all-projects-id ()
+      (helm :sources '(org-projects-helm-source-all-projects-id)))
+
     (defun org-projects-get-project-category-current ()
       (org-map-entries '(let ((category (org-entry-get (point) "CATEGORY"))
                               (name (nth 4 (org-heading-components))))
@@ -524,22 +565,46 @@ The states are
                               (name (nth 4 (org-heading-components))))
                           (cons name category)) "+TYPE=\"project\"" (list org-project-project-file)))
 
+    (defun org-projects-get-project-file-all ()
+      (org-map-entries '(let ((category (org-entry-get (point) "ORG_FILE"))
+                              (name (nth 4 (org-heading-components))))
+                          (cons name category)) "+TYPE=\"project\"" (list org-project-project-file)))
 
-  ;; Helm source for current projects
+    (defun org-projects-get-project-id-all ()
+      (org-map-entries '(let ((category (org-entry-get (point) "ID"))
+                              (name (nth 4 (org-heading-components))))
+                          (cons name category)) "+TYPE=\"project\"" (list org-project-project-file)))
+
+  ;; Helm source for current projects by category
     (setq org-projects-helm-source-current-projects-category
           '((name . "Get current projects using helm.")
             (candidates . org-projects-get-project-category-current)
             (action . (lambda (candidate)
                         candidate))))
 
-    ;;helm fallback source for all projects
+    ;;helm fallback source for all projects by category
     (setq org-projects-helm-source-all-projects-category
           '((name . "Get current projects using helm.")
             (candidates . org-projects-get-project-category-all)
             (action . (lambda (candidate)
                         candidate))))
 
+    ;;helm source for projects files
+    (setq org-projects-helm-source-all-projects-file
+          '((name . "Get current projects using helm.")
+            (candidates . org-projects-get-project-file-all)
+            (action . (lambda (candidate)
+                        candidate))))
+
+    ;;helm source for projects id
+    (setq org-projects-helm-source-all-projects-id
+          '((name . "Get current projects using helm.")
+            (candidates . org-projects-get-project-id-all)
+            (action . (lambda (candidate)
+                        candidate))))
+
 #+END_SRC
+..fix empty..
 
 *** TODO Integrating  projectile into projects
 - When working on files in project directories it would be great to auto track time spent working on those files.
@@ -558,6 +623,7 @@ I have a lot of initialization code that is project specific. Different projects
      "INIT=\"true\""
     (list org-project-project-file)))
 #+END_SRC
+..fix empty..
 
 ** Updating
 **** Updating a tasks status when states change
@@ -580,6 +646,7 @@ This is how I ensure that my status objects are updated
   (add-hook 'org-after-todo-state-change-hook
             'org-project-task-update-status-on-todo-changes)
 #+END_SRC
+..fix empty..
 
 ** TODO Archiving
 **** Projects
@@ -649,6 +716,7 @@ This is how I ensure that my status objects are updated
       str))
 
 #+END_SRC
+..fix empty..
 *** CANCELED Create a function to build a custom for projects
     :LOGBOOK:
     - State "CANCELED"   from "TODO"    [2015-07-20 Mon 13:15]
@@ -684,15 +752,18 @@ This is how I ensure that my status objects are updated
   ;;           (setq days (- days 1))))
   ;;     (message "End date was earlier than start date. You must move forward in time.")))
 #+END_SRC
+..fix empty..
 
 ****** TODO Next an org-map-entries function that that finds all days with clocked values within a range and then passses those dates to our "run function over range function"
 #+BEGIN_SRC emacs-lisp
 ;; TODO
 #+END_SRC
+..fix empty..
 ****** TODO Finally the function that gets the time for each day
 #+BEGIN_SRC emacs-lisp
 ;; TODO
 #+END_SRC
+..fix empty..
 ***** TODO Get total time clocked for each day
 ****** Notes
 ******* org-minutes-to-clocksum-string (m)
@@ -753,7 +824,7 @@ The format is determined by `org-time-clocksum-format',
   ;;           org-clock-file-total-minutes)))
 
 #+END_SRC
-
+..fix empty..
 
 
 
@@ -767,6 +838,7 @@ The format is determined by `org-time-clocksum-format',
         )
 
 #+END_SRC
+..fix empty..
 * References
 - http://juanreyero.com/article/emacs/org-teams.html
 
@@ -779,6 +851,7 @@ The format is determined by `org-time-clocksum-format',
 
 ;;; org-package.el ends here
 #+END_SRC
+..fix empty..
 
   Before you can build this on a new system, make sure that you put
   the cursor over any of these properties, and hit: =C-c C-c=
