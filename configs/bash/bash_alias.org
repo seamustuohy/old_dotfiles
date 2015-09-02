@@ -11,6 +11,7 @@ Show the TCP and UDP ports being listened on with the process associated, user, 
 #+BEGIN_SRC sh
 alias lport="sudo netstat -lepunt"
 #+END_SRC
+...fix empty...
 
 ** Simple Servers
 
@@ -19,11 +20,13 @@ run simple python server from directory
 #+BEGIN_SRC sh
 alias simpleServer="python -m SimpleHTTPServer"
 #+END_SRC
+...fix empty...
 
 Use simple python server to view jekyll site from _all directory. Useful for when you use SVG's as much as I do.
 #+BEGIN_SRC sh
 alias jserver="cd ..; jekyll --no-server; cd _site; simpleServer"
 #+END_SRC
+...fix empty...
 
 ** Connecting to other devices
 OpenWRT easy ssh and scp node Alias's
@@ -31,12 +34,14 @@ OpenWRT easy ssh and scp node Alias's
 alias oscp='scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
 alias ossh='ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
 #+END_SRC
+...fix empty...
 
 * Scraping
 
 #+BEGIN_SRC sh
 alias listserv='time ~/.bin/get_listserv'
 #+END_SRC
+...fix empty...
 
 Alias' for easier navigation
 #+BEGIN_SRC sh
@@ -47,6 +52,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias cd=cd_func
 #+END_SRC
+...fix empty...
 
 #+BEGIN_SRC sh
 cd_func ()
@@ -97,16 +103,19 @@ cd_func ()
   return 0
 }
 #+END_SRC
+...fix empty...
 
 * Pranks & Misc
 
 #+BEGIN_SRC sh
 alias rainbow='for i in {1..665535};do printf "%x\n" $i;done|while read -r u;do printf "\033[38;5;$((16+$((16#$u))%230))m\u$u\033[0m";done'
 #+END_SRC
+...fix empty...
 
 #+BEGIN_SRC sh
 whitenoise() { aplay -c 2 -f S16_LE -r 44100 /dev/urandom ;}
 #+END_SRC
+...fix empty...
 
 * Coding
 
@@ -118,6 +127,7 @@ function gg() {
    git --git-dir="${_gg}/.git" --work-tree="${_gg}" "$@"
 }
 #+END_SRC
+...fix empty...
 
 * Utilities
 ** Installed
@@ -125,32 +135,37 @@ find installed files (good for grepping for dependencies. "installed |grep DEPEN
 #+BEGIN_SRC sh
 alias installed='dpkg --get-selections | grep -v deinstall'
 #+END_SRC
+...fix empty...
 
 ** Alert
 Add an "alert" alias for long running commands.  Use like so: sleep 10; alert
 #+BEGIN_SRC sh
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 #+END_SRC
+...fix empty...
 
 ** Hide mistaken history commands
 # Hide the previous command you just ran and forgot to use space.
 #+BEGIN_SRC sh
 alias hideprev='history -d $((HISTCMD-2)) && history -d $((HISTCMD-1))'
 #+END_SRC
+...fix empty...
 
 ** Un-delete File
 
 #+BEGIN_SRC sh
 undel_func(){
-	echo "Searching for deleted file with string $1"
-	# *"Attempt"* to recover an accidentally removed file.
-	sudo fgrep --binary-files=text -C 2000 "$1" /dev/sda > recovereddata.out
+        echo "Searching for deleted file with string $1"
+        # *"Attempt"* to recover an accidentally removed file.
+        sudo fgrep --binary-files=text -C 2000 "$1" /dev/sda > recovereddata.out
 }
 #+END_SRC
+...fix empty...
 
 #+BEGIN_SRC sh
 alias undelete=undel_func
 #+END_SRC
+...fix empty...
 
 ** DD-Status
 
@@ -161,61 +176,65 @@ Usage: ddstat
 #+BEGIN_SRC sh
 alias ddstat="sudo kill -USR1 `pgrep -l '^dd$' | cut -f 1 -d \" \"`"
 #+END_SRC
+...fix empty...
 
 ** Burn USB with alert
 
 #+BEGIN_SRC sh
 burnusb() {
-	sudo dd if=$1 of=$2 bs=4M conv=sync
-	sync
-	ding
-	notify-send -u critical 'burnusb' 'done'
+        sudo dd if=$1 of=$2 bs=4M conv=sync
+        sync
+        ding
+        notify-send -u critical 'burnusb' 'done'
 }
 #+END_SRC
+...fix empty...
 
 ** Extract a compressed file
 #+BEGIN_SRC sh
 extract() {
-	if [ -f $1 ] ; then
-		case $1 in
-			*.tar.bz2) tar xvjf $1 ;;
-			*.tar.gz) tar xvzf $1 ;;
-			*.bz2) bunzip2 $1 ;;
-			*.rar) unrar x $1 ;;
-			*.gz) gunzip $1 ;;
-			*.tar) tar xvf $1 ;;
-			*.tbz2) tar xvjf $1 ;;
-			*.tgz) tar xvzf $1 ;;
-			*.zip) unzip $1 ;;
-			*.Z) uncompress $1;;
-			*.7z) 7z x $1 ;;
-			*) echo "'$1' cannot be extracted via >extract<" ;;
-		esac
-	else
-		echo "'$1' is not a valid file"
-	fi
+        if [ -f $1 ] ; then
+                case $1 in
+                        *.tar.bz2) tar xvjf $1 ;;
+                        *.tar.gz) tar xvzf $1 ;;
+                        *.bz2) bunzip2 $1 ;;
+                        *.rar) unrar x $1 ;;
+                        *.gz) gunzip $1 ;;
+                        *.tar) tar xvf $1 ;;
+                        *.tbz2) tar xvjf $1 ;;
+                        *.tgz) tar xvzf $1 ;;
+                        *.zip) unzip $1 ;;
+                        *.Z) uncompress $1;;
+                        *.7z) 7z x $1 ;;
+                        *) echo "'$1' cannot be extracted via >extract<" ;;
+                esac
+        else
+                echo "'$1' is not a valid file"
+        fi
 }
 #+END_SRC
+...fix empty...
 
 ** Grab a compressed file from online and uncompress it
 #+BEGIN_SRC sh
 curltar() {
-	case $1 in
-		*.tar.bz2) \curl -kL $1 | tar xvjf - ;;
-		*.tar.gz) \curl -kL $1 | tar xvzf - ;;
-		*.bz2) \curl -kL $1 | bunzip2 - ;;
-		*.rar) \curl -kL $1 | unrar x - ;;
-		*.gz) \curl -kL $1 | gunzip - ;;
-		*.tar) \curl -kL $1 | tar xvf - ;;
-		*.tbz2) \curl -kL $1 | tar xvjf - ;;
-		*.tgz) \curl -kL $1 | tar xvzf - ;;
-		*.zip) \curl -kL $1 | unzip - ;;
-		*.Z) \curl -kL $1 | uncompress - ;;
-		*.7z) \curl -kL $1 | 7z x - ;;
-		*) \curl -kLO $1
-	esac
+        case $1 in
+                *.tar.bz2) \curl -kL $1 | tar xvjf - ;;
+                *.tar.gz) \curl -kL $1 | tar xvzf - ;;
+                *.bz2) \curl -kL $1 | bunzip2 - ;;
+                *.rar) \curl -kL $1 | unrar x - ;;
+                *.gz) \curl -kL $1 | gunzip - ;;
+                *.tar) \curl -kL $1 | tar xvf - ;;
+                *.tbz2) \curl -kL $1 | tar xvjf - ;;
+                *.tgz) \curl -kL $1 | tar xvzf - ;;
+                *.zip) \curl -kL $1 | unzip - ;;
+                *.Z) \curl -kL $1 | uncompress - ;;
+                *.7z) \curl -kL $1 | 7z x - ;;
+                *) \curl -kLO $1
+        esac
 }
 #+END_SRC
+...fix empty...
 
 ** Git Branch Parsing
 #+BEGIN_SRC sh
@@ -223,6 +242,30 @@ function parse_git_branch() {
     git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1) /'
 }
 #+END_SRC
+...fix empty...
+
+** Crontab
+
+#+BEGIN_SRC sh
+
+  crontab_add() {
+      (crontab -l ; echo "$1") 2>&1 \
+          | grep -v "no crontab" \
+          | sort | uniq \
+          | crontab -
+  }
+
+  crontab_delete() {
+      (crontab -l ; echo "$1") 2>&1 \
+          | grep -v "no crontab" \
+          | grep -v $1 \
+          |  sort | uniq \
+          | crontab -
+  }
+
+
+#+END_SRC
+...fix empty...
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.
 Create the script by tangling it with: =C-c C-v t=
@@ -231,6 +274,3 @@ Create the script by tangling it with: =C-c C-v t=
 #+PROPERTY: comments org
 #+PROPERTY: shebang #!/usr/bin/env bash
 #+DESCRIPTION: My bash alias'
-
-
-

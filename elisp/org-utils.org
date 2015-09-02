@@ -49,7 +49,13 @@ The command returns the requested time stamp."
 #+END_SRC
 
 
+** Logging and States
 
+*** TODO Create a logbook "STATE" scraper.
+(02:56:11 PM) gnusosa: elation: look at org-read-property-name and org-remove-empty-drawer-at, and make a mashup of both
+(02:57:17 PM) gnusosa: elation: and org-read-property-value
+(03:07:12 PM) elation:  gnusosa: to make sure I am following you. Use the drawer function to identify all drawers, and then in a narrowed region get information about the various properties within it, e.g. the state items.
+(03:15:26 PM) gnusosa: elation: right, but you will have to write your own parser of the elements of the logbook
 * Technical Artifacts
 
   Make sure that we can simply =require= this library.

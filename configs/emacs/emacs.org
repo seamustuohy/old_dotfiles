@@ -1955,7 +1955,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
                               ("tw"
                                "TODAY's WORK Agenda"
                                ;;Only show projects, that are not personal, and are active in the top bar
-                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
+                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/!+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
                                       ((org-agenda-overriding-header "Core Clocking Tasks")))
                                 (agenda ""
                                         ;;This skip-project variable gets project categories marked as personal
@@ -1969,7 +1969,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
                               ("tp"
                                "TODAY's Personal Agenda"
                                ;;Only show projects, that are not personal, and are active in the top bar
-                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
+                               ((tags "TYPE=\"project\"+PERSONAL=\"n\"+LEVEL=1/!+ACTIVE|+STARTUP|+CLOSEOUT|+ONGOING"
                                       ((org-agenda-overriding-header "Core Clocking Tasks")))
                                 (agenda ""
                                         ;;This skip-project variable gets project categories marked as personal
