@@ -1,0 +1,1 @@
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; libreoffice %s; test=test -n "$DISPLAY"
