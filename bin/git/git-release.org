@@ -1,0 +1,38 @@
+#+TITLE: Git Release
+#+AUTHOR: seamus tuohy
+#+EMAIL: s2e@seamustuohy.com
+#+DATE: <2015-04-28 Tue>
+#+TAGS: cli git
+
+
+#+BEGIN_SRC sh
+hook() {
+  local hook=.git/hooks/$1.sh
+  if test -f $hook; then
+    echo "... $1"
+    . $hook
+  fi
+}
+
+if test $# -gt 0; then
+  hook pre-release
+  echo "... releasing $1"
+  git commit -a -m "Release $1"
+  git tag $1 -a -m "Release $1" \
+    && git push $2 \
+    && git push $2 --tags \
+    && hook post-release \
+    && echo "... complete"
+else
+  echo "tag required" 1>&2 && exit 1
+fi
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/bin/git-release
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env bash
+#+DESCRIPTION: Sets up and tags a release at the current point in the repo.

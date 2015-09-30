@@ -1,0 +1,50 @@
+
+* Imports
+
+#+BEGIN_SRC python
+from bs4 import BeautifulSoup
+from urllib import urlopen
+#+END_SRC
+
+* Scraping
+#+BEGIN_SRC python
+  def get_url(url):
+      url_obj = urlopen(url).read()
+      html = BeautifulSoup(url_obj)
+      raw = html.get_text()
+      return raw
+#+END_SRC
+
+* Command line
+
+** Parse Arguments
+
+#+BEGIN_SRC python
+  def parse_arguments():
+      arg_p = argparse.ArgumentParser("Get raw text from a url")
+      arg_p.add_argument("-u", "--url", type=str, help="A url to parse.")
+      args = arg_p.parse_args()
+      return args
+#+END_SRC
+
+** Main
+
+#+BEGIN_SRC python
+  if __name__ == '__main__':
+      import sys
+      import argparse
+      args = parse_arguments()
+      raw = get_url(args.url)
+      utf_raw = raw.encode("UTF-8")
+      sys.stdout.write(utf_raw)
+      sys.exit(0)
+#+END_SRC
+
+* Technical Section
+This file originally came from an [[http://orgmode.org][org-mode]] file.
+Create the script by tangling it with: =C-c C-v t=
+
+#+PROPERTY: tangle ~/.bin/url_text_scrape
+#+PROPERTY: comments org
+#+PROPERTY: shebang #!/usr/bin/env python
+#+DESCRIPTION: Very Simple url scraping with python
