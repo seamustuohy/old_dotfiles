@@ -192,26 +192,28 @@ burnusb() {
 
 ** Extract a compressed file
 #+BEGIN_SRC sh
-extract() {
-        if [ -f $1 ] ; then
-                case $1 in
-                        *.tar.bz2) tar xvjf $1 ;;
-                        *.tar.gz) tar xvzf $1 ;;
-                        *.bz2) bunzip2 $1 ;;
-                        *.rar) unrar x $1 ;;
-                        *.gz) gunzip $1 ;;
-                        *.tar) tar xvf $1 ;;
-                        *.tbz2) tar xvjf $1 ;;
-                        *.tgz) tar xvzf $1 ;;
-                        *.zip) unzip $1 ;;
-                        *.Z) uncompress $1;;
-                        *.7z) 7z x $1 ;;
-                        *) echo "'$1' cannot be extracted via >extract<" ;;
-                esac
-        else
-                echo "'$1' is not a valid file"
-        fi
-}
+    extract() {
+            if [ -f $1 ] ; then
+                    case $1 in
+                            ,*.tar.bz2) tar xvjf $1 ;;
+                            ,*.tar.gz) tar xvzf $1 ;;
+                            ,*.tar.xz) tar xvJf $1 ;;
+                            ,*.xz) unxz -v $1 ;;
+                            ,*.bz2) bunzip2 $1 ;;
+                            ,*.rar) unrar x $1 ;;
+                            ,*.gz) gunzip $1 ;;
+                            ,*.tar) tar xvf $1 ;;
+                            ,*.tbz2) tar xvjf $1 ;;
+                            ,*.tgz) tar xvzf $1 ;;
+                            ,*.zip) unzip $1 ;;
+                            ,*.Z) uncompress $1;;
+                            ,*.7z) 7z x $1 ;;
+                            ,*) echo "'$1' cannot be extracted via >extract<" ;;
+                    esac
+            else
+                    echo "'$1' is not a valid file"
+            fi
+    }
 #+END_SRC
 ...fix empty...
 
@@ -244,6 +246,19 @@ function parse_git_branch() {
 #+END_SRC
 ...fix empty...
 
+** Git purge file
+Use filter-branch to remove an unwanted file/directory from a repo's git revision history.
+
+#+BEGIN_SRC sh
+git_purge() {
+git filter-branch --prune-empty --index-filter "git rm -rf --cached --ignore-unmatch ${1}" --tag-name-filter cat -- --all
+}
+
+git_fpurge() {
+git filter-branch -f --prune-empty --index-filter "git rm -rf --cached --ignore-unmatch ${1}" --tag-name-filter cat -- --all
+}
+
+#+END_SRC
 ** Crontab
 
 #+BEGIN_SRC sh
@@ -265,7 +280,23 @@ function parse_git_branch() {
 
 
 #+END_SRC
+
 ...fix empty...
+
+** Backup
+
+Backup my un-encrypted files to another encrypted medium.
+
+#+BEGIN_SRC sh
+  backup() {
+      duplicity  -v 9 \
+          --encrypt-key=D9F9B3064FDF373D102543132CF23545F2D7DAC4 \
+          "${MOBILE_HOME}" \
+          file:///media/s2e/backup_data/
+  }
+#+END_SRC
+
+
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.
 Create the script by tangling it with: =C-c C-v t=

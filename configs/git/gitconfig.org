@@ -31,11 +31,11 @@
         churn = !sh -c '~/.dotfiles/git/alias/churn'
 
 [color]
-        ui = always
+        #ui = always
         status = true
 
-[commit]
-        template=~/.dotfiles/git/template
+#[commit]
+        #template=~/.dotfiles/git/template
 #+END_SRC
 
 * Technical Section

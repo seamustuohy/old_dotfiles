@@ -10,9 +10,7 @@
 ..fix empty..
 
 #+BEGIN_SRC emacs-lisp
-
 ;;(debug)
-
 #+END_SRC
 ..fix empty..
 
@@ -117,7 +115,7 @@ Load each package individually. Too busy with the re-write today to script up a 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (in-package-d "calfw"))
 (add-to-list 'load-path (in-package-d "org-caldav"))
-(add-to-list 'load-path (in-package-d "synonyms"))
+;;(add-to-list 'load-path (in-package-d "synonyms"))
 (add-to-list 'load-path (in-package-d "writegood-mode"))
 (add-to-list 'load-path (in-package-d "guru-mode"))
 (add-to-list 'load-path (in-package-d "org-bullets"))
@@ -627,64 +625,6 @@ I want to be able to clock to major projects as well as to the websites I visit,
 ..fix empty..
 
 ** Language Specific
-*** HTML
-#+BEGIN_SRC emacs-lisp
-; web-mode
-(require 'web-mode)
-(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
-#+END_SRC
-..fix empty..
-
-*** XML
-Pretty format XML markup in region. You need to have nxml-mode
-http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
-this.  The function inserts linebreaks to separate tags that have
-nothing but whitespace between them.  It then indents the markup
-by using nxml's indentation rules.
-#+BEGIN_SRC emacs-lisp
-(defun bf-pretty-print-xml-region (begin end)
-  "Pretty format XML markup in region. You need to have nxml-mode
-http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
-this.  The function inserts linebreaks to separate tags that have
-nothing but whitespace between them.  It then indents the markup
-by using nxml's indentation rules."
-  (interactive "r")
-  (save-excursion
-      (nxml-mode)
-      (goto-char begin)
-      (while (search-forward-regexp "\>[ \\t]*\<" nil t)
-        (backward-char) (insert "\n"))
-      (indent-region begin end))
-    (message "Ah, much better!"))
-#+END_SRC
-..fix empty..
-
-*** Markdown
-#+BEGIN_SRC emacs-lisp
-(autoload 'markdown-mode "markdown-mode.el" nil t)
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-;; flyspell mode for spell checking in markdown
-(add-hook 'markdown-mode-hook 'turn-on-flyspell 'append)
-#+END_SRC
-..fix empty..
-
-*** YAML
-#+BEGIN_SRC emacs-lisp
-(require 'yaml-mode)
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-#+END_SRC
-..fix empty..
-
-*** LogFiles
-#+BEGIN_SRC emacs-lisp
- (require 'syslog-mode)
- (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode))
-#+END_SRC
-..fix empty..
-
 *** python
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
@@ -718,6 +658,107 @@ by using nxml's indentation rules."
 
 #+END_SRC
 ..fix empty..
+
+** cscope
+#+BEGIN_SRC emacs-lisp
+(require 'helm-cscope)
+;; Enable helm-cscope-mode
+(add-hook 'c-mode-hook 'helm-cscope-mode)
+(add-hook 'c++-mode-hook 'helm-cscope-mode)
+;; Set key bindings
+(eval-after-load "helm-cscope"
+  '(progn
+     (define-key helm-cscope-mode-map (kbd "M-t") 'helm-cscope-find-this-symbol)
+     (define-key helm-cscope-mode-map (kbd "M-T") 'helm-cscope-find-assignments-to-this-symbol)
+     (define-key helm-cscope-mode-map (kbd "M-g M-c") 'helm-cscope-find-called-function)
+     (define-key helm-cscope-mode-map (kbd "M-g M-p") 'helm-cscope-find-calling-this-funtcion)
+     (define-key helm-cscope-mode-map (kbd "M-r") 'helm-cscope-find-global-definition)
+     (define-key helm-cscope-mode-map (kbd "M-s") 'helm-cscope-find-this-text-string)
+     (define-key helm-cscope-mode-map (kbd "M-l") 'helm-cscope-find-files-including-file)))
+#+END_SRC
+
+** PHP
+#+BEGIN_SRC emacs-lisp
+  (require 'php-mode)
+#+END_SRC
+
+* Data Manipulation
+
+** Language Specific
+*** HTML
+#+BEGIN_SRC emacs-lisp
+; web-mode
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
+#+END_SRC
+..fix empty..
+
+*** XML
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.xml\\'" . nxml-mode))
+#+END_SRC
+
+Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules.
+#+BEGIN_SRC emacs-lisp
+(defun bf-pretty-print-xml-region (begin end)
+  "Pretty format XML markup in region. You need to have nxml-mode
+http://www.emacswiki.org/cgi-bin/wiki/NxmlMode installed to do
+this.  The function inserts linebreaks to separate tags that have
+nothing but whitespace between them.  It then indents the markup
+by using nxml's indentation rules."
+  (interactive "r")
+  (save-excursion
+      (nxml-mode)
+      (goto-char begin)
+      (while (search-forward-regexp "\>[ \\t]*\<" nil t)
+        (backward-char) (insert "\n"))
+      (indent-region begin end))
+    (message "Ah, much better!"))
+#+END_SRC
+..fix empty..
+
+*** YAML
+#+BEGIN_SRC emacs-lisp
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+#+END_SRC
+..fix empty..
+
+*** JSON
+#+BEGIN_SRC emacs-lisp
+(require 'json-mode)
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-mode))
+#+END_SRC
+
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+(autoload 'markdown-mode "markdown-mode.el" nil t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+;; flyspell mode for spell checking in markdown
+(add-hook 'markdown-mode-hook 'turn-on-flyspell 'append)
+#+END_SRC
+..fix empty..
+
+*** LogFiles
+#+BEGIN_SRC emacs-lisp
+ (require 'syslog-mode)
+ (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode))
+#+END_SRC
+..fix empty..
+
+*** CSV
+#+BEGIN_SRC emacs-lisp
+ (require 'csv-mode)
+ (add-to-list 'auto-mode-alist '("\\.csv\\'" . csv-mode))
+#+END_SRC
 
 * Display
 #+BEGIN_SRC emacs-lisp
@@ -1231,9 +1272,9 @@ I use flyspell mode for spell checking for any text files.
 
 **** Define path for synonyms code and thesaurus
 #+BEGIN_SRC emacs-lisp
-(setq synonyms-file        "~/.emacs.d/resources/thesaurus/mthesaur.txt")
-(setq synonyms-cache-file  "~/.emacs.d/cache/thesaurus.txt")
-(require 'synonyms)
+;(setq synonyms-file        "~/.emacs.d/resources/thesaurus/mthesaur.txt")
+;(setq synonyms-cache-file  "~/.emacs.d/cache/thesaurus.txt")
+;(require 'synonyms)
 #+END_SRC
 ..fix empty..
 
@@ -1448,6 +1489,15 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 (define-key personal-global-map (kbd "h p") 'helm-dash-at-point)
 #+END_SRC
 ..fix empty..
+
+* Remembrance Agent
+
+#+BEGIN_SRC emacs-lisp
+  (load "remem.el")
+  (setq remem-database-dir "/home/s2e/temp/ra")
+  (setq remem-scopes-list '(("mail" 6 5 500) ("work" 6 5 500)))
+  (setq hilit-background-mode 'dark)
+#+END_SRC
 
 * Navigation
 #+BEGIN_SRC emacs-lisp
@@ -2479,7 +2529,6 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
 (setq org-odt-preferred-output-format "doc")
 #+END_SRC
 ..fix empty..
-
 ** Babel
 
 *** Set acceptable languages (whatever I want Babel, whatever I want.)

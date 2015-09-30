@@ -4,9 +4,15 @@
 #+DATE: 2015 Apr 18
 #+TAGS: bash commandline
 
+* Mobile Home
+
+I keep my home directory mobile so that I can easily switch between computers.
+
+#+BEGIN_SRC sh
+export MOBILE_HOME=/media/truecrypt1
+#+END_SRC
 
 * Editor
-
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
   # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
@@ -120,6 +126,8 @@ export LS_COLORS
 PS1="\[\e[32m\]\$(parse_git_branch)\[\e[34m\]\h:\W \$ \[\e[m\]"
 #+END_SRC
 
+..fix tangle errors..
+
 #+BEGIN_SRC sh
 PROMPT_COMMAND=prompt_commands
 #+END_SRC
@@ -174,6 +182,7 @@ Add CASK to the path for emacs.
 #+BEGIN_SRC sh
 export PATH="$PATH:$HOME/.cask/bin"
 #+END_SRC
+
 
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.
