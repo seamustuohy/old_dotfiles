@@ -289,10 +289,17 @@ Backup my un-encrypted files to another encrypted medium.
 
 #+BEGIN_SRC sh
   backup() {
+    # backup mobile home data
       duplicity  -v 9 \
-          --encrypt-key=D9F9B3064FDF373D102543132CF23545F2D7DAC4 \
+          --encrypt-key=B6193EC73CF07AA7 \
           "${MOBILE_HOME}" \
-          file:///media/s2e/backup_data/
+          file:///media/s2e/Backup/mobile_home
+
+    # backup home directory data
+      duplicity  -v 9 \
+          --encrypt-key=B6193EC73CF07AA7 \
+          /home/s2e/ \
+          file:///media/s2e/Backup/home_dir
   }
 #+END_SRC
 

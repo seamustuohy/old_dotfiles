@@ -34,40 +34,42 @@ NONE
 ** Debian Software and Dependencies
 
 #+BEGIN_SRC sh
-          install_package_deps() {
+  install_package_deps() {
 
-              sudo apt-get -y install \
-                  zip \
-                  unzip \
-                  tree \
-                  vim \
-                  wget \
-                  time \
-                  python-dev \
-                  python3-dev \
-                  python-pip \
-                  python3-pip \
-                  sqlite3 \
-                  pylint \
-                  gnutls-bin \
-                  offlineimap \
-                  python-notmuch \
-                  python-bs4 \
-                  libncurses5-dev \
-                  silversearcher-ag \
-                  duplicity \
-                  keepass2 \
-                  terminator \
-                  pidgin-otr \
-                  pidgin \
-                  git \
-                  sudo \
-                  libxapian-dev \
-                  libgmime-2.6-dev \
-                  libtalloc-dev \
-                  zlib1g-dev \
-                  python-sphinx
-          }
+      sudo apt-get -y install \
+          zip \
+          unzip \
+          tree \
+          vim \
+          wget \
+          time \
+          python-dev \
+          python3-dev \
+          python-pip \
+          python3-pip \
+          sqlite3 \
+          pylint \
+          gnutls-bin \
+          offlineimap \
+          python-notmuch \
+          python-bs4 \
+          libncurses5-dev \
+          silversearcher-ag \
+          duplicity \
+          keepass2 \
+          terminator \
+          pidgin-otr \
+          pidgin \
+          git \
+          sudo \
+          libxapian-dev \
+          libgmime-2.6-dev \
+          libtalloc-dev \
+          zlib1g-dev \
+          python-sphinx
+    # Conkeror Installation
+      install_conkeror
+  }
 #+END_SRC
 
 
@@ -408,7 +410,18 @@ pip_install() {
   }
 #+END_SRC
 
-
+* Conkeror-Nightlies
+#+BEGIN_SRC sh
+  install_conkeror() {
+      echo "# Conkeror See: http://noone.org/conkeror-nightly-debs/" | sudo tee --append /etc/apt/sources.list
+      echo "deb     http://noone.org/conkeror-nightly-debs jessie main" | sudo tee --append /etc/apt/sources.list
+      echo "deb-src http://noone.org/conkeror-nightly-debs jessie main" | sudo tee --append /etc/apt/sources.list
+      sudo apt-key adv --keyserver pgp.uni-mainz.de --recv-keys 80379429
+      sudo apt-get update
+      sudo apt-get upgrade
+      sudo apt-get install conkeror
+  }
+#+END_SRC
 * Link from Mobile Home
 
 #+BEGIN_SRC sh

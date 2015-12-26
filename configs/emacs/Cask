@@ -3,6 +3,8 @@
 (source melpa)
 
 (depends-on "undo-tree")
+;;(depends-on "org-pdfview")
+(depends-on "pdf-tools")
 (depends-on "php-mode")
 (depends-on "json-mode")
 (depends-on "csv-mode")
@@ -15,6 +17,8 @@
 (depends-on "yasnippet")
 (depends-on "rainbow-mode")
 (depends-on "company")
+(depends-on "jedi")
+(depends-on "company-jedi")
 (depends-on "helm")
 (depends-on "helm-dash")
 (depends-on "helm-projectile")

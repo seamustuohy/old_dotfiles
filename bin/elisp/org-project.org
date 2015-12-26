@@ -133,7 +133,6 @@ The states are
   "* TODO %?
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
-  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
   :ID: %(org-id-uuid)
   :ASSIGNED:
   :IMPORTANCE:
@@ -152,7 +151,6 @@ The states are
   "* ACTIVE %?
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
-  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
   :ID: %(org-id-uuid)
   :ASSIGNED:
   :IMPORTANCE:
@@ -171,7 +169,6 @@ The states are
   "* CONTACT RE: %?
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
-  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
   :ID: %(org-id-uuid)
   :IMPORTANCE:
   :URGENCY:
@@ -185,7 +182,6 @@ The states are
   "* CONTACT [[notmuch:id:%:message-id][%? - %:subject]]
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
-  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
   :ID: %(org-id-uuid)
   :IMPORTANCE:
   :URGENCY:
@@ -218,7 +214,6 @@ The states are
   "* %^{STATUS|DONE|SOMEDAY|CANCELED|FAILED} %?
   :PROPERTIES:
   :CATEGORY: %(prompt-for-current-projects-category)
-  :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
   :ID: %(org-id-uuid)
   :ASSIGNED:
   :IMPORTANCE:
@@ -255,7 +250,6 @@ The states are
       "* MEET about %?
       :PROPERTIES:
       :CATEGORY: %(prompt-for-current-projects-category)
-      :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
       :ID: %(org-id-uuid)
       :ASSIGNED:
       :IMPORTANCE:
@@ -274,7 +268,6 @@ The states are
       "* EVENT
       :PROPERTIES:
       :CATEGORY: %(prompt-for-current-projects-category)
-      :EFFORT: %^{effort|1:00|0:05|0:15|0:30|2:00|4:00}
       :ID: %(org-id-uuid)
       :ASSIGNED:
       :IMPORTANCE:
@@ -405,7 +398,6 @@ The states are
       - TODO: The TODO status of the task entry. [strings]
       - TAGS: The non-propert tags of the task entry. [list of strings]
       - PROJECT: The project (CATEGORY) of the task entry [string]
-      - EFFORT: The effort assigned to the task entry. [string]
       - ID: The task entries ID. [string]
       - ASSIGNED: The individual assigned to the task (if not me) [string]
       - IMPORTANCE: The level of importance of the task entry. [string] (currently unassigned)

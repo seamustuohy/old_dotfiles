@@ -1,4 +1,4 @@
-#+TITLE: Emacs
++TITLE: Emacs
 #+AUTHOR: seamus tuohy
 #+EMAIL: s2e@seamustuohy.com
 #+DATE: 2015 Apr 18
@@ -28,7 +28,7 @@ GPG key to use for encryption
 Either the Key ID or set to nil to use symmetric encryption.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-crypt-key "F2D7DAC4")
+(setq org-crypt-key "3CF07AA7")
 #+END_SRC
 ..fix empty..
 
@@ -128,7 +128,6 @@ Load each package individually. Too busy with the re-write today to script up a 
   (add-to-list 'load-path my-elisp-dir)
 #+END_SRC
 ..fix empty..
-
 
 ** Use Package
 
@@ -337,6 +336,7 @@ All calendar configuration is done in projects
 (require 'calfw)
 (require 'calfw-org)
 (require 'org-caldav)
+(setq org-icalendar-timezone nil)
 #+END_SRC
 ..fix empty..
 
@@ -1118,7 +1118,25 @@ Load my current theme.
 (totd)
 #+END_SRC
 ..fix empty..
+** PDF Viewing
+#+BEGIN_SRC emacs-lisp
+(pdf-tools-install)
 
+(defvar tv/prefer-pdf-tools (fboundp 'pdf-view-mode))
+(defun tv/start-pdf-tools-if-pdf ()
+  (when (and tv/prefer-pdf-tools
+             (eq doc-view-doc-type 'pdf))
+    (pdf-view-mode)))
+
+(add-hook 'doc-view-mode-hook 'tv/start-pdf-tools-if-pdf)
+
+
+;; For later when I want to try org-pdfview
+;; http://matt.hackinghistory.ca/2015/11/11/note-taking-with-pdf-tools/
+;(eval-after-load 'org '(require 'org-pdfview))
+;(add-to-list 'org-file-apps '("\\.pdf\\'" . org-pdfview-open))
+;(add-to-list 'org-file-apps '("\\.pdf::\\([[:digit:]]+\\)\\'" . org-pdfview-open))
+#+END_SRC
 * File Management
 #+BEGIN_SRC emacs-lisp
 (message "Initializing file management")
@@ -1252,6 +1270,7 @@ I use flyspell mode for spell checking for any text files.
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
 (add-hook 'message-mode-hook 'turn-on-flyspell 'append)
+(add-hook 'tex-mode-hook 'turn-on-flyspell 'append)
 
 #+END_SRC
 ..fix empty..
@@ -1361,13 +1380,44 @@ Via" [[http://whattheemacsd.com/my-misc.el-02.html][what the emacs.d]]
 I have found company mode to be mostly annoying when writing because it captures my keystrokes and does not allow me to do any actions when it is suggesting something (which is whenever I am at the end of a word). I am going to look into how to make it more useful and then try again.
 #+BEGIN_SRC emacs-lisp
 (require 'company)
-(setq company-idle-delay 0.5)
+(setq company-idle-delay 1)
 (setq company-tooltip-limit 10)
 (setq company-minimum-prefix-length 2)
 
 ;; invert the navigation direction if the the completion popup-isearch-match
 ;; is displayed on top (happens near the bottom of windows)
 (setq company-tooltip-flip-when-above t)
+
+;; HOOKS
+;; Python only for now.
+(add-hook 'python-mode-hook 'company-mode)
+
+
+;;; jedi autocompletion
+(require 'jedi)
+(require 'company-jedi)
+(add-hook 'python-mode-hook 'jedi:setup)
+;;(setq jedi:complete-on-dot t)
+
+;;; company needs some help to work with jedi
+(defun my/python-company-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+(add-hook 'python-mode-hook 'my/python-company-mode-hook)
+
+;; Jedi
+;(require 'jedi)
+
+;; Hook up to autocomplete
+;; (add-to-list 'ac-sources 'ac-source-jedi-direct)
+
+;; Enable for python-mode
+;; (add-hook 'python-mode-hook 'jedi:setup)
+
+;;(defun python-hooks-company-jedi ()
+;;  (add-to-list 'company-backends 'company-jedi))
+
+;;(add-hook 'python-mode-hook 'python-hooks-company-jedi)
+
 
 ;;(add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
@@ -1490,6 +1540,12 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 #+END_SRC
 ..fix empty..
 
+**** Keyfreq
+#+BEGIN_SRC emacs-lisp
+(require 'keyfreq)
+(keyfreq-mode 1)
+(keyfreq-autosave-mode 1)
+#+END_SRC
 * Remembrance Agent
 
 #+BEGIN_SRC emacs-lisp
@@ -2645,6 +2701,11 @@ The following snippet
 ;;  (provide 'init-emacs)
 #+END_SRC
 ..fix empty
+
+
+#+BEGIN_SRC emacs-lisp
+;; THIS SHOULD BE THE END OF THE FILE
+#+END_SRC
 
   Before you can build this on a new system, make sure that you put
   the cursor over any of these properties, and hit: =C-c C-c=

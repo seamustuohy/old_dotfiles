@@ -183,6 +183,11 @@ Add CASK to the path for emacs.
 export PATH="$PATH:$HOME/.cask/bin"
 #+END_SRC
 
+Things
+#+BEGIN_SRC sh
+export PATH="$PATH:$HOME/.cabal/bin"
+#+END_SRC
+
 
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.
