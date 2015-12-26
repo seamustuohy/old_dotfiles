@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#
+# This file is part of my helpers, a series of short snippets.
+# Copyright © 2015 seamus tuohy, <stuohy@internews.org>
+#
+# This program is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the included LICENSE file for details.
+
+# Setup
+
+#Bash should terminate in case a command or chain of command finishes with a non-zero exit status.
+#Terminate the script in case an uninitialized variable is accessed.
+#See: https://github.com/azet/community_bash_style_guide#style-conventions
+set -e
+set -u
+
+# DEBUGGING
+# set -x
+
+# Read Only variables
+
+#readonly PROG_DIR=$(readlink -m $(dirname $0))
+#readonly readonly PROGNAME=$(basename )
+#readonly PROGDIR=$(readlink -m $(dirname ))
+
+
+main() {
+    # Generate a Private Key
+    openssl genrsa -aes256 -out server.key 2048
+
+    # Generate a CSR (Certificate Signing Request)
+    openssl req -new -sha256 -key server.key -out server.csr
+
+    # Remove Passphrase from Key
+    cp server.key server.key.with.password
+    openssl rsa -in server.key.with.password -out server.key
+
+    # generate a self-signed certificate
+    # Generate a temporary certificate which is good for 365 days.
+    openssl x509 -req -days 365 -sha256 -in server.csr -signkey server.key -out server.crt
+}
+
+
+cleanup() {
+    # put cleanup needs here
+    exit 0
+}
+
+trap 'cleanup' EXIT
+
+
+main
