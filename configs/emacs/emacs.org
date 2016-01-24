@@ -635,7 +635,12 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-mode))
 #+END_SRC
 ..fix empty..
-
+*** Bro
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (in-package-d "bro-mode"))
+(require 'bro-mode)
+(add-to-list 'auto-mode-alist '("\\.bro\\'" . bro-mode))
+#+END_SRC
 ** Code Folding
 #+BEGIN_SRC emacs-lisp
 (setq hs-hide-comments-when-hiding-all +1)
@@ -1120,22 +1125,22 @@ Load my current theme.
 ..fix empty..
 ** PDF Viewing
 #+BEGIN_SRC emacs-lisp
-(pdf-tools-install)
+  ;; (pdf-tools-install)
 
-(defvar tv/prefer-pdf-tools (fboundp 'pdf-view-mode))
-(defun tv/start-pdf-tools-if-pdf ()
-  (when (and tv/prefer-pdf-tools
-             (eq doc-view-doc-type 'pdf))
-    (pdf-view-mode)))
+  ;; (defvar tv/prefer-pdf-tools (fboundp 'pdf-view-mode))
+  ;; (defun tv/start-pdf-tools-if-pdf ()
+  ;;   (when (and tv/prefer-pdf-tools
+  ;;              (eq doc-view-doc-type 'pdf))
+  ;;     (pdf-view-mode)))
 
-(add-hook 'doc-view-mode-hook 'tv/start-pdf-tools-if-pdf)
+  ;; (add-hook 'doc-view-mode-hook 'tv/start-pdf-tools-if-pdf)
 
 
-;; For later when I want to try org-pdfview
-;; http://matt.hackinghistory.ca/2015/11/11/note-taking-with-pdf-tools/
-;(eval-after-load 'org '(require 'org-pdfview))
-;(add-to-list 'org-file-apps '("\\.pdf\\'" . org-pdfview-open))
-;(add-to-list 'org-file-apps '("\\.pdf::\\([[:digit:]]+\\)\\'" . org-pdfview-open))
+  ;; For later when I want to try org-pdfview
+  ;; http://matt.hackinghistory.ca/2015/11/11/note-taking-with-pdf-tools/
+  ;(eval-after-load 'org '(require 'org-pdfview))
+  ;(add-to-list 'org-file-apps '("\\.pdf\\'" . org-pdfview-open))
+  ;(add-to-list 'org-file-apps '("\\.pdf::\\([[:digit:]]+\\)\\'" . org-pdfview-open))
 #+END_SRC
 * File Management
 #+BEGIN_SRC emacs-lisp
@@ -1657,6 +1662,35 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
 #+END_SRC
 ..fix empty..
 
+** In current window/frame
+
+#+BEGIN_SRC emacs-lisp
+;;
+;; ace jump mode major function
+;;
+(add-to-list 'load-path "/full/path/where/ace-jump-mode.el/in/")
+(autoload
+  'ace-jump-mode
+  "ace-jump-mode"
+  "Emacs quick move minor mode"
+  t)
+;; you can select the key you prefer to
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+
+
+
+;;
+;; enable a more powerful jump back function from ace jump mode
+;;
+(autoload
+  'ace-jump-mode-pop-mark
+  "ace-jump-mode"
+  "Ace jump back:-)"
+  t)
+(eval-after-load "ace-jump-mode"
+  '(ace-jump-mode-enable-mark-sync))
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
+#+END_SRC
 * Org-Mode
 #+BEGIN_SRC emacs-lisp
 (message "Initializing org mode")

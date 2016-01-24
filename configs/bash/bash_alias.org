@@ -43,6 +43,7 @@ alias listserv='time ~/.bin/get_listserv'
 #+END_SRC
 ...fix empty...
 
+* Terminal and Navigation
 Alias' for easier navigation
 #+BEGIN_SRC sh
 alias ll='ls -alF'
@@ -52,7 +53,8 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias cd=cd_func
 #+END_SRC
-...fix empty...
+
+cd function for providing easy movement and history.
 
 #+BEGIN_SRC sh
 cd_func ()
@@ -104,6 +106,23 @@ cd_func ()
 }
 #+END_SRC
 ...fix empty...
+
+** Colorize Terminal
+Colorize Logs
+#+BEGIN_SRC sh
+if [ -f "/usr/bin/ccze" ]; then
+    lesslog() { ccze -A < $1 | less -R; }
+    taillog() { tail -f $1 | ccze -A; }
+fi
+#+END_SRC
+
+Colorize Less
+
+#+BEGIN_SRC sh
+alias lesc='LESS="-R" LESSOPEN="|pygmentize -g %s" less'
+#+END_SRC
+
+
 
 * Pranks & Misc
 
@@ -301,6 +320,25 @@ Backup my un-encrypted files to another encrypted medium.
           /home/s2e/ \
           file:///media/s2e/Backup/home_dir
   }
+#+END_SRC
+
+** Find item in a Bash config file
+
+#+BEGIN_SRC sh
+# Look for relevant string in bash config files when things go weird
+# $ grep_bash PATH
+grep_bash(){
+  for f in  ~/.bashrc ~/.profile ~/.bash_profile ~/.bash_login \
+            /etc/profile /etc/environment /etc/bash.bashrc;
+  do
+    [ -e $f ] && grep -H "$@" $f;
+  done
+}
+#+END_SRC
+
+** Expand shortened URL's
+#+BEGIN_SRC sh
+expandurl() { { curl -sI $1 | sed -n 's/Location:.* //p';} }
 #+END_SRC
 
 

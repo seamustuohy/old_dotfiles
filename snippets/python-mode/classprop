@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: classprop
+# key: classprop
+# group: general
+# contributor: seamus tuohy
+# --
+
+    @property
+    def ${1:property_name}(self):
+        """I'm the '$1' property."""
+        return self._$1
+
+    @$1.setter
+    def $1(self, value):
+        self._$1 = value
+
+    @$1.deleter
+    def $1(self):
+        del self._$1

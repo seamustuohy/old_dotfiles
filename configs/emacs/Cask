@@ -13,6 +13,7 @@
 (depends-on "helm-swoop")
 (depends-on "helm-ag")
 (depends-on "use-package")
+(depends-on "ace-jump-mode")
 (depends-on "guide-key")
 (depends-on "yasnippet")
 (depends-on "rainbow-mode")

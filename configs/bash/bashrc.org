@@ -108,17 +108,19 @@ HISTFILESIZE=2000
 
 #+BEGIN_SRC sh
 export TERM=xterm-color
-export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
 export CLICOLOR=1
-color_prompt=yes
 #+END_SRC
 
-ls Colors
+
+Colorize basic commands
 #+BEGIN_SRC sh
-alias ls='ls --color'
-LS_COLORS='di=1:fi=0:ln=31:pi=5:so=5:bd=5:cd=5:or=31:mi=0:ex=35:*.rpm=90'
-export LS_COLORS
+  alias ls="ls --color=auto"
+  alias grep='grep --color=auto'
+  alias fgrep='fgrep --color=auto'
+  alias egrep='egrep --color=auto'
 #+END_SRC
+
+
 
 * Prompt
 

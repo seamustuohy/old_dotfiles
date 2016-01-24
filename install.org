@@ -31,6 +31,39 @@ NONE
 
 * Installation
 
+
+** Master Installer
+
+#+BEGIN_SRC sh
+      install_emacs_deps() {
+          #install_thesaurus
+          install_write_good
+          install_guru_mode
+          install_cask
+          install_code_checkers
+          install_calfw
+          install_orgcaldav
+          install_org-bullets
+          install_sumy
+          install_notmuch
+          install_offlineimap
+          install_twittering
+          install_org_notmuch_clocking
+          install_string_utils
+          install_cv
+          install_pycal
+          install_pygments
+          type truecrypt || install_truecrypt
+      }
+#+END_SRC
+
+** Install Pygments
+#+BEGIN_SRC sh
+    install_pygments() {
+        sudo pip install Pygments
+  }
+#+END_SRC
+
 ** Debian Software and Dependencies
 
 #+BEGIN_SRC sh
@@ -72,32 +105,6 @@ NONE
   }
 #+END_SRC
 
-
-
-** Master Installer
-
-#+BEGIN_SRC sh
-    install_emacs_deps() {
-        #install_thesaurus
-        install_write_good
-        install_guru_mode
-        install_cask
-        install_code_checkers
-        install_calfw
-        install_orgcaldav
-        install_org-bullets
-        install_sumy
-        install_notmuch
-        install_offlineimap
-        install_twittering
-        install_org_notmuch_clocking
-        install_string_utils
-        install_cv
-        install_pycal
-        type truecrypt || install_truecrypt
-    }
-#+END_SRC
-
 ** Truecrypt
 #+BEGIN_SRC sh
   install_truecrypt() {
@@ -122,7 +129,6 @@ NONE
       fi
   }
 #+END_SRC
-
 
 ** Thesarus
 Check for a thesaurus and if it does not exist install it.
