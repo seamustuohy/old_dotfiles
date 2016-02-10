@@ -34,6 +34,21 @@
         #ui = always
         status = true
 
+# https://groups.google.com/forum/#!topic/binary-transparency/f-BI4o8HZW0/discussion
+# for $deity's sake, check that anything we're getting is complete and sane on a regular basis
+# It seems git's default behavior in many situations is -- despite communicating objectID by
+# content-addressable hashes which should be sufficient to assure some integrity -- it may not actually bother to *check* them.
+# Yes, even when receiving objects from other repos.
+# So, enabling these configuration parameters may "slow down" your git operations.
+# (Anecdotally, I'd say "no it bloody won't"; I've had them on for months now and pretty much forget they were there.)
+# The return is actually noticing if someone ships you a bogus object.  Everyone should enable these.
+[transfer]
+        fsckobjects = true
+[fetch]
+        fsckobjects = true
+[receive]
+        fsckObjects = true
+
 #[commit]
         #template=~/.dotfiles/git/template
 #+END_SRC

@@ -230,6 +230,7 @@ Start a server when there is not a server already running.
 #+END_SRC
 ..fix empty..
 
+
 ** Confirmation
 I like to stay in my emacs environment. Make sure emacs isn't accidentally killed
 
@@ -641,6 +642,24 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (require 'bro-mode)
 (add-to-list 'auto-mode-alist '("\\.bro\\'" . bro-mode))
 #+END_SRC
+*** PHP
+ #+BEGIN_SRC emacs-lisp
+   (require 'php-mode)
+ #+END_SRC
+*** Conkeror
+
+[[https://github.com/bard/mozrepl/wiki/Emacs-integration][Emacs Integration for MozRepl]]
+#+BEGIN_SRC emacs-lisp
+
+  (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
+
+  (add-hook 'javascript-mode-hook 'javascript-custom-setup)
+  (defun javascript-custom-setup ()
+    (moz-minor-mode 1))
+
+  (add-to-list 'auto-mode-alist '("\\.conkerorrc\\'" . javascript-mode))
+#+END_SRC
+
 ** Code Folding
 #+BEGIN_SRC emacs-lisp
 (setq hs-hide-comments-when-hiding-all +1)
@@ -682,10 +701,6 @@ I want to be able to clock to major projects as well as to the websites I visit,
      (define-key helm-cscope-mode-map (kbd "M-l") 'helm-cscope-find-files-including-file)))
 #+END_SRC
 
-** PHP
-#+BEGIN_SRC emacs-lisp
-  (require 'php-mode)
-#+END_SRC
 
 * Data Manipulation
 
@@ -1120,7 +1135,6 @@ Load my current theme.
              stars "\n\n")
       (window-start) ?\r
       "Hit any key when done reading")))
-(totd)
 #+END_SRC
 ..fix empty..
 ** PDF Viewing
@@ -1141,6 +1155,11 @@ Load my current theme.
   ;(eval-after-load 'org '(require 'org-pdfview))
   ;(add-to-list 'org-file-apps '("\\.pdf\\'" . org-pdfview-open))
   ;(add-to-list 'org-file-apps '("\\.pdf::\\([[:digit:]]+\\)\\'" . org-pdfview-open))
+#+END_SRC
+** Browsing
+#+BEGIN_SRC emacs-lisp
+(setq browse-url-generic-program (executable-find "conkeror"))
+(setq browse-url-browser-function 'browse-url-generic)
 #+END_SRC
 * File Management
 #+BEGIN_SRC emacs-lisp
@@ -1506,8 +1525,8 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
           "Python 2"
           "Python 3"
           "D3JS"
-          "Lua_5.2"
-          "Emacs_Lisp"
+          "Lua"
+          "Emacs Lisp"
           "Flask"
           ))
 #+END_SRC
@@ -1521,14 +1540,14 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 (add-hook 'sh-mode-hook '(lambda () (setq-local helm-dash-docsets '("Bash"))))
 (add-hook 'lua-mode-hook '(lambda () (setq-local helm-dash-docsets '("Lua"))))
 (add-hook 'markdown-mode-hook '(lambda () (setq-local helm-dash-docsets '("Markdown" "LaTeX"))))
-(add-hook 'org-mode-hook '(lambda () (setq-local helm-dash-docsets '("LaTeX" "Emacs Lisp" "Bash" "Python" "HTML"))))
+(add-hook 'org-mode-hook '(lambda () (setq-local helm-dash-docsets '("LaTeX" "Emacs Lisp" "Bash" "Python 2" "Python 3" "HTML"))))
 
 ;; Web based docs
-(add-hook 'web-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3.js" "HTML" "CSS" "JavaScript"))))
-(add-hook 'javascript-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3.js" "JavaScript"))))
+(add-hook 'web-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3JS" "HTML" "CSS" "JavaScript"))))
+(add-hook 'javascript-mode-hook '(lambda () (setq-local helm-dash-docsets '("D3JS" "JavaScript"))))
 
 ;;python docs
-(add-hook 'python-mode-hook '(lambda () (setq-local helm-dash-docsets '("Ansible" "Flask" "Python"))))
+(add-hook 'python-mode-hook '(lambda () (setq-local helm-dash-docsets '("Ansible" "Flask" "Python 3" "Python 2"))))
 #+END_SRC
 ..fix empty..
 
@@ -2726,6 +2745,10 @@ The following snippet
   (org-projects-add-project-agenda-files)
 #+END_SRC
 ..fix empty..
+* Run Quote of the day
+#+BEGIN_SRC emacs-lisp
+(totd)
+#+END_SRC
 
 * Technical Artifacts
 

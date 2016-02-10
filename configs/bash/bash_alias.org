@@ -123,7 +123,6 @@ alias lesc='LESS="-R" LESSOPEN="|pygmentize -g %s" less'
 #+END_SRC
 
 
-
 * Pranks & Misc
 
 #+BEGIN_SRC sh
@@ -185,6 +184,19 @@ undel_func(){
 alias undelete=undel_func
 #+END_SRC
 ...fix empty...
+
+#+BEGIN_SRC sh
+  undel_media() {
+      #sudo foremost -i /dev/sdd1 -o ~/temp/media
+      sudo foremost -i $1 -o $2
+      sudo chown -R s2e $2
+      cd $2/mp4
+      # Repair all mp4's found
+      find . |grep xargs -I % ffmpg -i % -o %.new.mp4
+      # TODO - Run repair function on all media
+  }
+
+#+END_SRC
 
 ** DD-Status
 
@@ -341,6 +353,32 @@ grep_bash(){
 expandurl() { { curl -sI $1 | sed -n 's/Location:.* //p';} }
 #+END_SRC
 
+** Latex
+
+Requires libcanberra-gtk-dev
+
+> sudo apt-get install libcanberra-gtk-dev
+
+Add the following latex to your document to use
+
+#+BEGIN_QUOTE
+\begin{center}
+    \centering
+    \def\svgwidth{\columnwidth}
+    \input{skills_FLM.pdf_tex}
+\end{center}
+#+END_QUOTE
+
+#+BEGIN_SRC sh
+  inkscape2latex() {
+      inkscape -D -z --file=${1}.svg --export-pdf=${1}.pdf --export-latex
+  }
+#+END_SRC
+
+** Screen into BeagleBone Black with a console cable
+#+BEGIN_SRC sh
+alias bbscreen="sudo screen /dev/ttyUSB0 115200"
+#+END_SRC
 
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.

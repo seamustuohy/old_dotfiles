@@ -1,0 +1,78 @@
+
+
+// Open an archived version of the current page in a new buffer.
+function archive_site(I) {
+    var current = I.buffer.display_uri_string
+    var url = "http://web.archive.org/save/" + current
+    load_url_in_new_buffer(url)
+}
+
+interactive("archive-site", null, archive_site);
+define_key(content_buffer_normal_keymap, "f12", "archive-site");
+
+
+// load urls from the command line in new buffers instead
+// of new windows.
+url_remoting_fn = load_url_in_new_buffer;
+
+
+// load download buffers in the background in the current
+// window, instead of in new windows.
+download_buffer_automatic_open_target = OPEN_NEW_BUFFER_BACKGROUND;
+
+
+// default directory for downloads and shell commands.
+cwd = get_home_directory();
+cwd.append("Downloads");
+
+
+// use vi as external editor.
+editor_shell_command = "urxvt -e vi";
+
+
+// view source in your editor.
+view_source_use_external_editor = true;
+
+
+require("new-tabs.js");
+
+// Web Jumps
+
+define_webjump("github","https://www.github.com/elationfoundation");
+define_webjump("archive.org", "http://www.archive.org/search.php?query=%s");
+
+// GOOGLE services
+define_webjump("translate", "http://translate.google.com/translate_t#auto|en|%s");
+define_webjump("scholar", "http://scholar.google.com/scholar?q=%s",
+               $alternative = "http://scholar.google.com");
+
+// Search
+define_webjump("search-site", "javascript:window.location.href='http://google.com/search?q=%s+site:'+window.location.host",
+              $doc="search within the current website");
+define_webjump("search-github", "http://github.com/search?q=%s&type=Everything",
+              $doc="search github");
+define_webjump("search-python", "http://docs.python.org/search.html?q=%s",
+              $doc="search in the Python 2 docs");
+define_webjump("search-python3", "http://docs.python.org/py3k/search.html?q=%s",
+              $doc="search within the python 3 docs");
+define_webjump("search-ohloh", "https://www.ohloh.net/p?query=%s",
+              $doc="search within Open Hub");
+define_webjump("search-savannah", "https://savannah.gnu.org/search/?words=%s&type_of_search=soft",
+              $doc="search within Savannah free software forge.");
+define_webjump("search-sourceforge", "http://sourceforge.net/search/?words=%s",
+              $doc="search within sourceforge.");
+define_webjump("search-stackoverflow", "https://stackoverflow.com/search?q=%s",
+              $doc="search within stack overflow.");
+
+// Archive webpage
+
+//define_webjump("testit", "javascript:void(function (url) { return "http://www.google.com"})");
+// https://github.com/mrBliss/dotfiles/blob/master/.conkerorrc/webjumps.js
+// https://github.com/search?o=desc&q=conkerer&ref=searchresults&s=stars&type=Repositories&utf8=%E2%9C%93
+// http://conkeror.org/FrontPage
+
+
+
+// Content Handlers
+
+content_handlers.set("application/pdf", content_handler_save); // open pdf immedietly
