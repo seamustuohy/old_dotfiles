@@ -14,6 +14,13 @@
 #+END_SRC
 ..fix empty..
 
+* TO READ
+- https://www.masteringemacs.org/article/effective-editing-movement
+- https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode
+- https://www.emacswiki.org/emacs/VisibleMark
+- https://www.emacswiki.org/emacs/HideShow
+
+
 * Information
 
 Personal Information
@@ -573,6 +580,11 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (message "Initializing code support")
 #+END_SRC
 ..fix empty..
+
+#+BEGIN_SRC emacs-lisp
+(setq-default fill-column 80) ;; Sets a 80 character line width
+#+END_SRC
+
 ** Text Manipulation
 *** Return and indent on prog-mode variants
 #+BEGIN_SRC emacs-lisp
@@ -589,6 +601,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 *** Wrap Regions
 #+BEGIN_SRC emacs-lisp
 ; wrap-region
+ (message "wrap region")
 (require 'wrap-region)
 (add-hook 'prog-mode-hook (lambda () (wrap-region-mode t)))
 (add-hook 'markdown-mode-hook (lambda () (wrap-region-mode t)))
@@ -606,6 +619,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
+ (message "key binding")
 (global-set-key (kbd "C-c m f") 'flycheck-mode)
 (global-set-key (kbd "C-c f r")
                 '(lambda ()
@@ -617,51 +631,18 @@ I want to be able to clock to major projects as well as to the websites I visit,
 #+END_SRC
 ..fix empty..
 
-*** Mode Hooks
-#+BEGIN_SRC emacs-lisp
-; turn on flycheck-mode in python-mode
-(add-hook 'python-mode-hook '(lambda () (flycheck-mode)))
-(add-hook 'sh-mode-hook '(lambda () (flycheck-mode)))
-#+END_SRC
 ..fix empty..
 
-** Language Specific
-*** python
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-#+END_SRC
-..fix empty..
-*** Lisp
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-mode))
-#+END_SRC
-..fix empty..
-*** Bro
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (in-package-d "bro-mode"))
-(require 'bro-mode)
-(add-to-list 'auto-mode-alist '("\\.bro\\'" . bro-mode))
-#+END_SRC
-*** PHP
- #+BEGIN_SRC emacs-lisp
-   (require 'php-mode)
- #+END_SRC
-*** Conkeror
+** Prettyness
 
-[[https://github.com/bard/mozrepl/wiki/Emacs-integration][Emacs Integration for MozRepl]]
 #+BEGIN_SRC emacs-lisp
-
-  (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
-
-  (add-hook 'javascript-mode-hook 'javascript-custom-setup)
-  (defun javascript-custom-setup ()
-    (moz-minor-mode 1))
-
-  (add-to-list 'auto-mode-alist '("\\.conkerorrc\\'" . javascript-mode))
+ (message "highlight")
+ (require 'highlight-indentation)
 #+END_SRC
 
 ** Code Folding
 #+BEGIN_SRC emacs-lisp
+ (message "hideshow")
 (setq hs-hide-comments-when-hiding-all +1)
 (setq hs-isearch-open t)
 (require 'hideshow-org)
@@ -702,6 +683,128 @@ I want to be able to clock to major projects as well as to the websites I visit,
 #+END_SRC
 
 
+
+** Language Specific
+*** python
+#+BEGIN_SRC emacs-lisp
+ (message "python")
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+#+END_SRC
+..fix empty..
+#+BEGIN_SRC emacs-lisp
+   (add-hook 'python-mode-hook
+             (lambda () (highlight-indentation-current-column-mode)))
+
+#+END_SRC
+..fix empty..
+
+#+BEGIN_SRC emacs-lisp
+; turn on flycheck-mode in python-mode
+
+(add-hook 'python-mode-hook '(lambda () (flycheck-mode)))
+(add-hook 'python-mode-hook
+            (lambda () (flyspell-prog-mode)))
+
+#+END_SRC
+
+..fix empty..
+*** Shell
+#+BEGIN_SRC emacs-lisp
+
+(add-hook 'sh-mode-hook '(lambda () (flycheck-mode)))
+(add-hook 'sh-mode-hook
+            (lambda () (flyspell-prog-mode)))
+
+#+END_SRC
+
+*** Lisp
+#+BEGIN_SRC emacs-lisp
+
+(add-to-list 'auto-mode-alist '("\\.el\\'" . lisp-mode))
+(add-hook 'lisp-mode-hook
+            (lambda () (flyspell-prog-mode)))
+
+#+END_SRC
+..fix empty..
+*** PHP
+ #+BEGIN_SRC emacs-lisp
+
+   (require 'php-mode)
+
+ #+END_SRC
+*** Conkeror
+- [[https://github.com/bard/mozrepl/wiki/Emacs-integration][- Emacs Integration for MozRepl]]
+#+BEGIN_SRC emacs-lisp
+  (autoload 'moz-minor-mode "moz" "Mozilla Minor and Inferior Mozilla Modes" t)
+
+  (add-hook 'javascript-mode-hook 'javascript-custom-setup)
+  (defun javascript-custom-setup ()
+    (moz-minor-mode 1))
+
+  (add-to-list 'auto-mode-alist '("\\.conkerorrc\\'" . javascript-mode))
+#+END_SRC
+
+*** Ruby
+- http://crypt.codemancers.com/posts/2013-09-26-setting-up-emacs-as-development-environment-on-osx/
+- https://github.com/ajvargo/ruby-refactor
+- http://mixandgo.com/blog/how-i-ve-convinced-emacs-to-dance-with-ruby
+
+TO-READ
+- https://www.emacswiki.org/emacs/RubyLanguage
+- http://rinari.rubyforge.org/
+- https://www.emacswiki.org/emacs/FlymakeRuby
+- https://www.emacswiki.org/emacs/GonzuiForEmacs
+- https://www.emacswiki.org/emacs/ruby-debug
+- https://searchcode.com/codesearch/view/54515416/
+- https://www.emacswiki.org/emacs/ruby-block.el
+- https://github.com/rejeep/ruby-tools.el
+- http://melpa.org/#/ruby-additional
+- https://github.com/purcell/ruby-hash-syntax
+- https://searchcode.com/codesearch/view/54515416/
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-to-list 'auto-mode-alist
+               '("\\.\\(?:cap\\|gemspec\\|irbrc\\|gemrc\\|rake\\|rb\\|ru\\|thor\\)\\'" . enh-ruby-mode))
+  (add-to-list 'auto-mode-alist
+               '("\\(?:Brewfile\\|Capfile\\|Gemfile\\(?:\\.[a-zA-Z0-9._-]+\\)?\\|[rR]akefile\\)\\'" . enh-ruby-mode))
+
+  (add-hook 'enh-ruby-mode-hook
+            (lambda () (highlight-indentation-current-column-mode)))
+
+  ;;(add-hook 'enh-ruby-mode-hook '(lambda () (flycheck-mode)))
+  (add-hook 'enh-ruby-mode-hook 'robe-mode)
+  (add-hook 'enh-ruby-mode-hook 'yard-mode)
+  (add-hook 'enh-ruby-mode-hook
+            (lambda () (flyspell-prog-mode)))
+
+  (eval-after-load 'company
+    '(push 'company-robe company-backends))
+
+
+
+  ;; When folding, take these delimiters into consideration
+  (add-to-list 'hs-special-modes-alist
+               '(enh-ruby-mode
+                 "\\(class\\|def\\|do\\|if\\)" "\\(end\\)" "#"
+                 (lambda (arg) (ruby-end-of-block)) nil))
+
+  (add-hook 'enh-ruby-mode-hook
+            (lambda ()
+              (hs-minor-mode 1) ;; Enables folding
+              (modify-syntax-entry ?: "."))) ;; Adds ":" to the word definition
+
+  ;; Start projectile-rails
+  ;; (add-hook 'projectile-mode-hook 'projectile-rails-on)
+
+#+END_SRC
+
+* Misc Development
+
+** Logfiles
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.log\\'" . auto-revert-mode))
+#+END_SRC
 * Data Manipulation
 
 ** Language Specific
@@ -1399,6 +1502,12 @@ Via" [[http://whattheemacsd.com/my-misc.el-02.html][what the emacs.d]]
 #+END_SRC
 ..fix empty..
 
+*** Discover Mode
+- https://www.masteringemacs.org/article/discoverel-discover-emacs-context-menus
+#+BEGIN_SRC emacs-lisp
+(require 'discover)
+(global-discover-mode 1)
+#+END_SRC
 ** Text Help
 *** TODO Company Mode
 I have found company mode to be mostly annoying when writing because it captures my keystrokes and does not allow me to do any actions when it is suggesting something (which is whenever I am at the end of a word). I am going to look into how to make it more useful and then try again.
@@ -1570,6 +1679,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 (keyfreq-mode 1)
 (keyfreq-autosave-mode 1)
 #+END_SRC
+
 * Remembrance Agent
 
 #+BEGIN_SRC emacs-lisp
@@ -1584,6 +1694,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 (message "Initializing navigation")
 #+END_SRC
 ..fix empty..
+
 ** In-File
 
   Movement and line based commands should operate on the lines that I see (even if they are using word wrap) by default.
@@ -1608,6 +1719,11 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 ;      scroll-conservatively 10000)
 #+END_SRC
 ..fix empty..
+*** jump to my last edit - goto change
+#+BEGIN_SRC emacs-lisp
+(require 'goto-chg)
+#+END_SRC
+
 
 *** Smart beginning of the line
 Move point to the first non-whitespace character on this line. If point was already at that position, move point to beginning of line.
@@ -1628,6 +1744,18 @@ If point was already at that position, move point to beginning of line."
 (global-set-key (kbd "C-a") 'smart-beginning-of-line)
 #+END_SRC
 ..fix empty..
+
+*** Move between symbols
+- https://github.com/mickeynp/smart-scan
+M-n and M-p move between symbols and type M-' to replace all symbols in the buffer matching the one under point, and C-u M-' to replace symbols in your current defun only (as used by narrow-to-defun.)
+
+#+BEGIN_SRC emacs-lisp
+(smartscan-mode 1)
+(global-set-key (kbd "M-n") 'smartscan-symbol-go-forward)
+(global-set-key (kbd "M-p") 'smartscan-symbol-go-backward)
+(global-set-key (kbd "M-'") 'smartscan-symbol-go-forward)
+
+#+END_SRC
 
 ** Helm
 
@@ -1710,6 +1838,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
   '(ace-jump-mode-enable-mark-sync))
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
 #+END_SRC
+
 * Org-Mode
 #+BEGIN_SRC emacs-lisp
 (message "Initializing org mode")

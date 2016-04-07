@@ -37,21 +37,32 @@ esac
 #        HISTORY CONTROLS
 #==================================
 
- don't put duplicate lines or lines starting with space in the history.
- See bash(1) for more options
+Huge history. Doesn't appear to slow things down, so why not?
+for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+#+BEGIN_SRC sh
+HISTSIZE=500000
+HISTFILESIZE=100000
+#+END_SRC
+
+Don't put duplicate lines or lines starting with space in the history.
+See bash(1) for more options
 #+BEGIN_SRC sh
 HISTCONTROL=ignoreboth
 #+END_SRC
 
- append to the history file, don't overwrite it
+Append to the history file, don't overwrite it
 #+BEGIN_SRC sh
 shopt -s histappend
 #+END_SRC
 
 ALSO See: PROMPT_COMMAND below
 
-remove duplicates while preserving input order
+Don't record some commands
+#+BEGIN_SRC sh
+export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
+#+END_SRC
 
+remove duplicates while preserving input order
 #+BEGIN_SRC sh
 function dedup {
    awk '! x[$0]++' $@
@@ -95,13 +106,6 @@ history_cleanup
 #+END_SRC
 
 
- for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-#+BEGIN_SRC sh
-HISTSIZE=1000
-HISTFILESIZE=2000
-#+END_SRC
-
-
 #==============================
 
 * Colors
@@ -119,8 +123,6 @@ Colorize basic commands
   alias fgrep='fgrep --color=auto'
   alias egrep='egrep --color=auto'
 #+END_SRC
-
-
 
 * Prompt
 
@@ -157,7 +159,6 @@ If set, the pattern "**" used in a pathname expansion context will match all fil
 shopt -s globstar
 #+END_SRC
 
-
 Enable programmable completion features (you don't need to enable this, if it's already enabled in /etc/bash.bashrc and /etc/profile sources /etc/bash.bashrc).
 
 #+BEGIN_SRC sh
@@ -168,6 +169,21 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+#+END_SRC
+
+Perform file completion in a case insensitive fashion
+#+BEGIN_SRC sh
+bind "set completion-ignore-case on"
+#+END_SRC
+
+Treat hyphens and underscores as equivalent
+#+BEGIN_SRC sh
+bind "set completion-map-case on"
+#+END_SRC
+
+Display matches for ambiguous patterns at first tab press
+#+BEGIN_SRC sh
+bind "set show-all-if-ambiguous on"
 #+END_SRC
 
 * Load External

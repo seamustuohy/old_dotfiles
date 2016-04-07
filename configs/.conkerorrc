@@ -8,8 +8,13 @@ function archive_site(I) {
 }
 
 interactive("archive-site", null, archive_site);
+
+// Get Org-Link of page
+
 define_key(content_buffer_normal_keymap, "f12", "archive-site");
 
+// Don't open download buffers ever
+remove_hook("download_added_hook", open_download_buffer_automatically);
 
 // load urls from the command line in new buffers instead
 // of new windows.
@@ -47,21 +52,21 @@ define_webjump("scholar", "http://scholar.google.com/scholar?q=%s",
                $alternative = "http://scholar.google.com");
 
 // Search
-define_webjump("search-site", "javascript:window.location.href='http://google.com/search?q=%s+site:'+window.location.host",
+define_webjump("s-site", "javascript:window.location.href='http://google.com/search?q=%s+site:'+window.location.host",
               $doc="search within the current website");
-define_webjump("search-github", "http://github.com/search?q=%s&type=Everything",
+define_webjump("s-github", "http://github.com/search?q=%s&type=Everything",
               $doc="search github");
-define_webjump("search-python", "http://docs.python.org/search.html?q=%s",
+define_webjump("s-python", "http://docs.python.org/search.html?q=%s",
               $doc="search in the Python 2 docs");
-define_webjump("search-python3", "http://docs.python.org/py3k/search.html?q=%s",
+define_webjump("s-python3", "http://docs.python.org/py3k/search.html?q=%s",
               $doc="search within the python 3 docs");
-define_webjump("search-ohloh", "https://www.ohloh.net/p?query=%s",
+define_webjump("s-ohloh", "https://www.ohloh.net/p?query=%s",
               $doc="search within Open Hub");
-define_webjump("search-savannah", "https://savannah.gnu.org/search/?words=%s&type_of_search=soft",
+define_webjump("s-savannah", "https://savannah.gnu.org/search/?words=%s&type_of_search=soft",
               $doc="search within Savannah free software forge.");
-define_webjump("search-sourceforge", "http://sourceforge.net/search/?words=%s",
+define_webjump("s-sourceforge", "http://sourceforge.net/search/?words=%s",
               $doc="search within sourceforge.");
-define_webjump("search-stackoverflow", "https://stackoverflow.com/search?q=%s",
+define_webjump("s-stackoverflow", "https://stackoverflow.com/search?q=%s",
               $doc="search within stack overflow.");
 
 // Archive webpage
@@ -76,3 +81,244 @@ define_webjump("search-stackoverflow", "https://stackoverflow.com/search?q=%s",
 // Content Handlers
 
 content_handlers.set("application/pdf", content_handler_save); // open pdf immedietly
+
+
+
+//  Make each page's title available to copy to the clipboard
+
+define_browser_object_class(
+    "page-title", "Get the title of the current page",
+    function (I, prompt) {
+        check_buffer(I.buffer, content_buffer);
+        yield co_return(I.buffer.document.title);
+    });
+
+define_key(content_buffer_normal_keymap, "* p", "browser-object-page-title");
+// So `* p c` will copy the title of the current buffer
+
+define_browser_object_class(
+    "org-link", "Get an org-mode link to the current page",
+    function (I, prompt) {
+        check_buffer(I.buffer, content_buffer);
+        var org_link = "[[" + I.buffer.display_uri_string + "][" + I.buffer.document.title + "]]"
+        yield co_return(org_link);
+    });
+
+define_key(content_buffer_normal_keymap, "* o", "browser-object-org-link");
+
+
+// selection searches
+// For example, pressing w will prompt you what to search on Wikipedia (with autocomplete),
+// pressing W will automatically search what you have currently selected.
+// Since it does more than selection searches, it could use a better name. Maybe webjump-shortcuts.
+
+
+function create_selection_search(webjump, key) {
+    interactive(webjump+"-selection-search",
+                "Search " + webjump + " with selection contents",
+                "find-url-new-buffer",
+                $browser_object = function (I) {
+                    return webjump + " " + I.buffer.top_frame.getSelection();});
+    define_key(content_buffer_normal_keymap, key.toUpperCase(), webjump + "-selection-search");
+
+    interactive("prompted-"+webjump+"-search", null,
+                function (I) {
+                    var term = yield I.minibuffer.read_url($prompt = "Search "+webjump+":",
+                                                           $initial_value = webjump+" ");
+                    browser_object_follow(I.buffer, FOLLOW_DEFAULT, term);
+                });
+    define_key(content_buffer_normal_keymap, key, "prompted-" + webjump + "-search");
+}
+// examples
+create_selection_search("google","l");
+create_selection_search("wikipedia","w");
+// create_selection_search("dictionary","d");
+// create_selection_search("myspace","y");
+// create_selection_search("amazon","a");
+// create_selection_search("youtube","u");
+
+
+
+// Revive a buffer that has been killed.
+
+define_key(default_global_keymap, "C-T", "revive-buffer");
+
+var kill_buffer_original = kill_buffer_original || kill_buffer;
+
+var killed_buffer_urls = [];
+var killed_buffer_histories = [];
+
+//  remember_killed_buffer
+kill_buffer = function (buffer, force) {
+    var hist = buffer.web_navigation.sessionHistory;
+
+    if (buffer.display_uri_string && hist) {
+        killed_buffer_histories.push(hist);
+        killed_buffer_urls.push(buffer.display_uri_string);
+    }
+
+    kill_buffer_original(buffer,force);
+};
+
+interactive("revive-buffer",
+    "Loads url from a previously killed buffer",
+    function restore_killed_buffer (I) {
+        if (killed_buffer_urls.length !== 0) {
+            var url = yield I.minibuffer.read(
+                $prompt = "Restore killed url:",
+                $completer = new all_word_completer($completions = killed_buffer_urls),
+                $default_completion = killed_buffer_urls[killed_buffer_urls.length - 1],
+                $auto_complete = "url",
+                $auto_complete_initial = true,
+                $auto_complete_delay = 0,
+                $require_match = true);
+
+            var window = I.window;
+            var creator = buffer_creator(content_buffer);
+            var idx = killed_buffer_urls.indexOf(url);
+
+            // Create the buffer
+            var buf = creator(window, null);
+
+            // Recover the history
+            buf.web_navigation.sessionHistory = killed_buffer_histories[idx];
+
+            // This line may seem redundant, but it's necessary.
+            var original_index = buf.web_navigation.sessionHistory.index;
+            buf.web_navigation.gotoIndex(original_index);
+
+            // Focus the new tab
+            window.buffers.current = buf;
+
+            // Remove revived from cemitery
+            killed_buffer_urls.splice(idx,1);
+            killed_buffer_histories.splice(idx,1);
+        } else {
+            I.window.minibuffer.message("No killed buffer urls");
+        }
+    });
+
+
+// Instapaper View
+interactive("render_instapaper",
+            "Render page with InstaPaper's Text view.",
+            function (I) {
+                var d = I.window.buffers.current.document;
+                if(!d.body)
+                    throw('Please wait until the page has loaded.');
+                browser_object_follow(
+                    I.window.buffers.current,
+                    OPEN_CURRENT_BUFFER,
+                    'http://www.instapaper.com/text?u='+encodeURIComponent(d.location.href));
+                I.window.minibuffer.message("Rendering with InstaPaper ...");
+            });
+
+define_key(content_buffer_normal_keymap, "a", "render_instapaper");
+
+// Ask before closing the window
+
+add_hook("window_before_close_hook",
+         function () {
+             var w = get_recent_conkeror_window();
+             var result = (w == null) ||
+                 "y" == (yield w.minibuffer.read_single_character_option(
+                     $prompt = "Quit Conkeror? (y/n)",
+                     $options = ["y", "n"]));
+             yield co_return(result);
+         });
+
+
+
+// Mozilla Style Readability
+
+var Node = Ci.nsIDOMNode;
+
+interactive("mozilla-readability", "Convert current page into readable version",
+            function mozilla_readability(I) {
+
+                var document = I.buffer.document;
+                var location = document.location;
+                var uri = {
+                    spec: location.href,
+                    host: location.host,
+                    prePath: location.protocol + "//" + location.host,
+                    scheme: location.protocol.substr(0, location.protocol.indexOf(":")),
+                    pathBase: location.protocol + "//" + location.host + location.pathname.substr(0, location.pathname.lastIndexOf("/") + 1)
+                };
+                var article = new Readability(uri, document).parse();
+
+                var title = "<a href=\""+article.uri.spec+"\"><h1 class='document_title'>"+ article.title + "</h1></a>";
+                document.getElementsByTagName('body')[0].innerHTML="<div id='bodyContent'><div id='box'><div id='box_inner'><div id='text'></div></div></div></div>";
+
+                document.getElementById('text').innerHTML=title+article.content;
+
+            });
+
+
+
+
+// DEVELOPMENT
+
+// Examine element properties and style.
+
+interactive("examine-element",
+            "Examine the attributes and style of a DOM node.",
+            function print_attribute (I) {
+                var element = yield read_browser_object(I);
+                var list = [];
+                var style = I.window.getComputedStyle(element);
+                var attributes = element.attributes;
+                var name = element.tagName.toLowerCase();
+
+                if (element.id) {
+                    name += "#" + element.id;
+                }
+
+                for (i = 0 ; i < element.classList.length ; i += 1) {
+                    name += "." + element.classList.item(i);
+                }
+
+                for (i = 0 ; i < style.length ; i += 1) {
+                    list.push([style.item(i), 1]);
+                }
+
+                for (i = 0 ; i < attributes.length ; i += 1) {
+                    list.push([attributes.item(i).name, 2]);
+                }
+
+                yield I.minibuffer.read(
+                    $prompt = name + ":",
+                    $completer = new prefix_completer(
+                        $completions = list.sort(),
+                        $get_string = function(item) item[0],
+                        $get_description = function(item) {
+                            var s, value;
+
+                            switch(item[1]) {
+                            case 1:
+                                s = "CSS property";
+                                value = style.getPropertyValue(item[0]);
+
+                                break;
+
+                            case 2:
+                                s = "Attribute";
+                                value = element.getAttribute(item[0]);
+
+                                break;
+                            }
+
+                            if (value) {
+                                s += " with value " + value;
+                            }
+
+                            return s;
+                        }),
+                    $auto_complete = true,
+                    $auto_complete_initial = true,
+                    $auto_complete_delay = 0,
+                    $require_match = false);
+            },
+            $browser_object = browser_object_dom_node);
+
+define_key(content_buffer_normal_keymap, "x", "examine-element");

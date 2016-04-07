@@ -18,6 +18,7 @@ except ImportError:
 def webBrowser():
   # Browser
   br = mechanize.Browser()
+  #br.set_debug_http(True)
 
   # Cookie Jar
   cj = cookielib.LWPCookieJar()
@@ -35,12 +36,14 @@ def webBrowser():
   # The site we will navigate into, handling it's session
   br.open('https://github.com/login')
 
-  # Select the second (index one) form (the first form is a search query box)
+  # Select the first (index 0) form
+  # There used to be a search box, if you get an error here they might have added it back.
   # this changes from web site to web site. GitHub.com/login happens to be the second form
-  br.select_form(nr=1)
+  br.select_form(nr=0)
   return br
 
 def authenticatePage(user, password):
+
   browser = webBrowser()
   browser.form['login'] = user
   browser.form['password'] = password
@@ -66,9 +69,6 @@ def readPage(browser, repo):
   return stats
 
 def verifyArgs(args):
-  if args.repo is None or len(args.repo.split('/')) != 2:
-    print '\nYou must specify a repository you are insterested in scrapeing:\n\t --repo foo/bar\n\nNote: GitHub is case-sensitive, so your arguments must be too'
-    sys.exit(1)
   if args.user is '':
     print '\nYou must specify a user to authenticate with'
     sys.exit(1)
@@ -129,10 +129,7 @@ def parseArgs(args=None):
 
 if __name__ == '__main__':
   args = parseArgs()
-  OI_repos = ["OpenInternet/co-pilot",
-              "OpenInternet/Documentation-Builder",
-              "OpenInternet/SAFETAG",
-              "elationfoundation/tor_anomaly",
+  OI_repos = ["elationfoundation/tor_anomaly",
               "elationfoundation/luci_tutorials",
               "elationfoundation/CAPEC_censorship",
               "elationfoundation/.dotfiles",
@@ -147,7 +144,10 @@ if __name__ == '__main__':
               "elationfoundation/pretty_md2pdf",
               "elationfoundation/seamustuohy.com",
               "elationfoundation/elationfoundation.github.io",
-              "elationfoundation/overview_archive"]
+              "elationfoundation/overview_archive",
+              "OpenInternet/copilot",
+              "OpenInternet/Documentation-Builder",
+              "OpenInternet/SAFETAG"]
 
   web_page = authenticatePage(args.user, args.password)
   clones = []
@@ -162,8 +162,8 @@ if __name__ == '__main__':
     for point in payload['Visitors']['counts']:
       visits.append([time.strftime("%Y-%b-%d", time.gmtime(point['bucket'])), repo, str(point['total']), str(point['unique'])])
 
-  print("found clones {0}".format(clones))
-  print("found visits {0}".format(clones))
+  #print("found clones {0}".format(clones))
+  #print("found visits {0}".format(clones))
   if args.write:
     print("writing to files")
     writeFile("{0}.clones.csv".format(args.write), clones)

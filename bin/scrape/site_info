@@ -1,0 +1,13 @@
+readonly NOTES_FILE="./NOTES.TXT"
+
+dns_exploration() {
+    local HOST_NAME="${1}"
+    dig ${HOST_NAME}
+    xdg-open https://www.robtex.net/?dns=${HOST_NAME}
+}
+
+
+main() {
+    local HOST_NAME="${1}"
+    dns_exploration "${HOST_NAME}"
+}

@@ -380,6 +380,21 @@ Add the following latex to your document to use
 alias bbscreen="sudo screen /dev/ttyUSB0 115200"
 #+END_SRC
 
+** Identify what process (including its children) is eating up all my memory
+#+BEGIN_SRC sh
+  alias psmem="sudo python ~/.dotfiles/bin/helpers/ps_mem.py"
+#+END_SRC
+
+** github stats
+
+#+BEGIN_SRC sh
+  gitstats() {
+      local user="$1"
+    python ~/.dotfiles/bin/scrape/github_traffic.py --log --user "${user}" --write ~/temp/github
+  }
+
+#+END_SRC
+
 * Technical Section
 This file originally came from an [[http://orgmode.org][org-mode]] file.
 Create the script by tangling it with: =C-c C-v t=
