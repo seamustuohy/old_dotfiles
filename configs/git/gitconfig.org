@@ -1,6 +1,6 @@
 #+TITLE: gitconfig
 #+AUTHOR: seamus tuohy
-#+EMAIL: s2e@seamustuohy.com
+#+EMAIL: code@seamustuohy.com
 #+DATE: 2015 Apr 18
 #+TAGS: git  commandline
 
@@ -13,7 +13,7 @@
 
 [user]
         name = seamus tuohy
-        email = s2e@seamustuohy.com
+        email = code@seamustuohy.com
 
 [grep]
         extendedRegexp = true

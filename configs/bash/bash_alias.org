@@ -34,7 +34,11 @@ OpenWRT easy ssh and scp node Alias's
 alias oscp='scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
 alias ossh='ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no"'
 #+END_SRC
-...fix empty...
+
+** Screen into BeagleBone Black with a console cable
+#+BEGIN_SRC sh
+alias bbscreen="sudo screen /dev/ttyUSB0 115200"
+#+END_SRC
 
 * Scraping
 
@@ -348,11 +352,6 @@ grep_bash(){
 }
 #+END_SRC
 
-** Expand shortened URL's
-#+BEGIN_SRC sh
-expandurl() { { curl -sI $1 | sed -n 's/Location:.* //p';} }
-#+END_SRC
-
 ** Latex
 
 Requires libcanberra-gtk-dev
@@ -373,11 +372,6 @@ Add the following latex to your document to use
   inkscape2latex() {
       inkscape -D -z --file=${1}.svg --export-pdf=${1}.pdf --export-latex
   }
-#+END_SRC
-
-** Screen into BeagleBone Black with a console cable
-#+BEGIN_SRC sh
-alias bbscreen="sudo screen /dev/ttyUSB0 115200"
 #+END_SRC
 
 ** Identify what process (including its children) is eating up all my memory

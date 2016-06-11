@@ -1,0 +1,2 @@
+# Emacs uses C-a for beginning-of-line, so I use C-z
+escape ^Zz

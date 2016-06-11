@@ -350,6 +350,13 @@ create_emacs_paths(){
 }
 #+END_SRC
 
+#+BEGIN_SRC sh
+  make_sudo_keep_env() {
+      echo "You need to add the following to your /etc/sudoers"
+      echo 'Defaults env_keep += HOME'
+  }
+#+END_SRC
+
 ** Links
 #+BEGIN_SRC sh
   link_lisp() {
@@ -357,6 +364,7 @@ create_emacs_paths(){
           ln -s ~/.dotfiles/templates/emacs/  ~/.emacs.d/templates || true
           ln -s ~/.dotfiles/snippets ~/.emacs.d/snippets
           ln -s ~/.dotfiles/configs/.mailcap ~/.mailcap
+          ln -s ~/.dotfiles/configs/.screenrc ~/.screenrc
   }
 #+END_SRC
 
@@ -453,16 +461,16 @@ pip_install() {
 * Main
 
 #+BEGIN_SRC sh
-  main() {
-      create_emacs_paths
-      link_mobile_home
-      tangle_code
-      link_lisp
-      install_package_deps
-      install_emacs_deps
-      prepare_packages
-  }
-
+    main() {
+        create_emacs_paths
+        link_mobile_home
+        tangle_code
+        link_lisp
+        install_package_deps
+        install_emacs_deps
+        prepare_packages
+        make_sudo_keep_env
+    }
 #+END_SRC
 
 Actually run everything.
