@@ -31,7 +31,6 @@ NONE
 
 * Installation
 
-
 ** Master Installer
 
 #+BEGIN_SRC sh
@@ -41,13 +40,13 @@ NONE
         install_guru_mode
         install_cask
         install_code_checkers
-        install_calfw
-        install_orgcaldav
+        # install_calfw
+        # install_orgcaldav
         install_org-bullets
         install_sumy
         install_notmuch
         install_offlineimap
-        install_twittering
+        # install_twittering
         install_org_notmuch_clocking
         install_string_utils
         install_cv
@@ -101,8 +100,6 @@ NONE
           libtalloc-dev \
           zlib1g-dev \
           python-sphinx
-    # Conkeror Installation
-      install_conkeror
   }
 #+END_SRC
 
@@ -299,10 +296,8 @@ Module for automatic summarization of text documents and HTML pages.
       get_git_package "$emacs_package_dir"/string-utils https://github.com/rolandwalker/string-utils.git
   }
 
-
-
 #+END_SRC
-** CV
+** Progress - CV
 [[https://github.com/Xfennec/cv][cv - Coreutils Viewer]]
 This tool can be described as a Tiny, Dirty, Linux-and-OSX-Only C command that looks for coreutils basic commands (cp, mv, dd, tar, gzip/gunzip, cat, etc.) currently running on your system and displays the percentage of copied data.
 #+BEGIN_SRC sh
@@ -431,18 +426,6 @@ pip_install() {
   }
 #+END_SRC
 
-* Conkeror-Nightlies
-#+BEGIN_SRC sh
-  install_conkeror() {
-      echo "# Conkeror See: http://noone.org/conkeror-nightly-debs/" | sudo tee --append /etc/apt/sources.list
-      echo "deb     http://noone.org/conkeror-nightly-debs jessie main" | sudo tee --append /etc/apt/sources.list
-      echo "deb-src http://noone.org/conkeror-nightly-debs jessie main" | sudo tee --append /etc/apt/sources.list
-      sudo apt-key adv --keyserver pgp.uni-mainz.de --recv-keys 80379429
-      sudo apt-get update
-      sudo apt-get upgrade
-      sudo apt-get install conkeror
-  }
-#+END_SRC
 * Link from Mobile Home
 
 #+BEGIN_SRC sh
