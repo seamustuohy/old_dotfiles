@@ -47,6 +47,14 @@ alias listserv='time ~/.bin/get_listserv'
 #+END_SRC
 ...fix empty...
 
+
+#+BEGIN_SRC sh
+  get_site_links() {
+      local SITE=${1}
+      wget -w 1 --no-check-certificate --spider -r ${SITE} 2>&1 | grep '^--' | awk '{ print $3 }' | grep -v '\.\(css\|js\|png\|gif\|jpg\|JPG\)$' > urls.txt
+  }
+#+END_SRC
+
 * Terminal and Navigation
 Alias' for easier navigation
 #+BEGIN_SRC sh
@@ -125,7 +133,6 @@ Colorize Less
 #+BEGIN_SRC sh
 alias lesc='LESS="-R" LESSOPEN="|pygmentize -g %s" less'
 #+END_SRC
-
 
 * Pranks & Misc
 

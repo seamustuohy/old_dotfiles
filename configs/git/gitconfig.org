@@ -22,13 +22,13 @@
 [alias]
         lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
         pdiff = diff --ignore-space-at-eol -b -w
-        churn = !sh -c '~/.dotfiles/git/alias/churn'
-        contrib = !sh -c '~/.dotfiles/git/alias/contributor $1 $2' -
-        overwritten = !sh -c '~/.dotfiles/git/alias/git-overwritten $1 $2 $3 ' -
+        churn = !sh -c '~/.bin/churn'
+        contrib = !sh -c '~/.bin/contributor $1 $2' -
         merge = merge --no-ff
+        # overwritten = !sh -c '~/.bin/git-overwritten $1 $2 $3 ' -
 
 [alias]
-        churn = !sh -c '~/.dotfiles/git/alias/churn'
+        churn = !sh -c '~/.bin/churn'
 
 [color]
         #ui = always

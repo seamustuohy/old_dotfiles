@@ -17,7 +17,6 @@ Set debug at point
 ;;(debug)
 #+END_SRC
 
--[Empty Spaces between blocks cause errors]-
 
 * TO READ
 - https://www.masteringemacs.org/article/effective-editing-movement
@@ -40,27 +39,28 @@ Either the Key ID or set to nil to use symmetric encryption.
 #+BEGIN_SRC emacs-lisp
 (setq org-crypt-key "3CF07AA7")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
+Setting the private directory below.
 
 #+BEGIN_SRC emacs-lisp
   (setq private-dir (file-truename "~/.s2e/"))
   (defun in-private-dir (path)
     (concat private-dir path))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
+Setting my auth sources.
 
 #+BEGIN_SRC emacs-lisp
 (setq auth-sources '("~/.s2e/.authinfo.gpg"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 * Personal key space
 
 #+BEGIN_SRC emacs-lisp
-(define-prefix-command 'personal-global-map)
-(global-set-key (kbd "C-C s") 'personal-global-map)
+ (define-prefix-command 'personal-global-map)
+ (global-set-key (kbd "C-C s") 'personal-global-map)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 * General Configuration
 ** Overwrite Highlighted Text
@@ -69,16 +69,18 @@ cua-selection-mode - enables typing over a region to replace it
 #+BEGIN_SRC emacs-lisp
 (cua-selection-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
+
 
 ** Spaces vs. Tabs
-No tabs for me.
 
+Make tabs four spaces instead.
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq tab-width 4)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
+
 
 ** UTF-8 by default
 
@@ -88,13 +90,13 @@ No tabs for me.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 * Packages
 
 #+BEGIN_SRC emacs-lisp
 (setq use-package-verbose t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Set up my emacs main directory path.
 #+BEGIN_SRC emacs-lisp
@@ -102,7 +104,7 @@ Set up my emacs main directory path.
 (defun in-emacs-d (path)
   (concat emacs-dir path))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Cask
 
 #+BEGIN_SRC emacs-lisp
@@ -110,7 +112,7 @@ Set up my emacs main directory path.
   (setq cask-filename (file-truename "~/.emacs.d/Cask"))
   (cask-initialize)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Local
 Create shortcut to packages directory
@@ -119,7 +121,7 @@ Create shortcut to packages directory
 (defun in-package-d (path)
   (concat my-package-dir path))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Load each package individually. Too busy with the re-write today to script up a loop.
 #+BEGIN_SRC emacs-lisp
@@ -131,13 +133,13 @@ Load each package individually. Too busy with the re-write today to script up a 
 (add-to-list 'load-path (in-package-d "org-bullets"))
 (add-to-list 'load-path (in-package-d "string-utils"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
   (setq my-elisp-dir (in-emacs-d "elisp/"))
   (add-to-list 'load-path my-elisp-dir)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Use Package
 
@@ -145,7 +147,7 @@ I am switching to use package. It seems to offer a much cleaner package declarat
 #+BEGIN_SRC emacs-lisp
 (require 'use-package)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Require
 
@@ -165,7 +167,7 @@ I am switching to use package. It seems to offer a much cleaner package declarat
   (eval-after-load 'org
     '(org-load-modules-maybe t))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I hate having to track down where I first require a package or have issues with my init ordering.
 #+BEGIN_SRC emacs-lisp
@@ -223,13 +225,13 @@ I hate having to track down where I first require a package or have issues with 
   (require 'org-bullets)
   (require 'string-utils)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 * Emacs Environment
 #+BEGIN_SRC emacs-lisp
 (message "Initializing Emacs Environment")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Server
 
 Start a server when there is not a server already running.
@@ -238,7 +240,7 @@ Start a server when there is not a server already running.
 (or (server-running-p)
     (server-start))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 
 ** Confirmation
@@ -250,7 +252,7 @@ I like to stay in my emacs environment. Make sure emacs isn't accidentally kille
    (if (yes-or-no-p "Do you want to exit? ")
        (save-buffers-kill-emacs)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 
 I do hate typing the full yes or no though
@@ -258,18 +260,18 @@ yes/no turns to y/n
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key "\C-x\C-c" 'paranoid-exit-from-emacs)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 * Text Manipulation
 #+BEGIN_SRC emacs-lisp
 (message "Initializing text manipulation")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Drag Stuff
 Use the super key and the control key to drag lines in any file anywhere I want.
 #+BEGIN_SRC emacs-lisp
@@ -278,7 +280,7 @@ Use the super key and the control key to drag lines in any file anywhere I want.
 (setq drag-stuff-modifier '(super control))
 (drag-stuff-global-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Expand Region
 Use C-= and C-- to expand and contract the highlighed portion to include what it currently knows as the region.
@@ -289,7 +291,7 @@ Huge time saver.
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C--") 'er/contract-region)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Unfill Paragraph
 ;;..fix link.. [[https://emacs.stackexchange.com/questions/2606/opposite-of-fill-paragraph][From Stack Overflow user King Marvel]]
@@ -303,12 +305,12 @@ Huge time saver.
  ;; Handy key definition
  (define-key global-map "\M-Q" 'unfill-paragraph)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 * Security
 #+BEGIN_SRC emacs-lisp
 (message "Initializing security")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 I use epa file to open encrypted files automatically
 #+BEGIN_SRC emacs-lisp
   ;; (use-package epa-file
@@ -319,13 +321,13 @@ I use epa file to open encrypted files automatically
   ;;     (epa-file-name-regexp-update)
   ;;     (epa-file-enable)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 * Hacks
 #+BEGIN_SRC emacs-lisp
 (message "Initializing hacks")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 This little hack saves me from when pasting becomes VERY slow. It occurs at seeming random intervals.
 - [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2015-04/msg00222.html][Problem]]
@@ -333,13 +335,13 @@ This little hack saves me from when pasting becomes VERY slow. It occurs at seem
 #+BEGIN_SRC emacs-lisp
 (setq x-selection-timeout 10)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 * Calendar
 #+BEGIN_SRC emacs-lisp
 (message "Initializing calendar")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Setup Calendar
 All calendar configuration is done in projects
 
@@ -349,7 +351,7 @@ All calendar configuration is done in projects
 (require 'org-caldav)
 (setq org-icalendar-timezone nil)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Pretty-ness
 #+BEGIN_SRC emacs-lisp
@@ -374,7 +376,7 @@ All calendar configuration is done in projects
         cfw:fchar-top-left-corner ?╔
         cfw:fchar-top-right-corner ?╗)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Notmuch integration
 
@@ -390,13 +392,13 @@ All calendar configuration is done in projects
 
  (mail-calendar-org-setup)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 * Communication
 #+BEGIN_SRC emacs-lisp
 (message "Initializing communications")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** IRC
 #+BEGIN_SRC emacs-lisp
   (use-package erc
@@ -408,7 +410,7 @@ All calendar configuration is done in projects
     (add-to-list 'erc-modules 'list)
     (erc-update-modules))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Channels list commented out because it is contained in a project file with other channels.
 #+BEGIN_SRC emacs-lisp
@@ -419,9 +421,24 @@ All calendar configuration is done in projects
     ;;                                      "#recon-ng"
     ;;                                      "#commotion")))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Email
+
+*** Mutt
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("/mutt" . mail-mode))
+(add-to-list 'auto-mode-alist
+             '("\\.*mutt-*\\|.article\\|\\.followup"
+                . mail-mode))
+  (defun my-mail-mode-hook ()
+     (auto-fill-mode 1)
+     (abbrev-mode 1)
+     (local-set-key "\C-Xk" 'server-edit))
+   (add-hook 'mail-mode-hook 'my-mail-mode-hook)
+
+#+END_SRC
+
 *** Notmuch
 **** Setup
 #+BEGIN_SRC emacs-lisp
@@ -453,12 +470,11 @@ All calendar configuration is done in projects
                (format-time-string "%s" now))))
         (notmuch-search-filter filter)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 ;(setq notmuch-fcc-dirs "Sent/")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** Mimetypes of attachments
 #+BEGIN_SRC emacs-lisp
@@ -466,7 +482,6 @@ All calendar configuration is done in projects
   ;; (setq mailcap-mime-data '(("application" (".*" (viewer . "xdg-open %s")))))
   ;; That didn't work at all... I'll just mess with /etc/mailcap instead.
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** Contacts
 
@@ -474,7 +489,7 @@ All calendar configuration is done in projects
   (setq org-contacts-files (list (file-truename "~/.s2e/contacts.org")))
 ;;  (add-to-list 'org-agenda-files (car org-contacts-files)) ; See emacs agenda
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Look at my emacs-org.org setup for org contacts capture.
 #+BEGIN_SRC emacs-lisp
@@ -485,13 +500,11 @@ Look at my emacs-org.org setup for org contacts capture.
   ;; :EMAIL: %(org-contacts-template-email)
   ;; :END:"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** Org
 #+BEGIN_SRC emacs-lisp
 (setq org-link-mailto-program '(browse-url-mail "mailto:%a?subject=%s"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** ;;..fix link..  [[id:903d388c-96f1-4589-9a2a-88bddac19ed2][SEE: Capture Calendar Events]]
 Modified gnus-calendar to work with notmuch.
@@ -508,7 +521,6 @@ Modified gnus-calendar to work with notmuch.
 
   ;;  (mail-calendar-org-setup)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** TODO OfflineImap
 Commented out becuase it never seems to work.
@@ -519,7 +531,6 @@ Commented out becuase it never seems to work.
 ;   :init
 ;   (add-hook 'gnus-before-startup-hook 'offlineimap))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 **** Clocking
 #+BEGIN_SRC emacs-lisp
@@ -546,7 +557,6 @@ Commented out becuase it never seems to work.
   ;;   (run-with-idle-timer 10 t 'org-notmuch-clocking-check-email-else-clock-out))
   ;; ;;      (add-to-list 'org-agenda-files "~/.org/email-tracking.org")) ;; see org agenda
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Twitter
 #+BEGIN_SRC emacs-lisp
@@ -556,14 +566,14 @@ Commented out becuase it never seems to work.
   :config
   (setq twittering-use-master-password t))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Contacts
 * Time Clocking
 #+BEGIN_SRC emacs-lisp
 (message "Initializing time clocking")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Display
 
 When clocked in for a task, display the current task and accumulated time in the frame title.
@@ -571,7 +581,7 @@ When clocked in for a task, display the current task and accumulated time in the
 #+BEGIN_SRC emacs-lisp
 (setq org-clock-clocked-in-display "frame-title")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** TODO Multi-level Time Tracking
 I want to be able to clock to major projects as well as to the websites I visit, emails I am reading and responding to, codebase I am in, emails I am responding to, etc. So, I need to have sub-projects automatically apply closked time to major "project codes" based upon tags (email org), or file location (code).
@@ -582,7 +592,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 #+BEGIN_SRC emacs-lisp
 (message "Initializing code support")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 (setq-default fill-column 80) ;; Sets a 80 character line width
@@ -594,12 +604,12 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (defun code/set-newline-and-indent ()
   (local-set-key [(return)] 'newline-and-indent))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook 'code/set-newline-and-indent)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Wrap Regions
 #+BEGIN_SRC emacs-lisp
@@ -611,14 +621,14 @@ I want to be able to clock to major projects as well as to the websites I visit,
 
 (wrap-region-add-wrapper "*" "*")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** FlyCheck
 
 #+BEGIN_SRC emacs-lisp
 (require 'flycheck)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -632,9 +642,9 @@ I want to be able to clock to major projects as well as to the websites I visit,
 (global-set-key [(f5)] 'flycheck-previous-error)
 (global-set-key [(f6)] 'flycheck-next-error)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
--[Empty Spaces between blocks cause errors]-
+
+
 
 ** Prettyness
 
@@ -665,7 +675,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
            (hs-show-block)))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** cscope
 #+BEGIN_SRC emacs-lisp
@@ -693,13 +703,13 @@ I want to be able to clock to major projects as well as to the websites I visit,
  (message "python")
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 #+BEGIN_SRC emacs-lisp
    (add-hook 'python-mode-hook
              (lambda () (highlight-indentation-current-column-mode)))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 ; turn on flycheck-mode in python-mode
@@ -710,7 +720,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
 
 #+END_SRC
 
--[Empty Spaces between blocks cause errors]-
+
 *** Shell
 #+BEGIN_SRC emacs-lisp
 
@@ -728,7 +738,7 @@ I want to be able to clock to major projects as well as to the websites I visit,
             (lambda () (flyspell-prog-mode)))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** PHP
  #+BEGIN_SRC emacs-lisp
 
@@ -818,7 +828,7 @@ TO-READ
 (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** XML
 
@@ -847,14 +857,18 @@ by using nxml's indentation rules."
       (indent-region begin end))
     (message "Ah, much better!"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
+*** RC files
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+#+END_SRC
 *** YAML
 #+BEGIN_SRC emacs-lisp
 (require 'yaml-mode)
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** JSON
 #+BEGIN_SRC emacs-lisp
@@ -871,14 +885,14 @@ by using nxml's indentation rules."
 ;; flyspell mode for spell checking in markdown
 (add-hook 'markdown-mode-hook 'turn-on-flyspell 'append)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** LogFiles
 #+BEGIN_SRC emacs-lisp
  (require 'syslog-mode)
  (add-to-list 'auto-mode-alist '("/var/log.*\\'" . syslog-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** CSV
 #+BEGIN_SRC emacs-lisp
@@ -890,7 +904,7 @@ by using nxml's indentation rules."
 #+BEGIN_SRC emacs-lisp
 (message "Initializing display")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Mark and Cursor
 
 I like to have the mark always active when I am selecting text.  This highlights the mark area.
@@ -899,14 +913,14 @@ NOTE: I am currently exploring how to correctly use the mark, so this may become
 #+BEGIN_SRC emacs-lisp
   (setq transient-mark-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I like to know exactly what character my cursor is on. This sets the cursor to be a box on top of that character.
 
 #+BEGIN_SRC emacs-lisp
   (setq-default cursor-type 'box)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I want to see parens highlighted and I want them immediately.
 
@@ -914,7 +928,7 @@ I want to see parens highlighted and I want them immediately.
   (setq show-paren-delay 0)
   (show-paren-mode)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Indicators
 *** Line number mode
@@ -922,14 +936,14 @@ I want to know what line number I am on. Line-number-mode keeps track of this fo
 #+BEGIN_SRC emacs-lisp
   (line-number-mode 1)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Frame shows buffer name
 When not clocked into a task I want to see the full path of the current buffer I am in in the title frame.
 #+BEGIN_SRC emacs-lisp
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Git Changes in the fringe
 In any programming major mode I use [diff-hl](https://github.com/dgutov/diff-hl) for highlighting uncommitted changes to my files  in the fringe.
@@ -940,7 +954,7 @@ In any programming major mode I use [diff-hl](https://github.com/dgutov/diff-hl)
 
 (add-hook 'prog-mode-hook '(lambda () (diff-hl-mode)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Display trailing whitespace in code
 I want trailing whitespaces displayed when I am in programming mode.
@@ -948,14 +962,14 @@ I want trailing whitespaces displayed when I am in programming mode.
   (add-hook 'prog-mode-hook (lambda ()
                               (setq show-trailing-whitespace t)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Line Numbers for coding
 When coding I  want to have my line number displayed on every line.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook '(lambda () (linum-mode)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** visual bells
 
@@ -963,7 +977,7 @@ When coding I  want to have my line number displayed on every line.
 (setq ring-bell-function 'ignore)
 (setq visible-bell t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Clean up
 
@@ -977,20 +991,20 @@ Get rid of the annoying menubars, toolbars, scrollbars, bells, and splash screen
   (setq ring-bell-function 'ignore)
   (setq inhibit-splash-screen t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 This makes the frame title format the currently active buffer so I can just look up to see the full path of whatever file I am modifying. [[file:emacs-clocking.org][See emacs-clocking for modifications for showing clocked tasks in the title frame.]]
 #+BEGIN_SRC emacs-lisp
   (setq frame-title-format '(buffer-file-name "%f" ("%b")))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I use popwin mode to make sure that temporary buffers act as pop-up windows and can be closed with <C-g>.
 #+BEGIN_SRC emacs-lisp
   (require 'popwin)
   (popwin-mode 1)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Splitting Windows
 
@@ -1012,7 +1026,7 @@ This has a better chance of being what I want when splitting strings. See: http:
   (global-set-key (kbd "C-x 2") 'bnb/vplit-last-buffer)
   (global-set-key (kbd "C-x 3") 'bnb/hsplit-last-buffer)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Perspective
 *** Config
@@ -1023,7 +1037,7 @@ Enable perspective mode
 #+BEGIN_SRC emacs-lisp
 (persp-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 loading code for our custom perspectives
 taken from Magnar Sveen
@@ -1035,7 +1049,7 @@ taken from Magnar Sveen
        (when initialize ,@body)
        (setq persp-last current-perspective)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Jump to last perspective
 taken from Magnar Sveen
@@ -1044,13 +1058,13 @@ taken from Magnar Sveen
     (interactive)
     (persp-switch (persp-name persp-last)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Easily switch to your last perspective
 #+BEGIN_SRC emacs-lisp
 (define-key persp-mode-map (kbd "C-x p -") 'custom-persp-last)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Calendar
 
@@ -1075,7 +1089,7 @@ Easily switch to your last perspective
   (define-key persp-mode-map (kbd "C-x p C") 'custom-persp/start-calendar) ;;only on first time do we sync
   (define-key persp-mode-map (kbd "C-x p c") 'custom-persp/calendar)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Email
 #+BEGIN_SRC emacs-lisp
@@ -1094,7 +1108,7 @@ Easily switch to your last perspective
       (define-key persp-mode-map (kbd "C-x p E") 'custom-persp/start-email)
       (define-key persp-mode-map (kbd "C-x p e") 'custom-persp/email)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** TODO Future Email
 **** TODO Encryption
@@ -1144,7 +1158,7 @@ org-agenda persp
 
       (define-key persp-mode-map (kbd "C-x p o") 'custom-persp/org-agenda)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
   (defun custom-persp/org-agenda-start ()
@@ -1155,7 +1169,7 @@ org-agenda persp
 
     (define-key persp-mode-map (kbd "C-x p O") 'custom-persp/org-agenda-start)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** IRC
 I actually do not like ERC at all. One of these days I will have to figure out a way to make it worth it. But, for now it is not going to happen.
@@ -1171,7 +1185,7 @@ I actually do not like ERC at all. One of these days I will have to figure out a
         ;; (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-irc)
         ;; (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/irc)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Init
 #+BEGIN_SRC emacs-lisp
       (defun custom-persp/start-init ()
@@ -1185,7 +1199,7 @@ I actually do not like ERC at all. One of these days I will have to figure out a
         (define-key persp-mode-map (kbd "C-x p I") 'custom-persp/start-init)
         (define-key persp-mode-map (kbd "C-x p i") 'custom-persp/init)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Pretty Things
 *** Themes
@@ -1193,13 +1207,13 @@ I keep my themes in a separate themes directory in my .emacs.d folder.
 #+BEGIN_SRC  emacs-lisp
 (add-to-list 'custom-theme-load-path (in-emacs-d "themes"))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Load my current theme.
 #+BEGIN_SRC emacs-lisp
   (load-theme 'tango-dark t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Colors
 #+BEGIN_SRC emacs-lisp
@@ -1207,7 +1221,7 @@ Load my current theme.
 (add-to-list 'find-file-hook
              (lambda () (unless (derived-mode-p 'web-mode) (rainbow-mode))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Fonts
 #+BEGIN_SRC emacs-lisp
@@ -1219,7 +1233,7 @@ Load my current theme.
 ;;(set-face-attribute 'default nil :font my/font-family :height 120)
 ;;(set-face-font 'default my/font-family)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Quotes
 #+BEGIN_SRC emacs-lisp
 ;; Quote of the Day
@@ -1242,7 +1256,7 @@ Load my current theme.
       (window-start) ?\r
       "Hit any key when done reading")))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** PDF Viewing
 #+BEGIN_SRC emacs-lisp
   ;; (pdf-tools-install)
@@ -1263,15 +1277,38 @@ Load my current theme.
   ;(add-to-list 'org-file-apps '("\\.pdf::\\([[:digit:]]+\\)\\'" . org-pdfview-open))
 #+END_SRC
 ** Browsing
-#+BEGIN_SRC emacs-lisp
+*** Start Chrome using a specified “user profile”?
+
+The bash command for starting with the default profile is the following:
+
+google-chrome --profile-directory=Default
+It expects the internal names of the profiles: Determine the profile name by trial and error, or looking in the Local State file. The state directories are located in ~/.config/google-chrome.
+
+ #+BEGIN_SRC emacs-lisp
+
+(defun browse-url-chrome-with-profile (url &optional profile)
+  ;; new-window ignored
+  "Open URL in a specific profile with chrome"
+  (interactive (browse-url-interactive-arg "URL: "))
+  (let ((profile-string (concat " --profile-directory=" (or profile "Default") " ")))
+  (unless
+      (string= ""
+               (shell-command-to-string
+                (concat (executable-find "google-chrome") profile-string url )))
+    (message "Starting Chrome...")
+    ;; I get an error on starting chrome, but it still opens. Work still needed to clean this up.
+    ;;(start-process (concat (executable-find "google-chrome") url) nil "google-chrome" url)
+    (message "Starting Chrome...done"))))
+
 (setq browse-url-generic-program (executable-find "google-chrome"))
-(setq browse-url-browser-function 'browse-url-generic)
-#+END_SRC
+(setq browse-url-browser-function 'browse-url-chrome-with-profile)
+
+ #+END_SRC
 * File Management
 #+BEGIN_SRC emacs-lisp
 (message "Initializing file management")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Cleanup
 
 I use these files for cleaning buffers when I save, or get annoyed by red highlighted spaces everywhere.
@@ -1295,19 +1332,19 @@ Including indent-buffer, which should not be called automatically on save."
   (file-management/cleanup-buffer-safe)
   (indent-region (point-min) (point-max)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-c n") 'file-management/cleanup-buffer)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Add the hook.
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'before-save-hook 'file-management/cleanup-buffer-safe)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Syncing
 
@@ -1316,7 +1353,7 @@ I will modify text files in bash while they are open in emacs when I need to do 
 #+BEGIN_SRC emacs-lisp
 (global-auto-revert-mode 1)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** I force emacs to assume new files are always modified. This is useful for  creating empty files.
 #+BEGIN_SRC emacs-lisp
@@ -1324,14 +1361,14 @@ I will modify text files in bash while they are open in emacs when I need to do 
   (when (not (file-exists-p (buffer-file-name)))
     (set-buffer-modified-p t)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Add the hook
 
 #+BEGIN_SRC emacs-lisp
 (add-hook 'find-file-hooks 'file-management/assume-new-is-modified)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Identification
 uniquify shows a files location when it shares the same name as another file.
@@ -1341,7 +1378,7 @@ uniquify shows a files location when it shares the same name as another file.
   uniquify-buffer-name-style 'post-forward
   uniquify-separator ":")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Backups
 
@@ -1350,7 +1387,7 @@ I use close to the basic backup setup described in the [[http://emacswiki.org/em
 #+BEGIN_SRC emacs-lisp
 ;;(setq temporary-file-directory "/tmp/")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
   (setq
@@ -1363,7 +1400,7 @@ I use close to the basic backup setup described in the [[http://emacswiki.org/em
    kept-old-versions 2
    version-control t)       ; use versioned backups
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Automatically purge backup files not accessed in a week:
 #+BEGIN_SRC emacs-lisp
@@ -1377,7 +1414,7 @@ Automatically purge backup files not accessed in a week:
         (message "%s" file)
         (delete-file file))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Auto-Save
 
@@ -1386,13 +1423,12 @@ Automatically purge backup files not accessed in a week:
 ;;(add-hook 'prog-mode-hook 'real-auto-save-mode)
 ;;(setq real-auto-save-interval 30)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 * Help
 #+BEGIN_SRC emacs-lisp
 (message "Initializing help")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Writing Help
 *** Spell Checking
 I use flyspell mode for spell checking for any text files.
@@ -1403,7 +1439,7 @@ I use flyspell mode for spell checking for any text files.
 (add-hook 'tex-mode-hook 'turn-on-flyspell 'append)
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Synonyms
 **** KeyBindings
@@ -1425,7 +1461,7 @@ I use flyspell mode for spell checking for any text files.
 ;(setq synonyms-cache-file  "~/.emacs.d/cache/thesaurus.txt")
 ;(require 'synonyms)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Writegood mode
 
@@ -1434,14 +1470,14 @@ helps me write-good.
 #+BEGIN_SRC emacs-lisp
 (require 'writegood-mode)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 (define-key personal-global-map (kbd "ww") 'writegood-mode)
 (define-key personal-global-map (kbd "wl") 'writegood-grade-level)
 (define-key personal-global-map (kbd "we") 'writegood-reading-ease)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Emacs Help
 *** Guide Key
@@ -1454,7 +1490,7 @@ helps me write-good.
   (setq guide-key/idle-delay .5)
   (setq guide-key/popup-window-position 'bottom)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Emacs Guru Mode
 
@@ -1463,20 +1499,20 @@ helps me write-good.
 #+BEGIN_SRC emacs-lisp
 (require 'guru-mode)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Currently running this globally. I may want to change this if I get too annoyed.
 #+BEGIN_SRC emacs-lisp
   (guru-global-mode +1)
   ;;(add-hook 'prog-mode-hook 'guru-mode)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I only want to get warnings when I use the arrow keys.
 #+BEGIN_SRC emacs-lisp
 (setq guru-warn-only t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Undo Help
 Undo tree makes complex undo actions easy
@@ -1484,7 +1520,7 @@ Undo tree makes complex undo actions easy
 (require 'undo-tree)
 (global-undo-tree-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 (define-key personal-global-map (kbd "u") 'undo-tree-visualize)
 
 **** Keep region when undoing in region
@@ -1503,7 +1539,7 @@ Via" [[http://whattheemacsd.com/my-misc.el-02.html][what the emacs.d]]
         (set-marker m nil))
     ad-do-it))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Discover Mode
 - https://www.masteringemacs.org/article/discoverel-discover-emacs-context-menus
@@ -1557,7 +1593,7 @@ I have found company mode to be mostly annoying when writing because it captures
 
 ;;(add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Auto-Complete Mode
 I am currently giving company mode a try out as an alternative to auto-complete mode.
@@ -1568,7 +1604,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 ; (global-auto-complete-mode t)
 ; (ac-config-default)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
 ;(defun ac-python-mode-setup ()
@@ -1576,7 +1612,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 ;
 ;(add-hook 'python-mode-hook 'ac-python-mode-setup)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Yasnippet
 #+BEGIN_SRC emacs-lisp
@@ -1584,7 +1620,7 @@ I am currently giving company mode a try out as an alternative to auto-complete 
 (yas/global-mode 1)
 (setq yas/indent-line 'fixed) ; for indented snippets
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 YASnippet - should appear before custom-set-variables
 
@@ -1594,7 +1630,7 @@ YASnippet - should appear before custom-set-variables
   :type 'string
   :group 'yasnippet)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet has a wrong fallback to the default <tab>, breaking Python's indentation cycling feature, and possibly other things too.
     - See:
@@ -1607,14 +1643,14 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
              (define-key yas-minor-mode-map (kbd "TAB") nil)
              (define-key yas-minor-mode-map  (kbd "<C-tab>") 'yas-expand-from-trigger-key)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Helm Dash
 
 #+BEGIN_SRC emacs-lisp
 (require 'helm-dash)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Install doc-sets via: [[https://github.com/glynnforrest/emacs.d/blob/75589b87af99167517682f1bbbacad1f55de2438/site-lisp/setup-helm.el][glynn forrest]]
 #+BEGIN_SRC emacs-lisp
@@ -1642,7 +1678,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
           "Flask"
           ))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Set our custom hooks for various modes
 
@@ -1661,20 +1697,20 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 ;;python docs
 (add-hook 'python-mode-hook '(lambda () (setq-local helm-dash-docsets '("Ansible" "Flask" "Python 3" "Python 2"))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Use the eww browser to view docsets
 #+BEGIN_SRC emacs-lisp
 (setq helm-dash-browser-func 'eww-browse-url)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Create keybindings
 #+BEGIN_SRC emacs-lisp
 (define-key personal-global-map (kbd "h d") 'helm-dash)
 (define-key personal-global-map (kbd "h p") 'helm-dash-at-point)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Keyfreq
 #+BEGIN_SRC emacs-lisp
@@ -1696,7 +1732,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 #+BEGIN_SRC emacs-lisp
 (message "Initializing navigation")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** In-File
 
@@ -1705,7 +1741,7 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 #+BEGIN_SRC emacs-lisp
 (global-visual-line-mode t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 # Sublimity provides smooth-scrolling and minimap, like the sublime editor.
 #+BEGIN_SRC emacs-lisp
@@ -1714,14 +1750,14 @@ Rebind yasnippet-expand to C-c tab. This is because the new version of yasnippet
 ;  (setq sublimity-scroll-weight 10
 ;        sublimity-scroll-drift-length 5)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #Scroll one line at a time without recentering the screen
 #+BEGIN_SRC emacs-lisp
 ;(setq scroll-step 1
 ;      scroll-conservatively 10000)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** jump to my last edit - goto change
 #+BEGIN_SRC emacs-lisp
 (require 'goto-chg)
@@ -1746,7 +1782,7 @@ If point was already at that position, move point to beginning of line."
 
 (global-set-key (kbd "C-a") 'smart-beginning-of-line)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Move between symbols
 - https://github.com/mickeynp/smart-scan
@@ -1785,7 +1821,7 @@ Use helm and turn the delay to nothing.
            ("C-x C-f" . helm-find-files)
            ("M-i" . helm-semantic-or-imenu)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Helm swoop is amazing! I use it far more than search, but I am still afraid to replace search with it.
 
@@ -1793,7 +1829,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
   (use-package helm-swoop
     :bind ("C-c C-M-s" . helm-swoop))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** Projectile
 #+BEGIN_SRC emacs-lisp
@@ -1803,14 +1839,14 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
       (setq projectile-completion-system 'helm)
       (helm-projectile-on))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ;;..fix link.. [[https://github.com/bbatsov/projectile/blob/master/persp-projectile.el][Persp-Projectile]] allows me to push projects into new perspectives. This makes it far easier for me to switch between tasks.
 #+BEGIN_SRC emacs-lisp
   (use-package persp-projectile
     :bind ("C-x p p" . projectile-persp-switch-project))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ** In current window/frame
 
@@ -1846,7 +1882,6 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
 #+BEGIN_SRC emacs-lisp
 (message "Initializing org mode")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Requirements
 *** Org-Modules
@@ -1867,7 +1902,7 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
   (eval-after-load 'org
     '(org-load-modules-maybe t))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Requirements
 #+BEGIN_SRC emacs-lisp
 (require 'org)
@@ -1875,7 +1910,6 @@ Helm swoop is amazing! I use it far more than search, but I am still afraid to r
 (require 'org-project)
 (require 'helm-custom-prompts)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Files to activate org for
 Open org-mode for .org files and for .org.gpg files.
@@ -1886,20 +1920,19 @@ Ends with ".org"
   (add-to-list 'auto-mode-alist
                '("\\.org\\'" . org-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ".org.gpg" occurs at least once in the file name. I use this when I open my archive files.
 #+BEGIN_SRC emacs-lisp
 ;;   (add-to-list 'auto-mode-alist '("\\(\\.org\\.gpg\\)?$" . org-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Auto Save
  Set auto-save for org mode files every hour, on the hour.
 #+BEGIN_SRC emacs-lisp
 (run-at-time "00:59" 3600 'org-save-all-org-buffers)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Capture
 
 Capture Mode
@@ -1907,7 +1940,7 @@ Capture Mode
 (setq org-default-notes-file "~/.org/todo/to_file.org")
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Capturing Org-Contacts
 #+BEGIN_SRC emacs-lisp
   (setq org-capture-templates
@@ -1928,56 +1961,68 @@ Capture Mode
   :TO_TAGS:
   :END:"))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
-** Bookmarking from the browser and org-protocol
+** FAILED Bookmarking from the browser and org-protocol
+   :LOGBOOK:
+   - State "FAILED"     from "TODO"       [2016-06-25 Sat 17:09]
+   - State "TODO"       from "FAILED"     [2016-06-25 Sat 17:09]
+   - State "FAILED"     from "CANCELED"   [2016-06-25 Sat 17:09]
+   - State "CANCELED"   from "SOMEDAY"    [2016-06-25 Sat 17:09]
+   - State "SOMEDAY"    from "DONE"       [2016-06-25 Sat 17:09]
+   - State "DONE"       from "SOMEDAY"    [2016-06-25 Sat 17:09]
+   - State "SOMEDAY"    from "DONE"       [2016-06-25 Sat 17:09]
+   - State "DONE"       from "MEETING"    [2016-06-25 Sat 17:09]
+   - State "MEETING"    from "EVENT"      [2016-06-25 Sat 17:09]
+   - State "EVENT"      from              [2016-06-25 Sat 17:09]
+   :END:
+
+Org Protocol has been replaced by a more robust solution.
 
 ;; https://stackoverflow.com/questions/9005843/interactively-enter-headline-under-which-to-place-an-entry-using-capture/24787118#24787118 for where I stole most of this
 ;; Searches for the current kill-ring head and adds the text under it.
 ;; If kill ring head is not found it creates it at the bottom of the file.
 ;; Used with pers-mode it files comments under Org-link pointing to the location of the page you have been visiting
 #+BEGIN_SRC emacs-lisp
-(defun dont-dup-headline ()
-  (let* ((org-refile-targets '((nil :maxlevel . 9)))
-         (hd (eval (current-kill 0))))
-    (goto-char (point-min))
-    (outline-next-heading)
-    (if (re-search-forward
-         (format org-complex-heading-regexp-format (regexp-quote hd))
-         nil t)
-        (goto-char (point-at-bol))
-      (goto-char (point-max))
-      (or (bolp) (insert "\n"))
-      (insert "* " hd "\n")))
-    (end-of-line))
+  ;; (defun dont-dup-headline ()
+  ;;   (let* ((org-refile-targets '((nil :maxlevel . 9)))
+  ;;          (hd (eval (current-kill 0))))
+  ;;     (goto-char (point-min))
+  ;;     (outline-next-heading)
+  ;;     (if (re-search-forward
+  ;;          (format org-complex-heading-regexp-format (regexp-quote hd))
+  ;;          nil t)
+  ;;         (goto-char (point-at-bol))
+  ;;       (goto-char (point-max))
+  ;;       (or (bolp) (insert "\n"))
+  ;;       (insert "* " hd "\n")))
+  ;;     (end-of-line))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 I add my org-protocol captures here.
 #+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-  (append org-capture-templates '(
-                                   ("p" "Org-Protocol")
-                                   ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
-                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
-                                   ("pc" "org-protocol-to-clocked" entry (clock)
-                                    "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
-                                   ("pG" "Guides and Manuals (AUTO)" plain (file+function "~/.org/work/library/guides.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pB" "Best Practices (AUTO)" plain (file+function "~/.org/work/library/b_practices.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pT" "Tools (AUTO)" plain (file+function "~/.org/work/library/tools.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pL" "Lessons Learned (AUTO)" plain (file+function "~/.org/work/library/lessons.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pO" "Organizations (AUTO)" plain (file+function "~/.org/work/library/orgs.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
-                                   ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
-                                    "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
+  ;; (setq org-capture-templates
+  ;;   (append org-capture-templates '(
+  ;;                                    ("p" "Org-Protocol")
+  ;;                                    ("po" "org-protocol" entry (file "~/.org/todo/to_file.org")
+  ;;                                     "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+  ;;                                    ("pc" "org-protocol-to-clocked" entry (clock)
+  ;;                                     "* Review %c\n:PROPERTIES:\n:ID: %(org-id-uuid)\n:CAPTURED:\s%U\n:END:\n" :immediate-finish t)
+  ;;                                    ("pG" "Guides and Manuals (AUTO)" plain (file+function "~/.org/work/library/guides.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pB" "Best Practices (AUTO)" plain (file+function "~/.org/work/library/b_practices.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pT" "Tools (AUTO)" plain (file+function "~/.org/work/library/tools.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pL" "Lessons Learned (AUTO)" plain (file+function "~/.org/work/library/lessons.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pO" "Organizations (AUTO)" plain (file+function "~/.org/work/library/orgs.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pP" "Projects (AUTO)" plain (file+function "~/.org/work/library/projects.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1)
+  ;;                                    ("pN" "Notes (AUTO)" plain (file+function "~/.org/work/library/notes.org" dont-dup-headline)
+  ;;                                     "Captured: %U\n#+BEGIN_QUOTE\n%i\n#+END_QUOTE\n" :immediate-finish t :empty-lines 1))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Refile
 
@@ -1986,19 +2031,19 @@ Targets include this file and any file contributing to the agenda - up to 3 leve
 (setq org-refile-targets (quote ((nil :maxlevel . 4)
                                  (org-agenda-files :maxlevel . 4))))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Allow refile to create parent tasks with confirmation
 #+BEGIN_SRC emacs-lisp
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Targets complete in steps so we start with filename, TAB shows the next level of targets etc
 #+BEGIN_SRC emacs-lisp
 (setq org-outline-path-complete-in-steps t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Dont give me DONE tasks as targets for refiling
 
@@ -2009,7 +2054,6 @@ Dont give me DONE tasks as targets for refiling
 
 (setq org-refile-target-verify-function 'org-init/verify-refile-target)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Display
 Font-lock-mode will colorize/fontify text as I type it.
@@ -2017,14 +2061,14 @@ This is great for showing TODO items immediately as I type them out.
 #+BEGIN_SRC emacs-lisp
 (global-font-lock-mode 1)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Also fold plain lists within major list items.
 
 #+BEGIN_SRC emacs-lisp
 (setq org-cycle-include-plain-lists t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Always use UTF-8 everywhere.
 
@@ -2034,13 +2078,13 @@ Always use UTF-8 everywhere.
 (set-charset-priority 'unicode)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Bullets Mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Inline images
 
@@ -2050,7 +2094,7 @@ When you see an image link, make it the image.
   ;;              (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex
   ;;                            "\\)\\]") 1))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 
 Enable iimage-mode every time an org-mode file is opened
@@ -2059,7 +2103,7 @@ Enable iimage-mode every time an org-mode file is opened
   ;;           (lambda ()
   ;;             (iimage-mode)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Enable toggle in case it does not work.
 #+BEGIN_SRC emacs-lisp
@@ -2071,7 +2115,7 @@ Enable toggle in case it does not work.
   ;;     (set-face-underline-p 'org-link t))
   ;;   (iimage-mode))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Agenda icons
 First, remove categories from the default agenda mode and set the icon list to nil.
@@ -2085,7 +2129,7 @@ First, remove categories from the default agenda mode and set the icon list to n
 
 (setq org-agenda-category-icon-alist nil)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Most of my agenda icons exist within project files. But there are a few non-project ones I use.
 #+BEGIN_SRC emacs-lisp
@@ -2125,14 +2169,14 @@ Most of my agenda icons exist within project files. But there are a few non-proj
                     nil nil :ascent center )))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Agenda
 *** Keybindings for Agenda Mode
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Agenda Files
 #+BEGIN_SRC emacs-lisp
@@ -2142,7 +2186,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
   (add-to-list 'org-agenda-files (car org-contacts-files))
 ;;  (add-to-list 'org-agenda-files "~/.org/email-tracking_archive.org")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Basic Settings
 #+BEGIN_SRC emacs-lisp
 ;;Start with the agenda log ON
@@ -2154,7 +2198,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 ;; Set the agenda to skip deadlines if they are done
 (setq org-agenda-skip-deadline-if-done t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Agenda todo item configuration
 #+BEGIN_SRC emacs-lisp
 ;; Keep tasks with dates on the global todo lists
@@ -2178,7 +2222,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 ;; Remove completed items from search results
 (setq org-agenda-skip-timestamp-if-done t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Display
 **** Always hilight the current agenda line
@@ -2187,7 +2231,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
           '(lambda () (hl-line-mode 1))
           'append)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Time Grid
 #+BEGIN_SRC emacs-lisp
@@ -2200,7 +2244,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
        "----------------"
        (600 800 1000 1200 1400 1600 1800 2000)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Custom clock faces
 #+BEGIN_SRC emacs-lisp
@@ -2208,7 +2252,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 (custom-set-faces
  '(org-mode-line-clock ((t (:background "grey75" :foreground "red" :box (:line-width -1 :style released-button)))) t))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** ;;..fix link.. [[http://orgmode.org/worg/agenda-optimization.html][Speed up agenda mode]]
 #+BEGIN_SRC emacs-lisp
@@ -2219,7 +2263,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 ;; Do not dim blocked tasks
 (setq org-agenda-dim-blocked-tasks nil)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Custom agenda commands
 #+BEGIN_SRC emacs-lisp
@@ -2305,7 +2349,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
 
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Agenda Functions
 
@@ -2325,7 +2369,7 @@ Most of my agenda icons exist within project files. But there are a few non-proj
           t
         nil)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Clocking States
     :PROPERTIES:
@@ -2363,7 +2407,7 @@ Usage example: To search for state changes that have moved from an non-done to d
 "
   (concat org-state-prefix-regex to-regex "\\s-+from\\s-+" from-regex "\\s-+" org-state-clock-entry-regex))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** Archiving
     :PROPERTIES:
     :ID:       b4d45769-0060-42d6-8f6f-67c7aab00a94
@@ -2449,7 +2493,6 @@ Taken from: [[http://web.archive.org/web/20150804221736/https://osdir.com/ml/ema
           (defalias 'archive-done-tasks 'org-my-archive-done-tasks)
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** ;;..fix link.. [[http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD][Org-Registry]]
 This currently breaks when it tries to load the directors defined by org-mode as files.
@@ -2457,7 +2500,6 @@ This currently breaks when it tries to load the directors defined by org-mode as
 ;(require 'org-registry)
 ;(org-registry-initialize)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Notification
 
@@ -2466,7 +2508,7 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
 ;;  (require 'org-notify)
 ;;  (org-notify-start)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 #+BEGIN_SRC emacs-lisp
   ;; (org-notify-add 'appt
@@ -2492,7 +2534,6 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
   ;;                 '(:time "3d"
   ;;                         :actions -email))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 ** Text Manipulation
 
@@ -2500,14 +2541,14 @@ I have disabled this snippet until I am ready to implement it. But, one day in t
 #+BEGIN_SRC emacs-lisp
 (setq org-catch-invisible-edits 'error)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Allow sub-tasks to block tasks above it.
 I actually really hate this. But it forces me to address tasks below an item to identify old TODO's I will never do.
 #+BEGIN_SRC emacs-lisp
 (setq org-enforce-todo-dependencies t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Security
 
 I use gpg encryption to secure my org-notes
@@ -2520,7 +2561,7 @@ I use gpg encryption to secure my org-notes
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance (quote ("crypt")))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 *** TODO wrap encryption functions in an overloaded encryption function
 If I have a region selected, encrypt it.
 If im in an e-mail encrypt it.
@@ -2533,13 +2574,13 @@ If im in an e-mail and that e-mail is encrypted decrypt it.
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 **** Link to custom ID, not to file location
 #+BEGIN_SRC emacs-lisp
 (setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Bookmarks with firefox
 ;; http://orgmode.org/worg/org-contrib/org-protocol.html
@@ -2547,7 +2588,7 @@ If im in an e-mail and that e-mail is encrypted decrypt it.
 #+BEGIN_SRC emacs-lisp
 (require 'org-protocol)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Linking to Archive URL's
 
@@ -2560,7 +2601,7 @@ If im in an e-mail and that e-mail is encrypted decrypt it.
      (point-min) (point-max)
      "xargs -I % python ~/.emacs.d/bin/wb.py %" t))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Time CLocking
 *** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -2587,7 +2628,7 @@ If im in an e-mail and that e-mail is encrypted decrypt it.
 ;; Include current clocking task in clock reports
 (setq org-clock-report-include-clocking-task t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 To file todo-state changes into LOGBOOK drawer
 #+BEGIN_SRC emacs-lisp
@@ -2595,7 +2636,7 @@ To file todo-state changes into LOGBOOK drawer
 ;; Save clock data and state changes and notes in the LOGBOOK drawer
 (setq org-clock-into-drawer t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Clocking Functions
 #+BEGIN_SRC emacs-lisp
@@ -2750,26 +2791,26 @@ To file todo-state changes into LOGBOOK drawer
         (org-clock-in nil))))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Clock Keys
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<f9> I") 'bh/punch-in)
 (global-set-key (kbd "<f9> O") 'bh/punch-out)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Exporting
 
 #+BEGIN_SRC emacs-lisp
 (setq org-odt-content-template-file "~/.dotfiles/templates/emacs/OrgOdtContentTemplate.xml")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 Sadly most people use Microsoft Word. So, I just export my .odt files as .doc files.
 #+BEGIN_SRC emacs-lisp
 (setq org-odt-preferred-output-format "doc")
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Babel
 
 *** Set acceptable languages (whatever I want Babel, whatever I want.)
@@ -2793,7 +2834,7 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
     (dot        . t)
     (css        . t)))
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 *** Make code-blocks pretty
 
@@ -2801,7 +2842,7 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
   (setq org-src-tab-acts-natively t)
   (setq org-src-fontify-natively t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 
 ***  [[http://eschulte.github.io/org-docco/org-docco.html][Org-Doco]] to make my tangled code pretty
 **** TODO Org-Doco does not currently allow headlines. So, I will have to modify it to do that before I can use it.
@@ -2839,7 +2880,7 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
                   (unless (bolp) (insert "\n"))))))))))))
 
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 * Projects
 #+BEGIN_SRC emacs-lisp
 
@@ -2852,7 +2893,6 @@ Sadly most people use Microsoft Word. So, I just export my .odt files as .doc fi
 
 (org-project-initialize)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
 
 The following snippet
 
@@ -2864,7 +2904,7 @@ The following snippet
 ;; Turn it back on
 (setq org-confirm-babel-evaluate t)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 ** Add all project org files to the org-mode agenda.
 
 #+BEGIN_SRC emacs-lisp
@@ -2876,7 +2916,7 @@ The following snippet
 
   (org-projects-add-project-agenda-files)
 #+END_SRC
--[Empty Spaces between blocks cause errors]-
+
 * Run Quote of the day
 #+BEGIN_SRC emacs-lisp
 (totd)
@@ -2889,7 +2929,6 @@ The following snippet
 #+BEGIN_SRC emacs-lisp
 ;;  (provide 'init-emacs)
 #+END_SRC
-..fix empty
 
 
 #+BEGIN_SRC emacs-lisp
